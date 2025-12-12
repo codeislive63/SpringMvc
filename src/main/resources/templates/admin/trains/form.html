@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Поезд • Админ</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body class="app-bg">
+<header th:replace="~{fragments/topbar :: topbar}"></header>
+
+<main class="page">
+    <h1>Поезд</h1>
+
+    <form th:action="@{/admin/panel/trains/save}"
+          th:object="${train}" method="post" class="card form-card">
+
+        <input type="hidden" th:field="*{id}"/>
+
+        <div class="form-group">
+            <label>Код</label>
+            <input type="text" th:field="*{code}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Название</label>
+            <input type="text" th:field="*{name}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Вместимость</label>
+            <input type="number" th:field="*{seatCapacity}" min="1" required>
+        </div>
+
+        <button class="btn primary w-100" type="submit">Сохранить</button>
+    </form>
+</main>
+</body>
+</html>

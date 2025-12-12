@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <title>Новый рейс • Админ</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body class="app-bg">
+
+<header th:replace="~{fragments/topbar :: topbar}"></header>
+
+<main class="page">
+    <section class="welcome">
+        <h1>Новый рейс</h1>
+        <p>Выберите маршрут (станция → станция), поезд и время отправления/прибытия.</p>
+
+        <!-- Подсказка если маршрутов нет -->
+        <div th:if="${#lists.isEmpty(routes)}" class="alert alert-error">
+            Сначала создайте хотя бы один маршрут (Станция → Станция).
+        </div>
+    </section>
+
+    <section class="cards-grid">
+        <article class="card search-card">
+            <form class="form" th:action="@{/admin/panel/trips/create}" method="post">
+
+                <!-- Маршрут -->
+                <div class="form-group">
+                    <label for="routeId">Маршрут</label>
+                    <div class="select-wrapper">
+                        <select name="routeId" id="routeId" class="custom-select"
+                                th:disabled="${#lists.isEmpty(routes)}" required>
+                            <option value="" disabled selected>Выберите маршрут</option>
+                            <option th:each="r : ${routes}"
+                                    th:value="${r.id}"
+                                    th:text="${r.origin.name + ' — ' + r.destination.name}">
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Поезд -->
+                <div class="form-group">
+                    <label for="trainId">Поезд</label>
+                    <div class="select-wrapper">
+                        <select name="trainId" id="trainId" class="custom-select" required>
+                            <option value="" disabled selected>Выберите поезд</option>
+                            <option th:each="t : ${trains}"
+                                    th:value="${t.id}"
+                                    th:text="${t.name + ' (' + t.code + ')'}">
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Время отправления -->
+                <div class="form-group">
+                    <label for="departure">Отправление</label>
+                    <input id="departure" type="datetime-local" name="departure" required>
+                </div>
+
+                <!-- Время прибытия -->
+                <div class="form-group">
+                    <label for="arrival">Прибытие</label>
+                    <input id="arrival" type="datetime-local" name="arrival" required>
+                </div>
+
+                <!-- Цена -->
+                <div class="form-group">
+                    <label for="basePrice">Базовая цена (BYN)</label>
+                    <input id="basePrice" type="number" name="basePrice"
+                           step="0.01" min="0" required>
+                </div>
+
+                <button class="btn primary w-100" type="submit"
+                        th:disabled="${#lists.isEmpty(routes)}">
+                    Создать рейс
+                </button>
+
+                <div class="actions" style="justify-content: center;">
+                    <a class="btn" th:href="@{/admin/panel/trips}">Назад к рейсам</a>
+                </div>
+            </form>
+        </article>
+    </section>
+</main>
+
+<script>
+    // Небольшой UX: ставим ближайшее время по умолчанию
+    document.addEventListener("DOMContentLoaded", () => {
+        const dep = document.getElementById("departure");
+        const arr = document.getElementById("arrival");
+
+        const pad = (n) => String(n).padStart(2, "0");
+        const toLocalDatetime = (d) =>
+            `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
+        if (dep && !dep.value) {
+            const d = new Date();
+            d.setMinutes(d.getMinutes() + 10);
+            dep.value = toLocalDatetime(d);
+        }
+
+        if (arr && !arr.value) {
+            const a = new Date();
+            a.setHours(a.getHours() + 4);
+            arr.value = toLocalDatetime(a);
+        }
+    });
+</script>
+
+</body>
+</html>

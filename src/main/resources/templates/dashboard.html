@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <title>Личный кабинет • Railway Booker</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body class="app-bg">
+
+<header class="topbar">
+    <div class="logo">
+        <a th:href="@{/dashboard}" style="text-decoration: none; color: inherit;">
+            Railway Booker
+        </a>
+    </div>
+    <div class="topbar-right">
+        <span class="user-name"
+              sec:authentication="principal.user.fullName">Пользователь</span>
+        <form th:action="@{/logout}" method="post">
+<!--            <input type="hidden"-->
+<!--                   th:name="${_csrf.parameterName}"-->
+<!--                   th:value="${_csrf.token}"/>-->
+            <button class="btn ghost" type="submit">Выйти</button>
+        </form>
+    </div>
+</header>
+
+<main class="page">
+    <section class="welcome">
+        <h1>
+            Привет,
+            <span th:text="${user.fullName}">пользователь</span> 👋
+        </h1>
+        <p>Выберите, что хотите сделать.</p>
+    </section>
+
+    <section class="cards-grid">
+
+        <!-- Блок пассажира -->
+        <article class="card" sec:authorize="hasRole('CUSTOMER')">
+            <h2>Пассажир</h2>
+            <p>Ищите рейсы, бронируйте и оплачивайте билеты.</p>
+
+            <div class="card-actions">
+                <a class="btn primary" th:href="@{/trips/search}">
+                    Поиск поездок
+                </a>
+                <a class="btn secondary" th:href="@{/tickets}">Мои билеты</a>
+            </div>
+        </article>
+
+        <!-- Блок администратора с навигацией -->
+        <article class="card" sec:authorize="hasRole('ADMIN')">
+            <h2>Администратор</h2>
+            <p>Управление станциями, поездами, маршрутами и рейсами.</p>
+
+            <div class="card-actions">
+                <a class="btn primary"
+                   th:href="@{/admin/panel/stations}">
+                    Станции
+                </a>
+                <a class="btn secondary"
+                   th:href="@{/admin/panel/trains}">
+                    Поезда
+                </a>
+                <a class="btn secondary"
+                   th:href="@{/admin/panel/routes}">
+                    Маршруты
+                </a>
+                <a class="btn secondary"
+                   th:href="@{/admin/panel/trips}">
+                    Рейсы
+                </a>
+            </div>
+        </article>
+
+    </section>
+</main>
+
+</body>
+</html>

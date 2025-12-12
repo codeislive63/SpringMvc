@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Новая станция</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+
+<body class="app-bg">
+<header th:replace="~{fragments/topbar :: topbar}"></header>
+
+<main class="page">
+    <h1>Добавить станцию</h1>
+
+    <form th:action="@{/admin/panel/stations/create}" method="post" class="form card">
+        <div class="form-group">
+            <label>Название</label>
+            <input type="text" name="name" required>
+        </div>
+
+        <div class="form-group">
+            <label>Код станции</label>
+            <input type="text" name="code" required>
+        </div>
+
+        <button class="btn primary w-100">Сохранить</button>
+    </form>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <title>Мои билеты • Railway Booker</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body class="app-bg">
+
+<header th:replace="~{fragments/topbar :: topbar}"></header>
+
+<main class="page">
+    <section class="welcome">
+        <h1>Мои билеты</h1>
+        <p>Здесь отображаются ваши покупки и возвраты.</p>
+
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+    </section>
+
+    <section class="cards-grid">
+        <article class="card" th:each="t : ${tickets}">
+            <h3 th:text="${t.trip.route.origin.name + ' — ' + t.trip.route.destination.name}">Маршрут</h3>
+
+            <p th:text="'Поезд: ' + ${t.trip.train.name} + ' (' + ${t.trip.train.code} + ')'">Поезд</p>
+            <p th:text="'Отправление: ' + ${#temporals.format(t.trip.departureTime,'dd.MM.yyyy HH:mm')}">Отправление</p>
+            <p th:text="'Место: ' + ${t.seatNumber}">Место</p>
+            <p th:text="'Цена: ' + ${#numbers.formatDecimal(t.price,1,'COMMA',2,'POINT')} + ' BYN'">Цена</p>
+
+            <p th:text="'Статус: ' + ${t.status}">Статус</p>
+
+            <div class="actions">
+                <form th:if="${t.status.name() == 'BOOKED' || t.status.name() == 'PAID'}"
+                      th:action="@{'/tickets/' + ${t.id} + '/refund'}"
+                      method="post"
+                      onsubmit="return confirm('Вернуть билет? Место станет доступно снова.')">
+                    <button class="btn danger" type="submit">Вернуть билет</button>
+                </form>
+            </div>
+        </article>
+
+        <div th:if="${#lists.isEmpty(tickets)}" class="card">
+            <h3>Пока нет билетов</h3>
+            <p>Найдите рейс и купите билет — он появится здесь.</p>
+            <a class="btn primary" th:href="@{/}">Поиск поездок</a>
+        </div>
+    </section>
+</main>
+</body>
+</html>

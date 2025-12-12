@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <title>Доступные рейсы • Railway Booker</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body class="app-bg">
+
+<header th:replace="~{fragments/topbar :: topbar}"></header>
+
+<main class="page">
+    <section class="welcome">
+        <h1>Доступные рейсы</h1>
+        <p th:if="${!#lists.isEmpty(trips)}">
+            Мы подобрали варианты для вашей поездки. Выберите рейс и забронируйте билет.
+        </p>
+        <p th:if="${#lists.isEmpty(trips)}">
+            На выбранную дату рейсов не найдено. Попробуйте изменить параметры поиска.
+        </p>
+    </section>
+
+    <!-- есть рейсы -->
+    <section class="cards-grid" th:if="${!#lists.isEmpty(trips)}">
+        <article class="card trip-card" th:each="trip : ${trips}">
+            <header class="trip-header">
+                <h2 th:text="${trip.route.origin.name + ' — ' + trip.route.destination.name}">
+                    Минск — Витебск
+                </h2>
+                <span class="badge"
+                      th:text="${trip.route.name}">Маршрут</span>
+            </header>
+
+            <div class="trip-body">
+                <div class="trip-row">
+                    <span class="label">Отправление</span>
+                    <span class="value"
+                          th:text="${#temporals.format(trip.departureTime, 'dd.MM.yyyy HH:mm')}">
+                        01.01.2025 10:00
+                    </span>
+                </div>
+                <div class="trip-row">
+                    <span class="label">Прибытие</span>
+                    <span class="value"
+                          th:text="${#temporals.format(trip.arrivalTime, 'dd.MM.yyyy HH:mm')}">
+                        01.01.2025 13:20
+                    </span>
+                </div>
+                <div class="trip-row">
+                    <span class="label">Поезд</span>
+                    <span class="value"
+                          th:text="${trip.train.name + ' · ' + trip.train.code}">
+                        Поезд
+                    </span>
+                </div>
+                <div class="trip-row">
+                    <span class="label">Свободных мест</span>
+                    <span class="value" th:text="${trip.seatsAvailable}">120</span>
+                </div>
+                <div class="trip-row">
+                    <span class="label">Базовая цена</span>
+                    <span class="value price"
+                          th:text="${#numbers.formatDecimal(trip.basePrice, 1, 'COMMA', 2, 'POINT') + ' BYN'}">
+                        25.00 BYN
+                    </span>
+                </div>
+            </div>
+
+            <div class="card-actions">
+                <button class="btn primary"
+                        type="button"
+                        th:onclick="|bookTrip(${trip.id})|">
+                    Купить билет
+                </button>
+                <a class="btn secondary" th:href="@{/trips/search}">
+                    Изменить поиск
+                </a>
+            </div>
+        </article>
+    </section>
+
+    <!-- нет рейсов -->
+    <section th:if="${#lists.isEmpty(trips)}">
+        <article class="card" style="max-width: 520px;">
+            <p class="muted">
+                На выбранную дату не найдено подходящих рейсов.
+            </p>
+            <div class="card-actions" style="margin-top: 12px;">
+                <a class="btn primary" th:href="@{/trips/search}">Вернуться к поиску</a>
+            </div>
+        </article>
+    </section>
+</main>
+
+<script>
+    async function bookTrip(tripId) {
+        if (!confirm("Забронировать билет на этот рейс?")) {
+            return;
+        }
+        try {
+            const res = await fetch(`/booking/${tripId}`, {
+                method: "POST"
+            });
+
+            // 1) Если Spring Security сделал редирект на /login
+            if (res.redirected && res.url.includes("/login")) {
+                // можно ещё добавить параметр from, чтобы потом вернуть назад
+                const from = encodeURIComponent(window.location.pathname + window.location.search);
+                window.location.href = `/login?from=${from}`;
+                return;
+            }
+
+            // 2) Если вместо редиректа вернётся 401/403
+            if (res.status === 401 || res.status === 403) {
+                const from = encodeURIComponent(window.location.pathname + window.location.search);
+                window.location.href = `/login?from=${from}`;
+                return;
+            }
+
+            if (!res.ok) {
+                throw new Error("Response not ok");
+            }
+
+            const ticket = await res.json();
+            alert(
+                "Билет забронирован!\n\n" +
+                "Номер билета: " + ticket.id + "\n" +
+                "Статус: " + ticket.status + "\n" +
+                "Место: " + ticket.seatNumber
+            );
+        } catch (e) {
+            console.error(e);
+            alert("Не удалось забронировать билет. Попробуйте ещё раз.");
+        }
+    }
+</script>
+
+
+</body>
+</html>

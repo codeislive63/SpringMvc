@@ -1,0 +1,28 @@
+<header class="topbar" th:fragment="topbar"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+
+    <div class="logo">
+        <a th:href="@{/}" style="text-decoration: none; color: inherit;">
+            Railway Booker
+        </a>
+    </div>
+
+    <div class="topbar-right">
+        <!-- когда пользователь залогинен -->
+        <span class="user-name"
+              sec:authorize="isAuthenticated()"
+              sec:authentication="principal.user.fullName">
+            Пользователь
+        </span>
+
+        <form th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()">
+            <button class="btn ghost" type="submit">Выйти</button>
+        </form>
+
+        <!-- когда гость -->
+        <a class="btn ghost" th:href="@{/login}" sec:authorize="isAnonymous()">
+            Войти
+        </a>
+    </div>
+</header>

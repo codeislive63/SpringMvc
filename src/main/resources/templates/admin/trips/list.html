@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Рейсы • Админ</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body class="app-bg">
+<header th:replace="~{fragments/topbar :: topbar}"></header>
+
+<main class="page">
+    <h1>Рейсы</h1>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+    <a class="btn primary" th:href="@{/admin/panel/trips/new}">Добавить рейс</a>
+
+    <section class="cards-grid">
+        <article class="card" th:each="trip : ${trips}">
+            <h3 th:text="${trip.route.name}">Маршрут</h3>
+            <p th:text="${trip.route.origin.name + ' — ' + trip.route.destination.name}">От-До</p>
+            <p th:text="'Поезд: ' + ${trip.train.name} + ' (' + ${trip.train.code} + ')'">Поезд</p>
+            <p th:text="'Отправление: ' + ${#temporals.format(trip.departureTime,'dd.MM.yyyy HH:mm')}">Отправление</p>
+            <p th:text="'Прибытие: ' + ${#temporals.format(trip.arrivalTime,'dd.MM.yyyy HH:mm')}">Прибытие</p>
+            <p th:text="'Цена: ' + ${#numbers.formatDecimal(trip.basePrice,1,'COMMA',2,'POINT')} + ' BYN'">Цена</p>
+
+            <div class="actions">
+                <!-- редактирование рейса можно добавить позже -->
+                <!-- <a class="btn" th:href="@{'/admin/panel/trips/' + ${trip.id} + '/edit'}">Изменить</a> -->
+
+                <form th:action="@{'/admin/panel/trips/' + ${trip.id} + '/delete'}"
+                      method="post"
+                      onsubmit="return confirm('Удалить рейс? Если есть билеты — удалить нельзя.')">
+                    <button class="btn danger" type="submit">Удалить</button>
+                </form>
+            </div>
+        </article>
+    </section>
+</main>
+</body>
+</html>

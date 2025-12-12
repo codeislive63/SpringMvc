@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Станции • Админ</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body class="app-bg">
+
+<header th:replace="~{fragments/topbar :: topbar}"></header>
+
+<main class="page">
+    <h1>Станции</h1>
+
+    <a class="btn primary" th:href="@{/admin/panel/stations/new}">Добавить станцию</a>
+
+    <div class="cards-grid">
+        <article class="card" th:each="s : ${stations}">
+            <h3 th:text="${s.name}">Название</h3>
+            <p th:text="'Код: ' + ${s.code}">Код</p>
+
+            <div class="actions">
+                <a class="btn" th:href="@{'/admin/panel/stations/' + ${s.id} + '/edit'}">Изменить</a>
+
+                <form th:action="@{'/admin/panel/stations/' + ${s.id} + '/delete'}"
+                      method="post"
+                      onsubmit="return confirm('Удалить станцию? Если она используется в рейсах — удалить нельзя.')">
+                    <button class="btn danger" type="submit">Удалить</button>
+                </form>
+            </div>
+        </article>
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Маршрут • Админ</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body class="app-bg">
+<header th:replace="~{fragments/topbar :: topbar}"></header>
+
+<main class="page">
+    <h1 th:text="${route.id == null ? 'Новый маршрут' : 'Редактировать маршрут'}">Маршрут</h1>
+
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+    <article class="card search-card">
+        <form class="form" th:action="@{/admin/panel/routes/save}" method="post">
+
+            <input type="hidden" name="id" th:value="${route.id}"/>
+
+            <div class="form-group">
+                <label>Откуда</label>
+                <div class="select-wrapper">
+                    <select class="custom-select" name="originId" required>
+                        <option value="" disabled th:selected="${route.origin == null}">Выберите станцию</option>
+                        <option th:each="s : ${stations}"
+                                th:value="${s.id}"
+                                th:selected="${route.origin != null and route.origin.id == s.id}"
+                                th:text="${s.name + ' (' + s.code + ')'}">
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Куда</label>
+                <div class="select-wrapper">
+                    <select class="custom-select" name="destinationId" required>
+                        <option value="" disabled th:selected="${route.destination == null}">Выберите станцию</option>
+                        <option th:each="s : ${stations}"
+                                th:value="${s.id}"
+                                th:selected="${route.destination != null and route.destination.id == s.id}"
+                                th:text="${s.name + ' (' + s.code + ')'}">
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Название (опционально)</label>
+                <input type="text" name="name" th:value="${route.name}" placeholder="Минск — Витебск">
+            </div>
+
+            <button class="btn primary w-100" type="submit">Сохранить</button>
+        </form>
+    </article>
+</main>
+</body>
+</html>

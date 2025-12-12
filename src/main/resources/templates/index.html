@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <title>Поиск поездок • Railway Booker</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body class="app-bg">
+
+<header th:replace="~{fragments/topbar :: topbar}"></header>
+
+<main class="page">
+    <section class="welcome">
+        <h1>Поиск поездок</h1>
+        <p>Выберите маршрут и дату, а мы подберём доступные рейсы.</p>
+
+        <div th:if="${error}" class="alert error" th:text="${error}"></div>
+    </section>
+
+    <section class="cards-grid">
+        <article class="card search-card">
+            <form class="form" th:action="@{/search}" method="get">
+                <div class="form-group">
+                    <label for="routeId">Маршрут</label>
+                    <div class="select-wrapper">
+                        <select name="routeId" id="routeId" class="custom-select" required>
+                            <option value="" disabled selected>Выберите маршрут</option>
+                            <option th:each="route : ${routes}"
+                                    th:value="${route.id}"
+                                    th:text="${route.origin.name + ' — ' + route.destination.name + ' (' + route.name + ')'}">
+                            </option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+                    <label for="date">Дата поездки</label>
+                    <input id="date" type="date" name="date" required>
+                </div>
+
+                <button class="btn primary w-100" type="submit">
+                    Найти рейсы
+                </button>
+            </form>
+        </article>
+    </section>
+</main>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const dateInput = document.getElementById("date");
+        if (dateInput && !dateInput.value) {
+            const today = new Date().toISOString().slice(0, 10);
+            dateInput.value = today;
+        }
+    });
+</script>
+
+
+</body>
+</html>

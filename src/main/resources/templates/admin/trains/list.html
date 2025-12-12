@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Поезда • Админ</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body class="app-bg">
+<header th:replace="~{fragments/topbar :: topbar}"></header>
+
+<main class="page">
+    <h1>Поезда</h1>
+
+    <a class="btn primary" th:href="@{/admin/panel/trains/new}">Добавить поезд</a>
+
+    <div class="cards-grid">
+        <article class="card" th:each="t : ${trains}">
+            <h3 th:text="${t.name}">Название</h3>
+            <p th:text="${t.code}">Код</p>
+            <p th:text="'Мест: ' + ${t.seatCapacity}">Мест</p>
+
+            <form th:action="@{'/admin/panel/trains/' + ${t.id} + '/delete'}" method="post">
+                <button class="btn danger" type="submit">Удалить</button>
+            </form>
+        </article>
+    </div>
+</main>
+</body>
+</html>
