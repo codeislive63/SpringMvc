@@ -14,7 +14,7 @@
     <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
 
     <article class="card search-card">
-        <form class="form" th:action="@{/admin/panel/routes/save}" method="post">
+        <form class="form" th:action="@{/admin/panel/routes/create}" method="post">
 
             <input type="hidden" name="id" th:value="${route.id}"/>
 

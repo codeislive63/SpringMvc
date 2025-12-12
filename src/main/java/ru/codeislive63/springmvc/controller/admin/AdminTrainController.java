@@ -38,8 +38,8 @@ public class AdminTrainController {
         return "admin/trains/form";
     }
 
-    @PostMapping("/save")
-    public String save(@ModelAttribute Train train) {
+    @PostMapping("/create")
+    public String create(@ModelAttribute Train train) {
         trainRepository.save(train);
         return "redirect:/admin/panel/trains";
     }

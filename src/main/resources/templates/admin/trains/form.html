@@ -11,7 +11,7 @@
 <main class="page">
     <h1>Поезд</h1>
 
-    <form th:action="@{/admin/panel/trains/save}"
+    <form th:action="@{/admin/panel/trains/create}"
           th:object="${train}" method="post" class="card form-card">
 
         <input type="hidden" th:field="*{id}"/>

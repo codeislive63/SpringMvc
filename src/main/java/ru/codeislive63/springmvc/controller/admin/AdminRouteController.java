@@ -46,8 +46,8 @@ public class AdminRouteController {
         return "admin/routes/form";
     }
 
-    @PostMapping("/save")
-    public String save(@RequestParam(required = false) Long id,
+    @PostMapping("/create")
+    public String create(@RequestParam(required = false) Long id,
                        @RequestParam Long originId,
                        @RequestParam Long destinationId,
                        @RequestParam(required = false) String name,

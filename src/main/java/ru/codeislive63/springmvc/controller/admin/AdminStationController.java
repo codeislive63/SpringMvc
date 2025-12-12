@@ -38,8 +38,8 @@ public class AdminStationController {
         return "admin/stations/form";
     }
 
-    @PostMapping("/save")
-    public String save(@ModelAttribute Station station) {
+    @PostMapping("/create")
+    public String create(@ModelAttribute Station station) {
         stationRepository.save(station);
         return "redirect:/admin/panel/stations";
     }
