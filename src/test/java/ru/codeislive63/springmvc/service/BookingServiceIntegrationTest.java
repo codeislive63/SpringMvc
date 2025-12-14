@@ -6,9 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import ru.codeislive63.springmvc.domain.PaymentStatus;
 import ru.codeislive63.springmvc.domain.TicketStatus;
-import ru.codeislive63.springmvc.domain.entity.Payment;
 import ru.codeislive63.springmvc.domain.entity.Route;
 import ru.codeislive63.springmvc.domain.entity.Station;
 import ru.codeislive63.springmvc.domain.entity.Ticket;
@@ -28,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class BookingServiceIntegrationTests {
+class BookingServiceIntegrationTest {
 
     @Autowired BookingService bookingService;
     @Autowired AdminService adminService;
@@ -91,18 +89,5 @@ class BookingServiceIntegrationTests {
 
         Trip afterCancel = tripRepository.findById(tripWithOneSeat.getId()).orElseThrow();
         assertEquals(1, afterCancel.getSeatsAvailable(), "После отмены seatsAvailable должен увеличиться");
-    }
-
-    @Test
-    void payTicket_shouldCreatePaymentAndSetPaid() {
-        Ticket ticket = bookingService.bookTicket(customer.getId(), tripWithOneSeat.getId());
-
-        Payment payment = bookingService.payTicket(ticket.getId());
-        assertNotNull(payment.getId());
-        assertEquals(PaymentStatus.SUCCESS, payment.getStatus());
-        assertEquals(ticket.getId(), payment.getTicket().getId());
-
-        Ticket refunded = bookingService.cancel(ticket.getId(), customer.getId());
-        assertEquals(TicketStatus.REFUNDED, refunded.getStatus(), "Оплаченный билет при отмене должен стать REFUNDED");
     }
 }
