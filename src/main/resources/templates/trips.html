@@ -130,6 +130,8 @@
                 "Статус: " + ticket.status + "\n" +
                 "Место: " + ticket.seatNumber
             );
+
+            window.location.reload();
         } catch (e) {
             console.error(e);
             alert("Не удалось забронировать билет. Попробуйте ещё раз.");
