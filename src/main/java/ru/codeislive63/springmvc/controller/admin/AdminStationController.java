@@ -1,10 +1,12 @@
 package ru.codeislive63.springmvc.controller.admin;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.codeislive63.springmvc.domain.entity.Station;
 import ru.codeislive63.springmvc.repository.StationRepository;
 
@@ -45,8 +47,14 @@ public class AdminStationController {
     }
 
     @PostMapping("/{id}/delete")
-    public String delete(@PathVariable Long id) {
-        stationRepository.deleteById(id);
+    public String delete(@PathVariable Long id, RedirectAttributes ra) {
+        try {
+            stationRepository.deleteById(id);
+            ra.addFlashAttribute("success", "Станция удалена");
+        } catch (DataIntegrityViolationException ex) {
+            ra.addFlashAttribute("error",
+                    "Нельзя удалить станцию: она используется в маршрутах. Сначала удалите маршруты/рейсы, связанные с этой станцией.");
+        }
         return "redirect:/admin/panel/stations";
     }
 }

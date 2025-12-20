@@ -14,6 +14,9 @@
 
     <a class="btn primary" th:href="@{/admin/panel/stations/new}">Добавить станцию</a>
 
+    <div th:if="${success}" class="notice success" th:text="${success}"></div>
+    <div th:if="${error}" class="notice error" th:text="${error}"></div>
+
     <div class="cards-grid">
         <article class="card" th:each="s : ${stations}">
             <h3 th:text="${s.name}">Название</h3>
