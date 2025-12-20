@@ -11,6 +11,9 @@
 
 <header th:replace="~{fragments/topbar :: topbar}"></header>
 
+<div th:if="${success}" class="notice success" th:text="${success}"></div>
+<div th:if="${error}" class="notice error" th:text="${error}"></div>
+
 <main class="page">
     <section class="welcome">
         <h1>Новый рейс</h1>
@@ -20,6 +23,11 @@
         <div th:if="${#lists.isEmpty(routes)}" class="alert alert-error">
             Сначала создайте хотя бы один маршрут (Станция → Станция).
         </div>
+
+        <div th:if="${#lists.isEmpty(trains)}" class="alert alert-error">
+            Сначала добавьте хотя бы один поезд.
+        </div>
+
     </section>
 
     <section class="cards-grid">
@@ -75,7 +83,7 @@
                 </div>
 
                 <button class="btn primary w-100" type="submit"
-                        th:disabled="${#lists.isEmpty(routes)}">
+                        th:disabled="${#lists.isEmpty(routes) or #lists.isEmpty(trains)}">
                     Создать рейс
                 </button>
 

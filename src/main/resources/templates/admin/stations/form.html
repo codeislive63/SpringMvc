@@ -2,7 +2,7 @@
 <html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Новая станция</title>
+    <title th:text="${station.id == null} ? 'Новая станция' : 'Редактирование станции'">Станция</title>
     <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
 
@@ -10,17 +10,24 @@
 <header th:replace="~{fragments/topbar :: topbar}"></header>
 
 <main class="page">
-    <h1>Добавить станцию</h1>
+    <h1 th:text="${station.id == null} ? 'Добавить станцию' : 'Редактировать станцию'">Станция</h1>
 
-    <form th:action="@{/admin/panel/stations/create}" method="post" class="form card">
+    <form th:action="@{/admin/panel/stations/create}"
+          th:object="${station}"
+          method="post"
+          class="form card">
+
+        <!-- ВАЖНО: чтобы при edit был UPDATE, а не INSERT -->
+        <input type="hidden" th:field="*{id}"/>
+
         <div class="form-group">
             <label>Название</label>
-            <input type="text" name="name" required>
+            <input type="text" th:field="*{name}" required>
         </div>
 
         <div class="form-group">
             <label>Код станции</label>
-            <input type="text" name="code" required>
+            <input type="text" th:field="*{code}" required>
         </div>
 
         <button class="btn primary w-100">Сохранить</button>

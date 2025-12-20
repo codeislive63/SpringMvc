@@ -41,10 +41,18 @@ public class AdminStationController {
     }
 
     @PostMapping("/create")
-    public String create(@ModelAttribute Station station) {
-        stationRepository.save(station);
+    public String create(@ModelAttribute Station station, RedirectAttributes ra) {
+        try {
+            stationRepository.save(station);
+            ra.addFlashAttribute("success",
+                    station.getId() == null ? "Станция создана" : "Станция сохранена");
+        } catch (DataIntegrityViolationException ex) {
+            ra.addFlashAttribute("error",
+                    "Нельзя сохранить станцию: проверьте уникальность кода и корректность данных.");
+        }
         return "redirect:/admin/panel/stations";
     }
+
 
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable Long id, RedirectAttributes ra) {

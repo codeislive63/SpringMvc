@@ -55,7 +55,9 @@ public class AdminRouteController {
 
         if (originId.equals(destinationId)) {
             ra.addFlashAttribute("error", "Станции отправления и назначения должны отличаться");
-            return "redirect:/admin/panel/routes/new";
+            return (id == null)
+                    ? "redirect:/admin/panel/routes/new"
+                    : "redirect:/admin/panel/routes/" + id + "/edit";
         }
 
         Station origin = stationRepository

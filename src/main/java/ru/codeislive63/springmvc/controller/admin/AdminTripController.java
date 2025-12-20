@@ -51,14 +51,23 @@ public class AdminTripController {
     @PostMapping("/create")
     public String create(@RequestParam Long routeId,
                          @RequestParam Long trainId,
-                         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+                         @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
                          LocalDateTime departure,
-                         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+                         @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
                          LocalDateTime arrival,
-                         @RequestParam BigDecimal basePrice) {
-
-        adminService.createTrip(routeId, trainId, departure, arrival, basePrice);
-        return "redirect:/admin/panel/trips";
+                         @RequestParam BigDecimal basePrice,
+                         RedirectAttributes ra) {
+        try {
+            adminService.createTrip(routeId, trainId, departure, arrival, basePrice);
+            ra.addFlashAttribute("success", "Рейс создан");
+            return "redirect:/admin/panel/trips";
+        } catch (IllegalArgumentException ex) {
+            ra.addFlashAttribute("error", ex.getMessage());
+            return "redirect:/admin/panel/trips/new";
+        } catch (org.springframework.dao.DataIntegrityViolationException ex) {
+            ra.addFlashAttribute("error", "Нельзя создать рейс: проверьте корректность данных и ограничения БД.");
+            return "redirect:/admin/panel/trips/new";
+        }
     }
 
     @PostMapping("/{id}/delete")

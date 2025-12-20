@@ -41,10 +41,17 @@ public class AdminTrainController {
     }
 
     @PostMapping("/create")
-    public String create(@ModelAttribute Train train) {
-        trainRepository.save(train);
+    public String create(@ModelAttribute Train train, RedirectAttributes ra) {
+        try {
+            trainRepository.save(train);
+            ra.addFlashAttribute("success", "Поезд сохранён");
+        } catch (DataIntegrityViolationException ex) {
+            ra.addFlashAttribute("error",
+                    "Нельзя сохранить поезд: проверьте уникальность кода и корректность данных.");
+        }
         return "redirect:/admin/panel/trains";
     }
+
 
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable Long id, RedirectAttributes ra) {
