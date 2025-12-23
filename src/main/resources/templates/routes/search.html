@@ -27,16 +27,14 @@
                     <div class="select-wrapper">
                         <select id="fromPointId"
                                 class="custom-select"
-                                th:field="*{fromPointId}"
+                                name="fromPointId"
                                 required>
-                            <!-- option по умолчанию: выбран, если fromPointId ещё не задан -->
-                            <option value="" disabled th:selected="${fromPointId == null}">
-                                Выберите станцию
-                            </option>
-                            <!-- варианты станций: selected определяется автоматически через th:field -->
+                            <!-- placeholder: выбран по умолчанию, если в запросе нет fromPointId -->
+                            <option value="" disabled th:selected="${req.fromPointId == null}">Выберите станцию</option>
                             <option th:each="s : ${stations}"
                                     th:value="${s.id}"
-                                    th:text="${s.name}">
+                                    th:text="${s.name}"
+                                    th:selected="${req.fromPointId != null and req.fromPointId == s.id}">
                             </option>
                         </select>
                     </div>
@@ -47,16 +45,13 @@
                     <div class="select-wrapper">
                         <select id="toPointId"
                                 class="custom-select"
-                                th:field="*{toPointId}"
+                                name="toPointId"
                                 required>
-                            <!-- option по умолчанию: выбран, если fromPointId ещё не задан -->
-                            <option value="" disabled th:selected="${toPointId == null}">
-                                Выберите станцию
-                            </option>
-                            <!-- варианты станций: selected определяется автоматически через th:field -->
+                            <option value="" disabled th:selected="${req.toPointId == null}">Выберите станцию</option>
                             <option th:each="s : ${stations}"
                                     th:value="${s.id}"
-                                    th:text="${s.name}">
+                                    th:text="${s.name}"
+                                    th:selected="${req.toPointId != null and req.toPointId == s.id}">
                             </option>
                         </select>
                     </div>
