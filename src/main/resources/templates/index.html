@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru"
       xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+>
 <head>
     <meta charset="UTF-8">
     <title>Поиск поездок • Railway Booker</title>
@@ -53,8 +53,7 @@
     document.addEventListener("DOMContentLoaded", () => {
         const dateInput = document.getElementById("date");
         if (dateInput && !dateInput.value) {
-            const today = new Date().toISOString().slice(0, 10);
-            dateInput.value = today;
+            dateInput.value = new Date().toISOString().slice(0, 10);
         }
     });
 </script>

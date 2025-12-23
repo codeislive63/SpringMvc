@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Поиск маршрута • Railway Booker</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body class="app-bg">
+
+<header th:replace="~{fragments/topbar :: topbar}"></header>
+
+<main class="page">
+    <section class="welcome">
+        <h1>Поиск маршрута</h1>
+        <p>Выберите станции отправления и назначения, а также период поездки.</p>
+
+        <div th:if="${error}" class="alert error" th:text="${error}"></div>
+    </section>
+
+    <section class="cards-grid">
+        <article class="card search-card">
+            <form class="form" th:action="@{/routes/search}" th:object="${req}" method="get">
+
+                <div class="form-group">
+                    <label for="fromPointId">Откуда</label>
+                    <div class="select-wrapper">
+                        <select id="fromPointId" class="custom-select" th:field="*{fromPointId}" required>
+                            <option value="" disabled selected>Выберите станцию</option>
+                            <option th:each="s : ${stations}" th:value="${s.id}" th:text="${s.name}"></option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="toPointId">Куда</label>
+                    <div class="select-wrapper">
+                        <select id="toPointId" class="custom-select" th:field="*{toPointId}" required>
+                            <option value="" disabled selected>Выберите станцию</option>
+                            <option th:each="s : ${stations}" th:value="${s.id}" th:text="${s.name}"></option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="departureDate">Дата отправления</label>
+                    <input id="departureDate" type="date" th:field="*{departureDate}" required>
+                </div>
+
+                <button class="btn primary w-100" type="submit">Найти</button>
+            </form>
+        </article>
+    </section>
+</main>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const d = document.getElementById("departureDate");
+        if (d && !d.value) d.value = new Date().toISOString().slice(0,10);
+    });
+</script>
+
+</body>
+</html>

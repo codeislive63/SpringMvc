@@ -25,9 +25,16 @@ public class DataInitializer implements CommandLineRunner {
         userService.register("admin@example.com", "admin123", "Администратор", RoleType.ADMIN);
         userService.register("customer@example.com", "cust123", "Пассажир", RoleType.CUSTOMER);
 
+        if (adminService.hasAnyData()) {
+            return;
+        }
+
         Station minsk = adminService.createStation("MSK", "Минск");
         Station gomel = adminService.createStation("GML", "Гомель");
         Station vitebsk = adminService.createStation("VTB", "Витебск");
+
+        Station orsha = adminService.createStation("ORS", "Орша");
+        Station smolensk = adminService.createStation("SML", "Смоленск");
 
         Train t1 = adminService.createTrain("TRAIN-1", "Скорый 001", 120);
         Train t2 = adminService.createTrain("TRAIN-2", "Региональный 045", 80);
@@ -35,9 +42,21 @@ public class DataInitializer implements CommandLineRunner {
         Route route1 = adminService.createRoute(minsk.getId(), gomel.getId(), 320, "Минск — Гомель");
         Route route2 = adminService.createRoute(minsk.getId(), vitebsk.getId(), 280, "Минск — Витебск");
 
+        Route mskOrsha = adminService.createRoute(minsk.getId(), orsha.getId(), 210, "Минск — Орша");
+        Route orshaSml = adminService.createRoute(orsha.getId(), smolensk.getId(), 160, "Орша — Смоленск");
+
         adminService.createTrip(route1.getId(), t1.getId(),
                 LocalDateTime.now().plusHours(4), LocalDateTime.now().plusHours(8), BigDecimal.valueOf(35));
         adminService.createTrip(route2.getId(), t2.getId(),
                 LocalDateTime.now().plusHours(6), LocalDateTime.now().plusHours(10), BigDecimal.valueOf(28));
+
+        LocalDateTime dep1 = LocalDateTime.now().withSecond(0).withNano(0).plusHours(2);
+        LocalDateTime arr1 = dep1.plusHours(2);
+
+        LocalDateTime dep2 = arr1.plusMinutes(40);
+        LocalDateTime arr2 = dep2.plusHours(2);
+
+        adminService.createTrip(mskOrsha.getId(), t2.getId(), dep1, arr1, BigDecimal.valueOf(12));
+        adminService.createTrip(orshaSml.getId(), t1.getId(), dep2, arr2, BigDecimal.valueOf(18));
     }
 }

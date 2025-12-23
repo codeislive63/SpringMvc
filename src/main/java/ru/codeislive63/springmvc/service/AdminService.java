@@ -74,5 +74,9 @@ public class AdminService {
         trip.setSeatsAvailable(train.getSeatCapacity());
         return tripRepository.save(trip);
     }
+
+    public boolean hasAnyData() {
+        return stationRepository.count() > 0 || routeRepository.count() > 0 || tripRepository.count() > 0;
+    }
 }
 

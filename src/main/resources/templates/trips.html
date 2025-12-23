@@ -104,15 +104,12 @@
                 method: "POST"
             });
 
-            // 1) Если Spring Security сделал редирект на /login
             if (res.redirected && res.url.includes("/login")) {
-                // можно ещё добавить параметр from, чтобы потом вернуть назад
                 const from = encodeURIComponent(window.location.pathname + window.location.search);
                 window.location.href = `/login?from=${from}`;
                 return;
             }
 
-            // 2) Если вместо редиректа вернётся 401/403
             if (res.status === 401 || res.status === 403) {
                 const from = encodeURIComponent(window.location.pathname + window.location.search);
                 window.location.href = `/login?from=${from}`;

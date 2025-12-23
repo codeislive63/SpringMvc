@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.codeislive63.springmvc.domain.entity.Payment;
 import ru.codeislive63.springmvc.domain.entity.Ticket;
@@ -41,5 +42,16 @@ public class BookingController {
     @GetMapping("/my")
     public ResponseEntity<List<Ticket>> my(@AuthenticationPrincipal UserPrincipal principal) {
         return ResponseEntity.ok(bookingService.myTickets(principal.user().getId()));
+    }
+
+    @GetMapping("/start")
+    public String start(@RequestParam(required = false) Long tripId,
+                        @RequestParam(required = false) Long tripId1,
+                        @RequestParam(required = false) Long tripId2,
+                        Model model) {
+        model.addAttribute("tripId", tripId);
+        model.addAttribute("tripId1", tripId1);
+        model.addAttribute("tripId2", tripId2);
+        return "booking/start";
     }
 }

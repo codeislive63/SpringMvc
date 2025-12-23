@@ -31,7 +31,15 @@ public class SecurityConfig {
                                         "/css/**", "/js/**", "/images/**"
                                 ).permitAll()
 
-                                .requestMatchers("/booking/**", "/dashboard", "/profile/**")
+                                .requestMatchers(
+                                        "/routes/**"
+                                )
+                                .permitAll()
+
+                                .requestMatchers(
+                                        "/booking/**",
+                                        "/dashboard",
+                                        "/profile/**")
                                 .authenticated()
 
                                 .requestMatchers("/admin/**")
@@ -43,7 +51,7 @@ public class SecurityConfig {
                         .loginProcessingUrl("/login")
                         .usernameParameter("email")
                         .passwordParameter("password")
-                        .defaultSuccessUrl("/dashboard", true)
+                        .defaultSuccessUrl("/dashboard")
                         .permitAll()
                 )
                 .logout(logout -> logout

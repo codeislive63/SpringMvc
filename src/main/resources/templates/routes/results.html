@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <title>Результаты • Railway Booker</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+
+    <!-- Локальные стили только для этой страницы -->
+    <style>
+        .results-grid { gap: 20px; }
+        .trip-card { padding: 22px; }
+        .trip-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+        .trip-title { margin: 0; font-size: 22px; font-weight: 700; }
+        .chip {
+            display: inline-flex; align-items: center;
+            padding: 6px 10px; border-radius: 999px;
+            background: rgba(255,255,255,.08);
+            border: 1px solid rgba(255,255,255,.12);
+            font-size: 13px; opacity: .95;
+        }
+        .summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+        .summary .item {
+            padding: 10px 12px; border-radius: 14px;
+            background: rgba(255,255,255,.05);
+            border: 1px solid rgba(255,255,255,.10);
+        }
+        .summary .label { font-size: 12px; opacity: .7; }
+        .summary .value { font-size: 16px; font-weight: 700; margin-top: 2px; }
+
+        .legs { margin-top: 16px; display: grid; gap: 12px; }
+        .leg {
+            padding: 14px 14px;
+            border-radius: 16px;
+            background: rgba(255,255,255,.04);
+            border: 1px solid rgba(255,255,255,.10);
+        }
+        .leg-route { font-weight: 700; font-size: 16px; }
+        .leg-time { margin-top: 6px; font-size: 13px; opacity: .85; }
+        .leg-meta { margin-top: 6px; font-size: 13px; opacity: .75; display: flex; gap: 10px; flex-wrap: wrap; }
+        .divider { height: 1px; background: rgba(255,255,255,.12); margin: 16px 0; border: 0; }
+
+        .actions { display: flex; gap: 12px; flex-wrap: wrap; }
+        .btn.secondary {
+            background: rgba(255,255,255,.06);
+            border: 1px solid rgba(255,255,255,.14);
+            color: rgba(255,255,255,.92);
+            text-decoration: none;
+        }
+        .btn.secondary:hover { filter: brightness(1.06); }
+        .muted { opacity: .75; }
+    </style>
+</head>
+
+<body class="app-bg">
+<header th:replace="~{fragments/topbar :: topbar}"></header>
+
+<main class="page">
+    <section class="welcome">
+        <h1>Результаты поиска</h1>
+        <p class="muted">Мы нашли варианты поездки: прямые и с пересадкой.</p>
+        <div th:if="${error}" class="alert error" th:text="${error}"></div>
+    </section>
+
+    <section class="cards-grid results-grid">
+        <article class="card trip-card" th:if="${#lists.isEmpty(itineraries)}">
+            <h2 class="trip-title">Ничего не найдено</h2>
+            <p class="muted">Попробуйте изменить дату или станции.</p>
+            <div class="actions" style="margin-top: 14px;">
+                <a class="btn secondary" th:href="@{/routes/search}">Назад к поиску</a>
+            </div>
+        </article>
+
+        <article class="card trip-card" th:each="it, stat : ${itineraries}">
+            <div class="trip-head">
+                <h2 class="trip-title" th:text="'Вариант #' + ${stat.index + 1}"></h2>
+                <span class="chip" th:text="'Пересадок: ' + ${it.transfers()}"></span>
+            </div>
+
+            <div class="summary">
+                <div class="item">
+                    <div class="label">Итого</div>
+                    <div class="value" th:text="${it.totalPrice}"></div>
+                </div>
+                <div class="item">
+                    <div class="label">В пути</div>
+                    <div class="value" th:text="${it.totalDurationText}"></div>
+                </div>
+            </div>
+
+            <div class="legs">
+                <div class="leg" th:each="leg : ${it.legs}">
+                    <div class="leg-route">
+                        <span th:text="${leg.fromName}"></span>
+                        <span> → </span>
+                        <span th:text="${leg.toName}"></span>
+                    </div>
+
+                    <div class="leg-time">
+                        <span th:text="${#temporals.format(leg.departureTime, 'dd.MM.yyyy HH:mm')}"></span>
+                        <span> — </span>
+                        <span th:text="${#temporals.format(leg.arrivalTime, 'dd.MM.yyyy HH:mm')}"></span>
+                    </div>
+
+                    <div class="leg-meta">
+                        <span th:text="'Цена: ' + ${leg.price}"></span>
+                        <span th:if="${leg.trainName != null}" th:text="'Поезд: ' + ${leg.trainName}"></span>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="divider"/>
+
+            <div class="actions">
+
+                <a class="btn primary"
+                   sec:authorize="hasRole('CUSTOMER')"
+                   th:href="@{/booking/start(tripId1=${it.legs.get(0).tripId}, tripId2=${it.legs.get(1).tripId})}">
+                    Выбрать с пересадкой
+                </a>
+
+                <a class="btn primary"
+                   sec:authorize="isAnonymous()"
+                   th:href="@{/booking/start(tripId1=${it.legs.get(0).tripId}, tripId2=${it.legs.get(1).tripId})}">
+                    Войти для бронирования
+                </a>
+
+                <a class="btn secondary" th:href="@{/routes/search}">Назад к поиску</a>
+            </div>
+
+        </article>
+    </section>
+</main>
+</body>
+</html>
