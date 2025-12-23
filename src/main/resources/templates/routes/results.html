@@ -113,15 +113,28 @@
             <hr class="divider"/>
 
             <div class="actions">
-
                 <a class="btn primary"
                    sec:authorize="hasRole('CUSTOMER')"
+                   th:if="${it.legs.size() == 1}"
+                   th:href="@{/booking/start(tripId=${it.legs.get(0).tripId})}">
+                    Выбрать
+                </a>
+                <a class="btn primary"
+                   sec:authorize="hasRole('CUSTOMER')"
+                   th:if="${it.legs.size() > 1}"
                    th:href="@{/booking/start(tripId1=${it.legs.get(0).tripId}, tripId2=${it.legs.get(1).tripId})}">
                     Выбрать с пересадкой
                 </a>
 
                 <a class="btn primary"
                    sec:authorize="isAnonymous()"
+                   th:if="${it.legs.size() == 1}"
+                   th:href="@{/booking/start(tripId=${it.legs.get(0).tripId})}">
+                    Войти для бронирования
+                </a>
+                <a class="btn primary"
+                   sec:authorize="isAnonymous()"
+                   th:if="${it.legs.size() > 1}"
                    th:href="@{/booking/start(tripId1=${it.legs.get(0).tripId}, tripId2=${it.legs.get(1).tripId})}">
                     Войти для бронирования
                 </a>

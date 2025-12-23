@@ -1,6 +1,7 @@
 package ru.codeislive63.springmvc.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.codeislive63.springmvc.domain.entity.Route;
@@ -22,12 +23,20 @@ public class RouteSearchService {
 
     private final TripRepository tripRepository;
 
-    private static final Duration MIN_TRANSFER = Duration.ofMinutes(20);
-    private static final Duration MAX_TRANSFER = Duration.ofHours(6);
+    @Value("${route.min-transfer:20}")
+    private int minTransferMinutes;
+
+    @Value("${route.max-transfer-hours:6}")
+    private int maxTransferHours;
 
     public List<ItineraryDto> search(RouteSearchRequest req) {
+        Duration minTransfer = Duration.ofMinutes(minTransferMinutes);
+        Duration maxTransfer = Duration.ofHours(maxTransferHours);
+
         LocalDateTime fromDt = req.getDepartureDate().atStartOfDay();
         LocalDateTime toDt = req.getDepartureDate().atTime(LocalTime.MAX);
+
+        LocalDateTime searchEnd = toDt.plusDays(1);
 
         Long originId = req.getFromPointId();
         Long destinationId = req.getToPointId();
@@ -54,17 +63,16 @@ public class RouteSearchService {
                 continue;
             }
 
-            LocalDateTime minDep = first.getArrivalTime().plus(MIN_TRANSFER);
-            LocalDateTime maxDep = first.getArrivalTime().plus(MAX_TRANSFER);
+            LocalDateTime minDep = first.getArrivalTime().plus(minTransfer);
+            LocalDateTime maxDep = first.getArrivalTime().plus(maxTransfer);
 
             if (maxDep.isBefore(fromDt) || minDep.isAfter(toDt)) {
                 continue;
             }
 
             LocalDateTime realMin = minDep.isBefore(fromDt) ? fromDt : minDep;
-            LocalDateTime realMax = maxDep.isAfter(toDt) ? toDt : maxDep;
 
-            List<Trip> seconds = tripRepository.findSecondLegs(transferId, destinationId, realMin, realMax);
+            List<Trip> seconds = tripRepository.findSecondLegs(transferId, destinationId, realMin, searchEnd);
 
             for (Trip second : seconds) {
                 Long secondDestId = second.getRoute().getDestination().getId();
