@@ -29,16 +29,14 @@
                                 class="custom-select"
                                 th:field="*{fromPointId}"
                                 required>
-                            <!-- placeholder выбран, если значение поля fromPointId не задано -->
-                            <option value="" disabled
-                                    th:selected="${#fields.field('fromPointId').value() == null}">
+                            <!-- option по умолчанию: выбран, если fromPointId ещё не задан -->
+                            <option value="" disabled th:selected="${fromPointId == null}">
                                 Выберите станцию
                             </option>
-                            <!-- остальные варианты -->
+                            <!-- варианты станций: selected определяется автоматически через th:field -->
                             <option th:each="s : ${stations}"
                                     th:value="${s.id}"
-                                    th:text="${s.name}"
-                                    th:selected="${#fields.field('fromPointId').value() == s.id}">
+                                    th:text="${s.name}">
                             </option>
                         </select>
                     </div>
@@ -51,14 +49,14 @@
                                 class="custom-select"
                                 th:field="*{toPointId}"
                                 required>
-                            <option value="" disabled
-                                    th:selected="${#fields.field('toPointId').value() == null}">
+                            <!-- option по умолчанию: выбран, если fromPointId ещё не задан -->
+                            <option value="" disabled th:selected="${toPointId == null}">
                                 Выберите станцию
                             </option>
+                            <!-- варианты станций: selected определяется автоматически через th:field -->
                             <option th:each="s : ${stations}"
                                     th:value="${s.id}"
-                                    th:text="${s.name}"
-                                    th:selected="${#fields.field('toPointId').value() == s.id}">
+                                    th:text="${s.name}">
                             </option>
                         </select>
                     </div>

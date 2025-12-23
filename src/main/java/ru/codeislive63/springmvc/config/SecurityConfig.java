@@ -22,36 +22,38 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth ->
-                        auth.requestMatchers(
-                                        "/", "/index",
-                                        "/login", "/register",
-                                        "/routes/search",   // добавьте слэш
-                                        "/routes/**",       // если хотите открывать и результаты поиска
-                                        "/trips/**",
-                                        "/css/**", "/js/**", "/images/**"
-                                ).permitAll()
-                                .requestMatchers(
-                                        "/booking/**",
-                                        "/dashboard",
-                                        "/profile/**"
-                                ).authenticated()
-                                .requestMatchers("/admin/**").hasRole("ADMIN")
-                                .anyRequest().authenticated()
-                )
-                .formLogin(login -> login
-                        .loginPage("/login")
-                        .loginProcessingUrl("/login")
-                        .usernameParameter("email")
-                        .passwordParameter("password")
-                        .defaultSuccessUrl("/dashboard")
-                        .permitAll()
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/")
-                        .permitAll()
-                );
+            .authorizeHttpRequests(auth ->
+                    auth.requestMatchers(
+                                    "/", "/index",
+                                    "/login", "/register",
+                                    "/routes/search",
+                                    "/routes/**",
+                                    "/trips/**",
+                                    "/error",
+                                    "/error/**",
+                                    "/css/**", "/js/**", "/images/**"
+                            ).permitAll()
+                            .requestMatchers(
+                                    "/booking/**",
+                                    "/dashboard",
+                                    "/profile/**"
+                            ).authenticated()
+                            .requestMatchers("/admin/**").hasRole("ADMIN")
+                            .anyRequest().authenticated()
+            )
+            .formLogin(login -> login
+                    .loginPage("/login")
+                    .loginProcessingUrl("/login")
+                    .usernameParameter("email")
+                    .passwordParameter("password")
+                    .defaultSuccessUrl("/dashboard")
+                    .permitAll()
+            )
+            .logout(logout -> logout
+                    .logoutUrl("/logout")
+                    .logoutSuccessUrl("/")
+                    .permitAll()
+            );
 
         return http.build();
     }
