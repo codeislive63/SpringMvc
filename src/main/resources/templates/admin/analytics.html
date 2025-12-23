@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Аналитика • Railway Booker</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="app-bg">
+<header th:replace="~{fragments/topbar :: topbar}"></header>
+
+<main class="page">
+    <section class="welcome">
+        <h1>Аналитика</h1>
+        <p>Раздел доступен только администраторам. Здесь собраны основные показатели о рейсах и билетах.</p>
+    </section>
+
+    <section class="cards-grid">
+        <!-- Диаграмма заполняемости рейсов -->
+        <article class="card">
+            <h2>Заполняемость рейсов</h2>
+            <canvas id="occupancyChart" width="400" height="200"></canvas>
+        </article>
+
+        <!-- Линейный график спроса по дням -->
+        <article class="card">
+            <h2>Количество проданных / забронированных билетов (14 дней)</h2>
+            <canvas id="demandChart" width="400" height="200"></canvas>
+        </article>
+
+        <!-- Круговая диаграмма статусов билетов -->
+        <article class="card">
+            <h2>Распределение билетов по статусам</h2>
+            <canvas id="statusChart" width="400" height="200"></canvas>
+        </article>
+    </section>
+</main>
+
+<script th:inline="javascript">
+    /* <![CDATA[ */
+    // данные для диаграмм из модели
+    const occupancies = [[${tripOccupancies}]];
+    const demandByDate = [[${demandByDate}]];
+    const statusDist = [[${statusDist}]];
+
+    // --- Заполняемость ---
+    const ocLabels = occupancies.map(o => o.routeLabel() + ' (' + o.formattedDeparture().substring(0, 16) + ')');
+    const ocData   = occupancies.map(o => o.occupancy);
+    new Chart(document.getElementById('occupancyChart'), {
+        type: 'bar',
+        data: {
+            labels: ocLabels,
+            datasets: [{
+                label: 'Заполнено (%)',
+                data: ocData,
+                backgroundColor: 'rgba(99,102,241,0.6)',
+                borderColor: 'rgba(99,102,241,1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+
+    // --- Спрос по дням ---
+    const demandLabels = Object.keys(demandByDate);
+    const demandValues = Object.values(demandByDate);
+    new Chart(document.getElementById('demandChart'), {
+        type: 'line',
+        data: {
+            labels: demandLabels,
+            datasets: [{
+                label: 'Билетов',
+                data: demandValues,
+                fill: false,
+                borderColor: 'rgba(234,88,12,0.8)',
+                tension: 0.2
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    // --- Статусы билетов ---
+    const statusLabels = Object.keys(statusDist);
+    const statusValues = Object.values(statusDist);
+    new Chart(document.getElementById('statusChart'), {
+        type: 'pie',
+        data: {
+            labels: statusLabels,
+            datasets: [{
+                data: statusValues,
+                backgroundColor: [
+                    'rgba(16,185,129,0.6)',  // PAID
+                    'rgba(255,206,86,0.6)',  // BOOKED
+                    'rgba(239,68,68,0.6)',   // CANCELLED
+                    'rgba(107,114,128,0.6)'  // REFUNDED
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+    /* ]]> */
+</script>
+</body>
+</html>

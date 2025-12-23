@@ -15,16 +15,25 @@
               sec:authentication="principal.user.fullName">
         </span>
 
-        <a class="btn ghost" th:href="@{/profile}" sec:authorize="isAuthenticated()">
+        <!-- отображать только для роли ADMIN -->
+        <a class="btn ghost" th:href="@{/admin/analytics}"
+           sec:authorize="hasRole('ADMIN')">
+            Аналитика
+        </a>
+
+        <a class="btn ghost" th:href="@{/profile}"
+           sec:authorize="isAuthenticated()">
             Личный кабинет
         </a>
 
-        <form th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()">
+        <form th:action="@{/logout}" method="post"
+              sec:authorize="isAuthenticated()">
             <button class="btn ghost" type="submit">Выйти</button>
         </form>
 
         <!-- когда гость -->
-        <a class="btn ghost" th:href="@{/login}" sec:authorize="isAnonymous()">
+        <a class="btn ghost" th:href="@{/login}"
+           sec:authorize="isAnonymous()">
             Войти
         </a>
     </div>
