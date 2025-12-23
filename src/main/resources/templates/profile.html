@@ -13,56 +13,12 @@
 
 <main class="page">
     <section class="welcome">
-        <div class="section-title">
-            <div class="eyebrow">Профиль</div>
-            <h1 style="margin: 0;">Личный кабинет</h1>
-        </div>
+        <h1>Личный кабинет</h1>
         <p>Здравствуйте, <b th:text="${user.fullName}">Имя</b>!</p>
         <p>Email: <span th:text="${user.email}">email</span></p>
-
-        <div class="info-grid">
-            <div class="info-tile">
-                <div class="label">Сохранённые пассажиры</div>
-                <span class="value">Храните документы и льготы для быстрого оформления</span>
-            </div>
-            <div class="info-tile">
-                <div class="label">История поездок</div>
-                <span class="value">Повторяйте маршруты и скачивайте билеты</span>
-            </div>
-            <div class="info-tile">
-                <div class="label">Бонусы и скидки</div>
-                <span class="value">Лояльность, промокоды, детские тарифы</span>
-            </div>
-            <div class="info-tile">
-                <div class="label">Документы</div>
-                <span class="value">Паспорт, ID-карта, детские свидетельства</span>
-            </div>
-        </div>
     </section>
 
     <section class="cards-grid">
-        <!-- Сохранённые пассажиры -->
-        <article class="card">
-            <h2>Сохранённые пассажиры и документы</h2>
-            <p class="muted">Добавьте часто используемые данные, чтобы оформлять билеты быстрее.</p>
-            <div class="list-stripe">
-                <div class="row-item">
-                    <div>
-                        <div class="title">Основной пассажир</div>
-                        <div class="meta">Паспорт • Льгот нет</div>
-                    </div>
-                    <button class="btn ghost" type="button" disabled>Редактировать</button>
-                </div>
-                <div class="row-item">
-                    <div>
-                        <div class="title">Детский билет</div>
-                        <div class="meta">Свидетельство о рождении • Детский тариф</div>
-                    </div>
-                    <button class="btn ghost" type="button" disabled>Редактировать</button>
-                </div>
-            </div>
-        </article>
-
         <!-- Активные (неоплаченные) брони -->
         <article class="card">
             <h2>Активные брони</h2>
@@ -122,29 +78,6 @@
                 <p th:text="'Цена: ' + ${#numbers.formatDecimal(t.price, 1, 'COMMA', 2, 'POINT')} + ' BYN'"></p>
                 <p>Статус: <span th:text="${t.status.label}"></span></p>
                 <hr>
-            </div>
-        </article>
-
-        <!-- Бонусы и лояльность -->
-        <article class="card">
-            <h2>Бонусы и скидки</h2>
-            <div class="info-grid">
-                <div class="info-tile">
-                    <div class="label">Баланс бонусов</div>
-                    <span class="value">0</span>
-                </div>
-                <div class="info-tile">
-                    <div class="label">Уровень лояльности</div>
-                    <span class="value">Базовый</span>
-                </div>
-                <div class="info-tile">
-                    <div class="label">Персональные скидки</div>
-                    <span class="value">Льготные и детские тарифы доступны</span>
-                </div>
-            </div>
-            <div class="card-actions" style="margin-top: 12px;">
-                <button class="btn ghost" type="button" disabled>Активировать промокод</button>
-                <button class="btn ghost" type="button" disabled>Подключить программу</button>
             </div>
         </article>
     </section>

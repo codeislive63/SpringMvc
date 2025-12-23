@@ -13,11 +13,8 @@
 
 <main class="page">
     <section class="welcome">
-        <div class="section-title">
-            <div class="eyebrow">Поиск поездов</div>
-            <h1 style="margin: 0;">Поиск поездок</h1>
-        </div>
-        <p>Выберите маршрут, дату и нужные фильтры: тип поезда, класс вагона, время отправления, цена и услуги.</p>
+        <h1>Поиск поездок</h1>
+        <p>Выберите маршрут и дату, а мы подберём доступные рейсы.</p>
 
         <div th:if="${error}" class="alert error" th:text="${error}"></div>
     </section>
@@ -44,102 +41,10 @@
                     <input id="date" type="date" name="date" required>
                 </div>
 
-                <div class="filter-grid">
-                    <div class="form-group">
-                        <label for="trainType">Тип поезда</label>
-                        <div class="select-wrapper">
-                            <select id="trainType" name="trainType" class="custom-select">
-                                <option value="">Любой</option>
-                                <option value="express">Скоростной / экспресс</option>
-                                <option value="regional">Региональный</option>
-                                <option value="night">Ночной</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="carClass">Класс вагона</label>
-                        <div class="select-wrapper">
-                            <select id="carClass" name="carClass" class="custom-select">
-                                <option value="">Любой</option>
-                                <option value="business">Бизнес</option>
-                                <option value="coupe">Купе</option>
-                                <option value="platzcart">Плацкарт</option>
-                                <option value="sitting">Сидячий</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="departureTime">Время отправления</label>
-                        <div class="input-inline">
-                            <input id="departureTime" type="time" name="departureTimeFrom" placeholder="с">
-                            <input type="time" name="departureTimeTo" placeholder="до">
-                        </div>
-                        <div class="hint">Ограничьте поиск по окну отправления</div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="price">Макс. цена</label>
-                        <input id="price" type="range" name="maxPrice" min="10" max="250" step="5" value="120"
-                               oninput="document.getElementById('priceValue').textContent=this.value + ' BYN'">
-                        <div class="hint">
-                            <span id="priceValue">120 BYN</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="divider-line"></div>
-
-                <div class="pill-group">
-                    <label class="pill-toggle">
-                        <input type="checkbox" name="wifi" value="true">
-                        <span>Wi‑Fi</span>
-                        <span class="dot"></span>
-                    </label>
-                    <label class="pill-toggle">
-                        <input type="checkbox" name="food" value="true">
-                        <span>Питание</span>
-                        <span class="dot"></span>
-                    </label>
-                    <label class="pill-toggle">
-                        <input type="checkbox" name="pets" value="true">
-                        <span>Можно с животными</span>
-                        <span class="dot"></span>
-                    </label>
-                    <label class="pill-toggle">
-                        <input type="checkbox" name="luggage" value="true">
-                        <span>Доп. багаж</span>
-                        <span class="dot"></span>
-                    </label>
-                </div>
-
                 <button class="btn primary w-100" type="submit">
                     Найти рейсы
                 </button>
             </form>
-        </article>
-
-        <article class="card filter-panel">
-            <h2 style="margin-top: 0;">Что учесть при поиске</h2>
-            <div class="info-grid">
-                <div class="info-tile">
-                    <div class="label">Посадка по времени</div>
-                    <span class="value">Утро, день, вечер</span>
-                </div>
-                <div class="info-tile">
-                    <div class="label">Услуги в поезде</div>
-                    <span class="value">Wi‑Fi, питание, розетки</span>
-                </div>
-                <div class="info-tile">
-                    <div class="label">Класс поездки</div>
-                    <span class="value">Сидячий, плацкарт, купе</span>
-                </div>
-                <div class="info-tile">
-                    <div class="label">Доп. сервисы</div>
-                    <span class="value">Страховка, питание, трансфер</span>
-                </div>
-            </div>
         </article>
     </section>
 </main>
