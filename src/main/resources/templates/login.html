@@ -44,13 +44,13 @@
                        required>
             </div>
 
-            <button class="btn primary w-100" type="submit">
-                Войти
-            </button>
+            <div class="form-group">
+                <button class="btn primary w-100" type="submit">Войти</button>
+            </div>
 
-            <p class="hint">
-                Нет аккаунта? <a th:href="@{/register}">Зарегистрируйтесь</a>
-            </p>
+            <div class="form-group" style="margin-top: 16px;">
+                <a th:href="@{/register}" class="btn secondary w-100">Зарегистрироваться</a>
+            </div>
 
             <p class="hint">
                 Демо-аккаунты:<br>

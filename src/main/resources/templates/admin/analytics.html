@@ -38,15 +38,13 @@
 </main>
 
 <script th:inline="javascript">
-    /* <![CDATA[ */
-    // данные для диаграмм из модели
-    const occupancies = [[${tripOccupancies}]];
-    const demandByDate = [[${demandByDate}]];
-    const statusDist = [[${statusDist}]];
+    const ocLabels    = [[${ocLabels}]];
+    const ocData      = [[${ocData}]];
+    const demandLabels= [[${demandLabels}]];
+    const demandValues= [[${demandValues}]];
+    const statusLabels= [[${statusLabels}]];
+    const statusValues= [[${statusValues}]];
 
-    // --- Заполняемость ---
-    const ocLabels = occupancies.map(o => o.routeLabel() + ' (' + o.formattedDeparture().substring(0, 16) + ')');
-    const ocData   = occupancies.map(o => o.occupancy);
     new Chart(document.getElementById('occupancyChart'), {
         type: 'bar',
         data: {

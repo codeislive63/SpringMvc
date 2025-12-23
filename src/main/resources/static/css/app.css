@@ -546,3 +546,7 @@ body.app-bg {
     color: #ffd2d2;
     border-color: rgba(255, 107, 107, 0.35);
 }
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
