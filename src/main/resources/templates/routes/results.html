@@ -64,6 +64,28 @@
     </section>
 
     <section class="cards-grid results-grid">
+        <article class="card filter-panel">
+            <h2 style="margin-top: 0;">Ваши параметры</h2>
+            <p class="muted">Маршрут, дата, время, тип поезда, класс вагона, цена и услуги.</p>
+            <div class="pill-group">
+                <span class="pill"><strong>Тип</strong> любой</span>
+                <span class="pill"><strong>Класс</strong> сидячий / купе</span>
+                <span class="pill"><strong>Время</strong> утро · день · вечер</span>
+                <span class="pill"><strong>Цена</strong> до 250 BYN</span>
+                <span class="pill"><strong>Услуги</strong> Wi‑Fi, питание</span>
+            </div>
+            <div class="legend">
+                <div class="item">
+                    <span class="dot"></span>
+                    <span>Доступные места</span>
+                </div>
+                <div class="item">
+                    <span class="dot" style="background: #f59e0b;"></span>
+                    <span>Детские / льготные</span>
+                </div>
+            </div>
+        </article>
+
         <article class="card trip-card" th:if="${#lists.isEmpty(itineraries)}">
             <h2 class="trip-title">Ничего не найдено</h2>
             <p class="muted">Попробуйте изменить дату или станции.</p>
@@ -87,6 +109,21 @@
                     <div class="label">В пути</div>
                     <div class="value" th:text="${it.totalDurationText}"></div>
                 </div>
+                <div class="item">
+                    <div class="label">Услуги</div>
+                    <div class="value">Wi‑Fi · Питание · Розетки</div>
+                </div>
+                <div class="item">
+                    <div class="label">Класс</div>
+                    <div class="value">Сидячий / Купе / Бизнес</div>
+                </div>
+            </div>
+
+            <div class="service-row" style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
+                <span class="service-chip"><span class="dot"></span> Wi‑Fi</span>
+                <span class="service-chip"><span class="dot"></span> Питание</span>
+                <span class="service-chip"><span class="dot"></span> Кондиционер</span>
+                <span class="service-chip"><span class="dot"></span> Розетки</span>
             </div>
 
             <div class="legs">
@@ -106,6 +143,23 @@
                     <div class="leg-meta">
                         <span th:text="'Цена: ' + ${leg.price}"></span>
                         <span th:if="${leg.trainName != null}" th:text="'Поезд: ' + ${leg.trainName}"></span>
+                    </div>
+
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-title" th:text="${leg.fromName + ' • Отправление'}"></div>
+                            <div class="timeline-meta">
+                                <span th:text="${#temporals.format(leg.departureTime, 'dd.MM.yyyy HH:mm')}"></span>
+                                <span>Посадка по паспорту</span>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-title" th:text="${leg.toName + ' • Прибытие'}"></div>
+                            <div class="timeline-meta">
+                                <span th:text="${#temporals.format(leg.arrivalTime, 'dd.MM.yyyy HH:mm')}"></span>
+                                <span>Услуги: Wi‑Fi, питание</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

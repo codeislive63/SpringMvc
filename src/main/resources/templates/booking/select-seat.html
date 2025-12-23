@@ -47,8 +47,18 @@
 
 <main class="page">
     <section class="welcome">
-        <h1>Выбор места</h1>
-        <p class="muted">Сначала выберите место для первого сегмента. Для маршрута с пересадкой второй сегмент станет активен после выбора места в первом.</p>
+        <div class="section-title">
+            <div class="eyebrow">Шаг 1</div>
+            <h1 style="margin: 0;">Выбор места</h1>
+        </div>
+        <p class="muted">
+            Отфильтруйте доступные места по классу и выберите услугу. Для маршрута с пересадкой сначала нужно выбрать место в первом сегменте.
+        </p>
+        <div class="pill-group" style="margin-top: 10px;">
+            <span class="pill"><strong>Проверка</strong> доступности мест</span>
+            <span class="pill"><strong>Схема</strong> вагона</span>
+            <span class="pill"><strong>Услуги</strong> Wi‑Fi, питание, багаж</span>
+        </div>
     </section>
 
     <section class="cards-grid">
@@ -68,6 +78,21 @@
                     <div class="chip">Сегмент 1</div>
                 </div>
 
+                <div class="info-grid">
+                    <div class="info-tile">
+                        <div class="label">Класс вагона</div>
+                        <span class="value">Сидячий / Купе</span>
+                    </div>
+                    <div class="info-tile">
+                        <div class="label">Услуги</div>
+                        <span class="value">Wi‑Fi · Питание · Розетки</span>
+                    </div>
+                    <div class="info-tile">
+                        <div class="label">Время в пути</div>
+                        <span class="value">Будет указано в деталях рейса</span>
+                    </div>
+                </div>
+
                 <div class="hint">Выберите место</div>
                 <div class="seat-grid" data-target="seat">
                     <button type="button"
@@ -79,12 +104,76 @@
                     </button>
                 </div>
 
-                <form th:action="@{/booking/reserve}" method="post" class="actions" style="margin-top: 16px;">
+                <div class="legend">
+                    <div class="item">
+                        <span class="dot"></span>
+                        <span>Свободно</span>
+                    </div>
+                    <div class="item">
+                        <span class="dot" style="background: #facc15;"></span>
+                        <span>Детский/льготный тариф</span>
+                    </div>
+                </div>
+
+                <form th:action="@{/booking/reserve}" method="post" class="form" style="margin-top: 16px;">
                     <input type="hidden" name="tripId" th:value="${tripId}"/>
                     <input type="hidden" name="seat" id="seat"/>
 
-                    <button class="btn primary" type="submit" id="reserveBtnSingle" disabled>Забронировать</button>
-                    <a class="btn secondary" th:href="@{/routes/search}">Назад</a>
+                    <h3 style="margin: 6px 0 4px;">Данные пассажира</h3>
+                    <div class="form-split">
+                        <div class="form-group">
+                            <label for="passengerName">ФИО пассажира</label>
+                            <input id="passengerName" name="passengerName" type="text" placeholder="Иванов Иван Иванович" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="document">Документ</label>
+                            <input id="document" name="document" type="text" placeholder="Паспорт / ID" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="passengerType">Тип билета</label>
+                            <div class="select-wrapper">
+                                <select id="passengerType" name="passengerType" class="custom-select">
+                                    <option value="adult">Взрослый</option>
+                                    <option value="child">Детский</option>
+                                    <option value="benefit">Льготный</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="contacts">Контакты</label>
+                            <input id="contacts" name="contacts" type="text" placeholder="Email или телефон для билета">
+                        </div>
+                    </div>
+
+                    <div class="divider-line"></div>
+                    <h4 style="margin: 0 0 8px;">Дополнительные услуги</h4>
+                    <div class="pill-group">
+                        <label class="pill-toggle">
+                            <input type="checkbox" name="meal" value="true">
+                            <span>Питание</span>
+                            <span class="dot"></span>
+                        </label>
+                        <label class="pill-toggle">
+                            <input type="checkbox" name="insurance" value="true">
+                            <span>Страхование</span>
+                            <span class="dot"></span>
+                        </label>
+                        <label class="pill-toggle">
+                            <input type="checkbox" name="transfer" value="true">
+                            <span>Трансфер/такси</span>
+                            <span class="dot"></span>
+                        </label>
+                        <label class="pill-toggle">
+                            <input type="checkbox" name="luggage" value="true">
+                            <span>Доп. багаж</span>
+                            <span class="dot"></span>
+                        </label>
+                    </div>
+
+                    <div class="actions" style="margin-top: 12px;">
+                        <button class="btn primary" type="submit" id="reserveBtnSingle" disabled>Забронировать</button>
+                        <a class="btn secondary" th:href="@{/routes/search}">Назад</a>
+                    </div>
                 </form>
             </article>
         </div>
@@ -117,7 +206,7 @@
                     </div>
                 </article>
 
-                <!-- CARD 2 (disabled until seat1 picked) -->
+                <!-- CARD 2 -->
                 <article class="card is-disabled" id="card2">
                     <div class="card-header">
                         <div>
@@ -143,14 +232,67 @@
                 </article>
             </div>
 
-            <form th:action="@{/booking/reserve}" method="post" class="actions" style="margin-top: 16px;">
+            <form th:action="@{/booking/reserve}" method="post" class="form" style="margin-top: 16px;">
                 <input type="hidden" name="tripId1" th:value="${tripId1}"/>
                 <input type="hidden" name="tripId2" th:value="${tripId2}"/>
                 <input type="hidden" name="seat1" id="seat1"/>
                 <input type="hidden" name="seat2" id="seat2"/>
 
-                <button class="btn primary" type="submit" id="reserveBtnTransfer" disabled>Забронировать</button>
-                <a class="btn secondary" th:href="@{/routes/search}">Назад</a>
+                <h3 style="margin: 6px 0 4px;">Данные пассажиров</h3>
+                <div class="form-split">
+                    <div class="form-group">
+                        <label for="passengerName1">Пассажир сегмента 1</label>
+                        <input id="passengerName1" name="passengerName1" type="text" placeholder="ФИО" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="passengerName2">Пассажир сегмента 2</label>
+                        <input id="passengerName2" name="passengerName2" type="text" placeholder="ФИО" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="documentTransfer">Документ</label>
+                        <input id="documentTransfer" name="documentTransfer" type="text" placeholder="Паспорт / ID" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="passengerTypeTransfer">Тип билета</label>
+                        <div class="select-wrapper">
+                            <select id="passengerTypeTransfer" name="passengerTypeTransfer" class="custom-select">
+                                <option value="adult">Взрослый</option>
+                                <option value="child">Детский</option>
+                                <option value="benefit">Льготный</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="divider-line"></div>
+                <h4 style="margin: 0 0 8px;">Дополнительные сервисы</h4>
+                <div class="pill-group">
+                    <label class="pill-toggle">
+                        <input type="checkbox" name="meal" value="true">
+                        <span>Выбор питания</span>
+                        <span class="dot"></span>
+                    </label>
+                    <label class="pill-toggle">
+                        <input type="checkbox" name="insurance" value="true">
+                        <span>Страхование</span>
+                        <span class="dot"></span>
+                    </label>
+                    <label class="pill-toggle">
+                        <input type="checkbox" name="transfer" value="true">
+                        <span>Трансфер</span>
+                        <span class="dot"></span>
+                    </label>
+                    <label class="pill-toggle">
+                        <input type="checkbox" name="luggage" value="true">
+                        <span>Багаж / животные</span>
+                        <span class="dot"></span>
+                    </label>
+                </div>
+
+                <div class="actions" style="margin-top: 12px;">
+                    <button class="btn primary" type="submit" id="reserveBtnTransfer" disabled>Забронировать</button>
+                    <a class="btn secondary" th:href="@{/routes/search}">Назад</a>
+                </div>
             </form>
         </div>
     </section>
