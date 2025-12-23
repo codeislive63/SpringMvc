@@ -58,5 +58,21 @@ public class DataInitializer implements CommandLineRunner {
 
         adminService.createTrip(mskOrsha.getId(), t2.getId(), dep1, arr1, BigDecimal.valueOf(12));
         adminService.createTrip(orshaSml.getId(), t1.getId(), dep2, arr2, BigDecimal.valueOf(18));
+
+        Route gomelMinsk   = adminService.createRoute(gomel.getId(),   minsk.getId(), 320, "Гомель — Минск");
+        Route vitebskMinsk = adminService.createRoute(vitebsk.getId(), minsk.getId(), 280, "Витебск — Минск");
+        Route orshaMsk     = adminService.createRoute(orsha.getId(),   minsk.getId(), 210, "Орша — Минск");
+        Route smolenskOrsha= adminService.createRoute(smolensk.getId(),orsha.getId(), 160, "Смоленск — Орша");
+
+        adminService.createTrip(gomelMinsk.getId(), t1.getId(),
+                LocalDateTime.now().plusHours(4), LocalDateTime.now().plusHours(8), BigDecimal.valueOf(35));
+        adminService.createTrip(vitebskMinsk.getId(), t2.getId(),
+                LocalDateTime.now().plusHours(6), LocalDateTime.now().plusHours(10), BigDecimal.valueOf(28));
+
+        adminService.createTrip(smolenskOrsha.getId(), t1.getId(), dep2, arr2, BigDecimal.valueOf(18));
+
+        LocalDateTime depReverse = arr2.plusMinutes(20);
+        LocalDateTime arrReverse = depReverse.plusHours(2);
+        adminService.createTrip(orshaMsk.getId(), t2.getId(), depReverse, arrReverse, BigDecimal.valueOf(12));
     }
 }
