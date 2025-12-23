@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Регистрация • Railway Booker</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body class="app-bg">
+<div class="center-wrapper">
+    <div class="card auth-card">
+        <div class="card-header">
+            <h1>Регистрация</h1>
+            <p>Создайте новый аккаунт</p>
+        </div>
+
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+        <form th:action="@{/register}" method="post" class="form">
+            <div class="form-group">
+                <label for="fullName">Полное имя</label>
+                <input id="fullName" name="fullName" type="text" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input id="email" name="email" type="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Пароль</label>
+                <input id="password" name="password" type="password" required>
+            </div>
+            <button class="btn primary w-100" type="submit">Зарегистрироваться</button>
+        </form>
+
+        <p class="hint">
+            Уже зарегистрированы? <a th:href="@{/login}">Войти</a>
+        </p>
+    </div>
+</div>
+</body>
+</html>

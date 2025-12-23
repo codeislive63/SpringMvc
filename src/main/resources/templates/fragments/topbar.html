@@ -9,12 +9,15 @@
     </div>
 
     <div class="topbar-right">
-        <!-- когда пользователь залогинен -->
+
         <span class="user-name"
               sec:authorize="isAuthenticated()"
               sec:authentication="principal.user.fullName">
-            Пользователь
         </span>
+
+        <a class="btn ghost" th:href="@{/profile}" sec:authorize="isAuthenticated()">
+            Личный кабинет
+        </a>
 
         <form th:action="@{/logout}" method="post" sec:authorize="isAuthenticated()">
             <button class="btn ghost" type="submit">Выйти</button>
