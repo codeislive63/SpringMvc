@@ -26,19 +26,17 @@ public class SecurityConfig {
                         auth.requestMatchers(
                                         "/", "/index",
                                         "/login", "/register",
-                                        "routes/search",
+                                        "/routes/search",   // добавьте слэш
+                                        "/routes/**",       // если хотите открывать и результаты поиска
                                         "/trips/**",
                                         "/css/**", "/js/**", "/images/**"
                                 ).permitAll()
-
                                 .requestMatchers(
                                         "/booking/**",
                                         "/dashboard",
-                                        "/profile/**")
-                                .authenticated()
-
-                                .requestMatchers("/admin/**")
-                                .hasRole("ADMIN")
+                                        "/profile/**"
+                                ).authenticated()
+                                .requestMatchers("/admin/**").hasRole("ADMIN")
                                 .anyRequest().authenticated()
                 )
                 .formLogin(login -> login
