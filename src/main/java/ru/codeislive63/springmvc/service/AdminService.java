@@ -3,6 +3,8 @@ package ru.codeislive63.springmvc.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.codeislive63.springmvc.domain.CarClass;
+import ru.codeislive63.springmvc.domain.TrainType;
 import ru.codeislive63.springmvc.domain.entity.Route;
 import ru.codeislive63.springmvc.domain.entity.Station;
 import ru.codeislive63.springmvc.domain.entity.Train;
@@ -34,10 +36,26 @@ public class AdminService {
     }
 
     public Train createTrain(String code, String name, int capacity) {
+        return createTrain(code, name, capacity, TrainType.EXPRESS, CarClass.ECONOMY, true, true, true);
+    }
+
+    public Train createTrain(String code,
+                             String name,
+                             int capacity,
+                             TrainType type,
+                             CarClass carClass,
+                             boolean wifi,
+                             boolean dining,
+                             boolean outlets) {
         return trainRepository.findByCode(code).orElseGet(() -> {
             Train train = new Train();
             train.setCode(code);
             train.setName(name);
+            train.setType(type);
+            train.setCarClass(carClass);
+            train.setWifiAvailable(wifi);
+            train.setDiningAvailable(dining);
+            train.setPowerOutlets(outlets);
             train.setSeatCapacity(capacity);
             return trainRepository.save(train);
         });
@@ -45,6 +63,10 @@ public class AdminService {
 
     @Transactional
     public Route createRoute(Long originId, Long destinationId, int distanceKm, String name) {
+        return createRoute(originId, destinationId, distanceKm, name, null);
+    }
+
+    public Route createRoute(Long originId, Long destinationId, int distanceKm, String name, java.util.List<String> stops) {
         Station origin = stationRepository.findById(originId)
                 .orElseThrow(() -> new IllegalArgumentException("Станция отправления не найдена"));
         Station destination = stationRepository.findById(destinationId)
@@ -55,6 +77,9 @@ public class AdminService {
             route.setDestination(destination);
             route.setDistanceKm(distanceKm);
             route.setName(name);
+            if (stops != null && !stops.isEmpty()) {
+                route.setStops(stops);
+            }
             return routeRepository.save(route);
         });
     }
@@ -80,4 +105,3 @@ public class AdminService {
                 || trainRepository.count() > 0 || tripRepository.count() > 0;
     }
 }
-

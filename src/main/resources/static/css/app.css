@@ -91,6 +91,18 @@ body.app-bg {
     color: var(--muted);
 }
 
+.form-group.two-col {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+}
+
+.form-group.two-col > div {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
 .form-group input {
     border-radius: 999px;
     border: 1px solid rgba(148, 163, 184, 0.5);
@@ -300,6 +312,17 @@ body.app-bg {
 .small {
     font-size: 0.75rem;
     color: var(--muted);
+}
+
+.pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.14);
+    font-size: 0.8rem;
 }
 
 /* Адаптив */

@@ -3,7 +3,9 @@ package ru.codeislive63.springmvc.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import ru.codeislive63.springmvc.domain.CarClass;
 import ru.codeislive63.springmvc.domain.RoleType;
+import ru.codeislive63.springmvc.domain.TrainType;
 import ru.codeislive63.springmvc.domain.entity.Route;
 import ru.codeislive63.springmvc.domain.entity.Station;
 import ru.codeislive63.springmvc.domain.entity.Train;
@@ -36,14 +38,20 @@ public class DataInitializer implements CommandLineRunner {
         Station orsha = adminService.createStation("ORS", "Орша");
         Station smolensk = adminService.createStation("SML", "Смоленск");
 
-        Train t1 = adminService.createTrain("TRAIN-1", "Скорый 001", 30);
-        Train t2 = adminService.createTrain("TRAIN-2", "Региональный 045", 30);
+        Train t1 = adminService.createTrain("TRAIN-1", "Скорый 001", 30,
+                TrainType.HIGH_SPEED, CarClass.COMFORT, true, true, true);
+        Train t2 = adminService.createTrain("TRAIN-2", "Региональный 045", 30,
+                TrainType.REGIONAL, CarClass.ECONOMY, true, false, true);
 
-        Route route1 = adminService.createRoute(minsk.getId(), gomel.getId(), 320, "Минск — Гомель");
-        Route route2 = adminService.createRoute(minsk.getId(), vitebsk.getId(), 280, "Минск — Витебск");
+        Route route1 = adminService.createRoute(minsk.getId(), gomel.getId(), 320, "Минск — Гомель",
+                java.util.List.of("Осиповичи", "Жлобин"));
+        Route route2 = adminService.createRoute(minsk.getId(), vitebsk.getId(), 280, "Минск — Витебск",
+                java.util.List.of("Орша", "Сенно"));
 
-        Route mskOrsha = adminService.createRoute(minsk.getId(), orsha.getId(), 210, "Минск — Орша");
-        Route orshaSml = adminService.createRoute(orsha.getId(), smolensk.getId(), 160, "Орша — Смоленск");
+        Route mskOrsha = adminService.createRoute(minsk.getId(), orsha.getId(), 210, "Минск — Орша",
+                java.util.List.of("Борисов"));
+        Route orshaSml = adminService.createRoute(orsha.getId(), smolensk.getId(), 160, "Орша — Смоленск",
+                java.util.List.of("Красное"));
 
         adminService.createTrip(route1.getId(), t1.getId(),
                 LocalDateTime.now().plusHours(4), LocalDateTime.now().plusHours(8), BigDecimal.valueOf(35));

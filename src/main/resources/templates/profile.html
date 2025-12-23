@@ -19,6 +19,29 @@
     </section>
 
     <section class="cards-grid">
+        <article class="card">
+            <h2>Профиль и бонусы</h2>
+            <p class="muted">Настройки вашего аккаунта, сохранённые пассажиры и программы лояльности.</p>
+            <div class="row">
+                <p>Текущий уровень: <b th:text="${loyaltyTier}">Базовый</b></p>
+                <p>Бонусные баллы: <b th:text="${loyaltyPoints}">0</b></p>
+            </div>
+            <div>
+                <p class="small">Сохранённые пассажиры</p>
+                <div class="actions" th:if="${!#lists.isEmpty(savedPassengers)}">
+                    <span class="badge" th:each="p : ${savedPassengers}" th:text="${p}"></span>
+                </div>
+                <p th:if="${#lists.isEmpty(savedPassengers)}" class="muted">Пока нет сохранённых пассажиров.</p>
+            </div>
+            <div style="margin-top:10px;">
+                <p class="small">Сохранённые документы</p>
+                <div class="actions" th:if="${!#lists.isEmpty(savedDocuments)}">
+                    <span class="badge" th:each="d : ${savedDocuments}" th:text="${d}"></span>
+                </div>
+                <p th:if="${#lists.isEmpty(savedDocuments)}" class="muted">Добавьте документы при оформлении билета — они сохранятся автоматически.</p>
+            </div>
+        </article>
+
         <!-- Активные (неоплаченные) брони -->
         <article class="card">
             <h2>Активные брони</h2>

@@ -29,7 +29,23 @@
             <p th:text="'Место: ' + ${t.seatNumber}">Место</p>
             <p th:text="'Цена: ' + ${#numbers.formatDecimal(t.price,1,'COMMA',2,'POINT')} + ' BYN'">Цена</p>
 
-            <p th:text="'Статус: ' + ${t.status}">Статус</p>
+            <p th:text="'Статус: ' + ${t.status.label}">Статус</p>
+            <div th:if="${t.passengerDetails != null}" class="notice">
+                <p><b>Пассажир:</b> <span th:text="${t.passengerDetails.fullName}"></span></p>
+                <p th:if="${t.passengerDetails.documentNumber}"><b>Документ:</b> <span th:text="${t.passengerDetails.documentNumber}"></span></p>
+                <p th:if="${t.passengerDetails.benefitType}"><b>Льгота:</b> <span th:text="${t.passengerDetails.benefitType}"></span></p>
+                <p th:if="${t.passengerDetails.childTicket}">Детский тариф</p>
+                <p th:if="${t.passengerDetails.loyaltyNumber}"><b>Бонусная карта:</b> <span th:text="${t.passengerDetails.loyaltyNumber}"></span></p>
+            </div>
+            <div th:if="${t.additionalServices != null}" class="notice">
+                <p><b>Услуги:</b></p>
+                <p class="small" th:if="${t.additionalServices.mealOption != null and !t.additionalServices.mealOption.isEmpty()}"
+                   th:text="'Питание: ' + ${t.additionalServices.mealOption}"></p>
+                <p class="small" th:if="${t.additionalServices.insuranceIncluded}">Страхование</p>
+                <p class="small" th:if="${t.additionalServices.transferIncluded}">Трансфер</p>
+                <p class="small" th:if="${t.additionalServices.baggageSelected}">Багаж</p>
+                <p class="small" th:if="${t.additionalServices.petTravel}">Животные</p>
+            </div>
 
             <div class="actions">
                 <form th:if="${t.status.name() == 'BOOKED' || t.status.name() == 'PAID'}"

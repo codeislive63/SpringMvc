@@ -38,4 +38,10 @@ public class Ticket {
 
     @Column(nullable = false)
     private LocalDateTime bookedAt;
+
+    @Embedded
+    private PassengerDetails passengerDetails;
+
+    @Embedded
+    private AdditionalServices additionalServices;
 }

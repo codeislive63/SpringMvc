@@ -5,6 +5,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.util.StringUtils;
 import ru.codeislive63.springmvc.domain.TicketStatus;
 import ru.codeislive63.springmvc.domain.entity.Ticket;
 import ru.codeislive63.springmvc.security.UserPrincipal;
@@ -38,6 +39,40 @@ public class ProfileController {
         model.addAttribute("unpaidTickets", unpaid);
         model.addAttribute("paidTickets", paid);
         model.addAttribute("cancelledTickets", cancelled);
+        model.addAttribute("savedPassengers", extractPassengers(tickets, user.getFullName()));
+        model.addAttribute("savedDocuments", extractDocuments(tickets));
+        model.addAttribute("loyaltyPoints", paid.size() * 120 + unpaid.size() * 40);
+        model.addAttribute("loyaltyTier", determineTier(paid.size()));
         return "profile";
+    }
+
+    private List<String> extractPassengers(List<Ticket> tickets, String fallback) {
+        List<String> names = tickets.stream()
+                .map(Ticket::getPassengerDetails)
+                .filter(details -> details != null && StringUtils.hasText(details.getFullName()))
+                .map(details -> details.getFullName().trim())
+                .distinct()
+                .toList();
+
+        if (names.isEmpty() && StringUtils.hasText(fallback)) {
+            return List.of(fallback);
+        }
+        return names;
+    }
+
+    private List<String> extractDocuments(List<Ticket> tickets) {
+        return tickets.stream()
+                .map(Ticket::getPassengerDetails)
+                .filter(details -> details != null && StringUtils.hasText(details.getDocumentNumber()))
+                .map(details -> details.getDocumentNumber().trim())
+                .distinct()
+                .toList();
+    }
+
+    private String determineTier(int paidTickets) {
+        if (paidTickets > 6) return "Платиновый";
+        if (paidTickets > 3) return "Золотой";
+        if (paidTickets > 0) return "Серебряный";
+        return "Базовый";
     }
 }

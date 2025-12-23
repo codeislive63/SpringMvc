@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -27,4 +30,9 @@ public class Route {
 
     @Column(nullable = false)
     private String name;
+
+    @ElementCollection
+    @CollectionTable(name = "route_stops", joinColumns = @JoinColumn(name = "route_id"))
+    @Column(name = "stop_name")
+    private List<String> stops = new ArrayList<>();
 }

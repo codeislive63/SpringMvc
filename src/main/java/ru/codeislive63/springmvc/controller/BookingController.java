@@ -12,6 +12,7 @@ import ru.codeislive63.springmvc.domain.entity.Trip;
 import ru.codeislive63.springmvc.security.UserPrincipal;
 import ru.codeislive63.springmvc.service.BookingService;
 import ru.codeislive63.springmvc.service.TripService;
+import ru.codeislive63.springmvc.web.dto.BookingRequest;
 
 import java.util.List;
 
@@ -59,6 +60,7 @@ public class BookingController {
             model.addAttribute("trip", trip);
             model.addAttribute("routeLabel", routeLabel(trip));
             model.addAttribute("seats", bookingService.availableSeats(tripId));
+            model.addAttribute("seatMap", bookingService.seatMap(tripId));
         }
         // If two trips selected (transfer), prepare seats for both legs and route info
         if (tripId1 != null && tripId2 != null) {
@@ -72,6 +74,8 @@ public class BookingController {
             model.addAttribute("routeLabelB", routeLabel(tripB));
             model.addAttribute("seats1", bookingService.availableSeats(tripId1));
             model.addAttribute("seats2", bookingService.availableSeats(tripId2));
+            model.addAttribute("seatMap1", bookingService.seatMap(tripId1));
+            model.addAttribute("seatMap2", bookingService.seatMap(tripId2));
         }
         return "booking/select-seat";
     }
@@ -82,24 +86,36 @@ public class BookingController {
      * If a transfer route is selected, expects {@code tripId1}, {@code tripId2}, {@code seat1} and {@code seat2}.
      */
     @PostMapping("/reserve")
-    public String reserve(@RequestParam(required = false) Long tripId,
-                          @RequestParam(required = false) Long tripId1,
-                          @RequestParam(required = false) Long tripId2,
-                          @RequestParam(required = false) Integer seat,
-                          @RequestParam(required = false) Integer seat1,
-                          @RequestParam(required = false) Integer seat2,
+    public String reserve(@ModelAttribute BookingRequest request,
                           @AuthenticationPrincipal UserPrincipal principal,
                           Model model) {
-        if (tripId != null && seat != null) {
-            Ticket ticket = bookingService.bookSeat(principal.user().getId(), tripId, seat);
+        if (request.getTripId() != null && request.getSeat() != null) {
+            Ticket ticket = bookingService.bookSeat(
+                    principal.user().getId(),
+                    request.getTripId(),
+                    request.getSeat(),
+                    request);
             model.addAttribute("tickets", List.of(ticket));
-        } else if (tripId1 != null && tripId2 != null && seat1 != null && seat2 != null) {
-            Ticket ticketA = bookingService.bookSeat(principal.user().getId(), tripId1, seat1);
-            Ticket ticketB = bookingService.bookSeat(principal.user().getId(), tripId2, seat2);
+        } else if (request.getTripId1() != null && request.getTripId2() != null
+                && request.getSeat1() != null && request.getSeat2() != null) {
+
+            Ticket ticketA = bookingService.bookSeat(
+                    principal.user().getId(),
+                    request.getTripId1(),
+                    request.getSeat1(),
+                    request);
+
+            Ticket ticketB = bookingService.bookSeat(
+                    principal.user().getId(),
+                    request.getTripId2(),
+                    request.getSeat2(),
+                    request);
+
             model.addAttribute("tickets", List.of(ticketA, ticketB));
         } else {
             throw new IllegalArgumentException("Неверные параметры для бронирования");
         }
+        model.addAttribute("passenger", request);
         return "booking/confirmation";
     }
 

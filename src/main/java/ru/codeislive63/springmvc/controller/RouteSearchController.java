@@ -6,6 +6,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ru.codeislive63.springmvc.domain.CarClass;
+import ru.codeislive63.springmvc.domain.TrainType;
 import ru.codeislive63.springmvc.repository.StationRepository;
 import ru.codeislive63.springmvc.service.RouteSearchService;
 import ru.codeislive63.springmvc.web.dto.RouteSearchRequest;
@@ -25,6 +27,8 @@ public class RouteSearchController {
                          BindingResult binding,
                          Model model) {
         model.addAttribute("stations", stationRepository.findAll());
+        model.addAttribute("trainTypes", TrainType.values());
+        model.addAttribute("carClasses", CarClass.values());
 
         if (req.getFromPointId() == null && req.getToPointId() == null
                 && req.getDepartureDate() == null) {
@@ -40,6 +44,7 @@ public class RouteSearchController {
             return "routes/search";
         }
 
+        model.addAttribute("req", req);
         model.addAttribute("itineraries", routeSearchService.search(req));
         return "routes/results";
     }

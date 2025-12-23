@@ -62,6 +62,49 @@
                     <input id="departureDate" type="date" th:field="*{departureDate}" required>
                 </div>
 
+                <div class="form-group two-col">
+                    <div>
+                        <label for="trainType">Тип поезда</label>
+                        <div class="select-wrapper">
+                            <select id="trainType" class="custom-select" name="trainType">
+                                <option value="">Любой</option>
+                                <option th:each="t : ${trainTypes}"
+                                        th:value="${t}"
+                                        th:text="${t.label}"
+                                        th:selected="${req.trainType != null and req.trainType == t}"></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="carClass">Класс вагона</label>
+                        <div class="select-wrapper">
+                            <select id="carClass" class="custom-select" name="carClass">
+                                <option value="">Любой</option>
+                                <option th:each="c : ${carClasses}"
+                                        th:value="${c}"
+                                        th:text="${c.label}"
+                                        th:selected="${req.carClass != null and req.carClass == c}"></option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group two-col">
+                    <div>
+                        <label for="departureFrom">Время отправления с</label>
+                        <input id="departureFrom" type="time" name="departureFrom" th:value="${req.departureFrom}">
+                    </div>
+                    <div>
+                        <label for="arrivalTo">Прибытие до</label>
+                        <input id="arrivalTo" type="time" name="arrivalTo" th:value="${req.arrivalTo}">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="maxPrice">Макс. цена (BYN)</label>
+                    <input id="maxPrice" type="number" min="0" step="1" name="maxPrice" th:value="${req.maxPrice}">
+                </div>
+
                 <button class="btn primary w-100" type="submit">Найти</button>
             </form>
         </article>

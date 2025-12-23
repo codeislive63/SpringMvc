@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.codeislive63.springmvc.domain.CarClass;
+import ru.codeislive63.springmvc.domain.TrainType;
 
 @Getter
 @Setter
@@ -21,6 +23,23 @@ public class Train {
 
     @Column(nullable = false)
     private String name;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TrainType type = TrainType.EXPRESS;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private CarClass carClass = CarClass.ECONOMY;
+
+    @Column(nullable = false)
+    private boolean wifiAvailable = false;
+
+    @Column(nullable = false)
+    private boolean diningAvailable = false;
+
+    @Column(nullable = false)
+    private boolean powerOutlets = false;
 
     @Column(nullable = false)
     private int seatCapacity;

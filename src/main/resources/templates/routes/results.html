@@ -36,9 +36,9 @@
             background: rgba(255,255,255,.04);
             border: 1px solid rgba(255,255,255,.10);
         }
-        .leg-route { font-weight: 700; font-size: 16px; }
-        .leg-time { margin-top: 6px; font-size: 13px; opacity: .85; }
-        .leg-meta { margin-top: 6px; font-size: 13px; opacity: .75; display: flex; gap: 10px; flex-wrap: wrap; }
+        .leg-route { font-weight: 700; font-size: 16px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+        .leg-time { margin-top: 6px; font-size: 13px; opacity: .85; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .leg-meta { margin-top: 6px; font-size: 13px; opacity: .75; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
         .divider { height: 1px; background: rgba(255,255,255,.12); margin: 16px 0; border: 0; }
 
         .actions { display: flex; gap: 12px; flex-wrap: wrap; }
@@ -50,6 +50,14 @@
         }
         .btn.secondary:hover { filter: brightness(1.06); }
         .muted { opacity: .75; }
+        .stack { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .pill { padding: 4px 8px; border-radius: 10px; background: rgba(99,102,241,.14); border: 1px solid rgba(99,102,241,.3); font-size: 12px; }
+        .pill.soft { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.14); }
+        .stops { margin: 8px 0 0; padding: 0; list-style: none; display: flex; gap: 8px; flex-wrap: wrap; }
+        .stops li { font-size: 12px; padding: 6px 10px; border-radius: 999px; border: 1px dashed rgba(255,255,255,.16); opacity: .8; }
+        .filter-card { display: grid; gap: 10px; }
+        .filter-badges { display: flex; gap: 8px; flex-wrap: wrap; }
+        .filter-badges .chip { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.14); }
     </style>
 </head>
 
@@ -64,6 +72,30 @@
     </section>
 
     <section class="cards-grid results-grid">
+        <article class="card filter-card">
+            <div class="trip-head">
+                <div>
+                    <h2 class="trip-title">Параметры поиска</h2>
+                    <p class="muted">Маршрут и фильтры, которые вы выбрали.</p>
+                </div>
+                <a class="btn secondary" th:href="@{/routes/search}">Изменить</a>
+            </div>
+            <div class="filter-badges">
+                <span class="chip" th:if="${req != null and req.departureDate != null}"
+                      th:text="'Дата: ' + ${#temporals.format(req.departureDate, 'dd.MM.yyyy')}"></span>
+                <span class="chip" th:if="${req != null and req.trainType != null}"
+                      th:text="'Тип: ' + ${req.trainType.label}"></span>
+                <span class="chip" th:if="${req != null and req.carClass != null}"
+                      th:text="'Класс: ' + ${req.carClass.label}"></span>
+                <span class="chip" th:if="${req != null and req.departureFrom != null}"
+                      th:text="'Отправление с: ' + ${#temporals.format(req.departureFrom, 'HH:mm')}"></span>
+                <span class="chip" th:if="${req != null and req.arrivalTo != null}"
+                      th:text="'Прибытие до: ' + ${#temporals.format(req.arrivalTo, 'HH:mm')}"></span>
+                <span class="chip" th:if="${req != null and req.maxPrice != null}"
+                      th:text="'Бюджет: ' + ${req.maxPrice} + ' BYN'"></span>
+            </div>
+        </article>
+
         <article class="card trip-card" th:if="${#lists.isEmpty(itineraries)}">
             <h2 class="trip-title">Ничего не найдено</h2>
             <p class="muted">Попробуйте изменить дату или станции.</p>
@@ -95,18 +127,30 @@
                         <span th:text="${leg.fromName}"></span>
                         <span> → </span>
                         <span th:text="${leg.toName}"></span>
+                        <span class="pill soft" th:text="${leg.trainName}"></span>
                     </div>
 
                     <div class="leg-time">
                         <span th:text="${#temporals.format(leg.departureTime, 'dd.MM.yyyy HH:mm')}"></span>
                         <span> — </span>
                         <span th:text="${#temporals.format(leg.arrivalTime, 'dd.MM.yyyy HH:mm')}"></span>
+                        <span class="pill soft" th:text="${leg.legDuration.toHours()} + ' ч ' + leg.legDuration.toMinutesPart() + ' мин'"></span>
                     </div>
 
                     <div class="leg-meta">
                         <span th:text="'Цена: ' + ${leg.price}"></span>
-                        <span th:if="${leg.trainName != null}" th:text="'Поезд: ' + ${leg.trainName}"></span>
+                        <span th:text="'Свободно мест: ' + ${leg.seatsAvailable}"></span>
+                        <span th:if="${leg.trainType != null}" th:text="${leg.trainType.label}"></span>
+                        <span th:if="${leg.carClass != null}" th:text="${leg.carClass.label}"></span>
+                        <span th:if="${leg.wifiAvailable}" class="pill">Wi‑Fi</span>
+                        <span th:if="${leg.diningAvailable}" class="pill">Питание</span>
+                        <span th:if="${leg.powerOutlets}" class="pill">Розетки</span>
                     </div>
+
+                    <ul class="stops" th:if="${leg.stops != null and !leg.stops.isEmpty()}">
+                        <li>Остановки:</li>
+                        <li th:each="stop : ${leg.stops}" th:text="${stop}"></li>
+                    </ul>
                 </div>
             </div>
 

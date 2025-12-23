@@ -6,15 +6,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.codeislive63.springmvc.domain.PaymentStatus;
 import ru.codeislive63.springmvc.domain.TicketStatus;
-import ru.codeislive63.springmvc.domain.entity.Payment;
-import ru.codeislive63.springmvc.domain.entity.Ticket;
-import ru.codeislive63.springmvc.domain.entity.Trip;
-import ru.codeislive63.springmvc.domain.entity.UserAccount;
+import ru.codeislive63.springmvc.domain.entity.*;
 import ru.codeislive63.springmvc.repository.PaymentRepository;
 import ru.codeislive63.springmvc.repository.TicketRepository;
 import ru.codeislive63.springmvc.service.pricing.PriceStrategyFactory;
+import ru.codeislive63.springmvc.web.dto.BookingRequest;
+import ru.codeislive63.springmvc.web.dto.SeatView;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -91,6 +91,21 @@ public class BookingService {
     }
 
     /**
+     * Возвращает схему вагона: список мест с указанием доступности.
+     */
+    public List<SeatView> seatMap(Long tripId) {
+        Trip trip = tripService.getTrip(tripId);
+        int capacity = Math.min(trip.getTrain().getSeatCapacity(), 50);
+        List<Integer> free = availableSeats(tripId);
+
+        List<SeatView> seats = new ArrayList<>(capacity);
+        for (int i = 1; i <= capacity; i++) {
+            seats.add(new SeatView(i, free.contains(i)));
+        }
+        return seats;
+    }
+
+    /**
      * Books a specific seat on a trip for the given user.
      * If the seat is not available or out of range, an exception will be thrown.
      *
@@ -120,6 +135,33 @@ public class BookingService {
         }
 
         return getTicket(trip, user, seatNumber);
+    }
+
+    @Transactional
+    public Ticket bookSeat(Long userId, Long tripId, int seatNumber, BookingRequest request) {
+        Trip trip = tripService.getTrip(tripId);
+        UserAccount user = userService.getUser(userId);
+
+        int capacity = Math.min(trip.getTrain().getSeatCapacity(), 50);
+
+        if (seatNumber < 1 || seatNumber > capacity) {
+            throw new IllegalArgumentException("Неверный номер места");
+        }
+
+        if (trip.getSeatsAvailable() <= 0) {
+            throw new IllegalStateException("Нет свободных мест");
+        }
+
+        List<Integer> available = availableSeats(tripId);
+        if (!available.contains(seatNumber)) {
+            throw new IllegalStateException("Место уже занято");
+        }
+
+        Ticket ticket = getTicket(trip, user, seatNumber);
+        enrichWithPassenger(ticket, request);
+        enrichWithServices(ticket, request);
+        ticket.setPrice(applyDiscounts(ticket.getPrice(), request));
+        return ticketRepository.save(ticket);
     }
 
     @Transactional
@@ -157,6 +199,55 @@ public class BookingService {
         UserAccount user = userService.getUser(userId);
         return ticketRepository.findByUser(user);
     }
+
+    private void enrichWithPassenger(Ticket ticket, BookingRequest request) {
+        if (request == null) {
+            return;
+        }
+        PassengerDetails details = ticket.getPassengerDetails() != null ? ticket.getPassengerDetails() : new PassengerDetails();
+        details.setFullName(request.getPassengerName());
+        details.setDocumentNumber(request.getPassengerDocument());
+        details.setBenefitType(resolveBenefitLabel(request.getBenefitType()));
+        details.setChildTicket(request.isChildTicket());
+        details.setLoyaltyNumber(request.getLoyaltyNumber());
+        ticket.setPassengerDetails(details);
+    }
+
+    private void enrichWithServices(Ticket ticket, BookingRequest request) {
+        if (request == null) {
+            return;
+        }
+        AdditionalServices services = ticket.getAdditionalServices() != null ? ticket.getAdditionalServices() : new AdditionalServices();
+        services.setMealOption(request.getMealOption());
+        services.setInsuranceIncluded(request.isInsuranceIncluded());
+        services.setTransferIncluded(request.isTransferIncluded());
+        services.setBaggageSelected(request.isBaggageSelected());
+        services.setPetTravel(request.isPetTravel());
+        ticket.setAdditionalServices(services);
+    }
+
+    private BigDecimal applyDiscounts(BigDecimal base, BookingRequest request) {
+        if (request == null) {
+            return base;
+        }
+        BigDecimal multiplier = BigDecimal.ONE;
+        if (request.isChildTicket()) {
+            multiplier = new BigDecimal("0.50");
+        } else if (request.getBenefitType() != null && !request.getBenefitType().isBlank()) {
+            multiplier = new BigDecimal("0.80");
+        }
+        return base.multiply(multiplier).setScale(2, RoundingMode.HALF_UP);
+    }
+
+    private String resolveBenefitLabel(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return null;
+        }
+        return switch (raw) {
+            case "student" -> "Студент";
+            case "pensioner" -> "Пенсионер";
+            case "military" -> "Военнослужащий";
+            default -> raw;
+        };
+    }
 }
-
-

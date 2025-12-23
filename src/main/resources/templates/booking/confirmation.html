@@ -23,6 +23,24 @@
             <p>Место: <b th:text="${t.seatNumber}"></b></p>
             <p>Цена: <b th:text="${t.price}"></b></p>
             <p>Статус: <b th:text="${t.status.label}"></b></p>
+            <div th:if="${t.passengerDetails != null}" class="notice">
+                <p><b>Пассажир:</b> <span th:text="${t.passengerDetails.fullName}">Имя</span></p>
+                <p><b>Документ:</b> <span th:text="${t.passengerDetails.documentNumber}">Документ</span></p>
+                <p th:if="${t.passengerDetails.benefitType}">Льгота: <span th:text="${t.passengerDetails.benefitType}"></span></p>
+                <p th:if="${t.passengerDetails.childTicket}">Детский билет (скидка применена)</p>
+                <p th:if="${t.passengerDetails.loyaltyNumber}">Бонусная карта: <span th:text="${t.passengerDetails.loyaltyNumber}"></span></p>
+            </div>
+            <div th:if="${t.additionalServices != null}" class="notice">
+                <p><b>Услуги:</b></p>
+                <ul style="margin: 6px 0 0 14px;">
+                    <li th:if="${t.additionalServices.mealOption != null and !t.additionalServices.mealOption.isEmpty()}"
+                        th:text="'Питание: ' + ${t.additionalServices.mealOption}"></li>
+                    <li th:if="${t.additionalServices.insuranceIncluded}">Страхование</li>
+                    <li th:if="${t.additionalServices.transferIncluded}">Трансфер / такси</li>
+                    <li th:if="${t.additionalServices.baggageSelected}">Дополнительный багаж</li>
+                    <li th:if="${t.additionalServices.petTravel}">Путешествие с животными</li>
+                </ul>
+            </div>
             <form th:action="@{/booking/pay/{id}(id=${t.id})}" method="post">
                 <button class="btn primary" type="submit">Оплатить</button>
             </form>

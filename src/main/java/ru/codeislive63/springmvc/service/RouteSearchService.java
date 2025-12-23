@@ -84,7 +84,8 @@ public class RouteSearchService {
             }
         }
 
-        return mergeAndSort(direct, withTransfer);
+        List<ItineraryDto> merged = mergeAndSort(direct, withTransfer);
+        return applyFilters(merged, req);
     }
 
     private List<ItineraryDto> mergeAndSort(List<ItineraryDto> direct, List<ItineraryDto> transfer) {
@@ -133,6 +134,8 @@ public class RouteSearchService {
 
     private TripLegDto toLeg(Trip t) {
         Route r = t.getRoute();
+        var train = t.getTrain();
+        var duration = Duration.between(t.getDepartureTime(), t.getArrivalTime());
 
         return TripLegDto.builder()
                 .tripId(t.getId())
@@ -142,7 +145,15 @@ public class RouteSearchService {
                 .departureTime(t.getDepartureTime())
                 .arrivalTime(t.getArrivalTime())
                 .price(t.getBasePrice())
-                .trainName(t.getTrain() != null ? t.getTrain().getName() : null)
+                .trainName(train != null ? train.getName() : null)
+                .trainType(train != null ? train.getType() : null)
+                .carClass(train != null ? train.getCarClass() : null)
+                .wifiAvailable(train != null && train.isWifiAvailable())
+                .diningAvailable(train != null && train.isDiningAvailable())
+                .powerOutlets(train != null && train.isPowerOutlets())
+                .stops(r.getStops())
+                .legDuration(duration)
+                .seatsAvailable(t.getSeatsAvailable())
                 .build();
     }
 
@@ -153,5 +164,19 @@ public class RouteSearchService {
         if (hours == 0) return minutes + " мин";
         if (minutes == 0) return hours + " ч";
         return hours + " ч " + minutes + " мин";
+    }
+
+    private List<ItineraryDto> applyFilters(List<ItineraryDto> itineraries, RouteSearchRequest req) {
+        return itineraries.stream()
+                .filter(it -> req.getTrainType() == null || it.getLegs().stream()
+                        .allMatch(l -> l.getTrainType() == req.getTrainType()))
+                .filter(it -> req.getCarClass() == null || it.getLegs().stream()
+                        .allMatch(l -> l.getCarClass() == req.getCarClass()))
+                .filter(it -> req.getDepartureFrom() == null || !it.departure().toLocalTime()
+                        .isBefore(req.getDepartureFrom()))
+                .filter(it -> req.getArrivalTo() == null || !it.arrival().toLocalTime()
+                        .isAfter(req.getArrivalTo()))
+                .filter(it -> req.getMaxPrice() == null || it.getTotalPrice().compareTo(req.getMaxPrice()) <= 0)
+                .toList();
     }
 }
