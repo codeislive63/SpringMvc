@@ -16,6 +16,7 @@ import ru.codeislive63.springmvc.service.pricing.PriceStrategyFactory;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -45,6 +46,72 @@ public class BookingService {
         ticket.setTrip(trip);
         ticket.setUser(user);
         ticket.setSeatNumber(nextSeat);
+        ticket.setPrice(price);
+        ticket.setBookedAt(LocalDateTime.now());
+        ticket.setStatus(TicketStatus.BOOKED);
+
+        Ticket saved = ticketRepository.save(ticket);
+        tripService.save(trip);
+        return saved;
+    }
+
+    /**
+     * Returns the list of seat numbers that are available for booking on the given trip.
+     * Seats that are either booked or paid (i.e. statuses {@link TicketStatus#BOOKED} or {@link TicketStatus#PAID})
+     * are excluded from the result.
+     *
+     * @param tripId ID of the trip
+     * @return list of free seat numbers starting from 1 up to the train's seat capacity
+     */
+    public List<Integer> availableSeats(Long tripId) {
+        Trip trip = tripService.getTrip(tripId);
+        int capacity = trip.getTrain().getSeatCapacity();
+        List<TicketStatus> reservedStatuses = List.of(TicketStatus.BOOKED, TicketStatus.PAID);
+        List<Integer> booked = ticketRepository.findBookedSeats(tripId, reservedStatuses);
+        List<Integer> free = new ArrayList<>();
+        for (int i = 1; i <= capacity; i++) {
+            if (!booked.contains(i)) {
+                free.add(i);
+            }
+        }
+        return free;
+    }
+
+    /**
+     * Books a specific seat on a trip for the given user.
+     * If the seat is not available or out of range, an exception will be thrown.
+     *
+     * @param userId     ID of the user
+     * @param tripId     ID of the trip
+     * @param seatNumber desired seat number
+     * @return booked ticket
+     */
+    @Transactional
+    public Ticket bookSeat(Long userId, Long tripId, int seatNumber) {
+        Trip trip = tripService.getTrip(tripId);
+        UserAccount user = userService.getUser(userId);
+
+        int capacity = trip.getTrain().getSeatCapacity();
+        if (seatNumber < 1 || seatNumber > capacity) {
+            throw new IllegalArgumentException("Неверный номер места");
+        }
+
+        if (trip.getSeatsAvailable() <= 0) {
+            throw new IllegalStateException("Нет свободных мест");
+        }
+
+        List<Integer> available = availableSeats(tripId);
+        if (!available.contains(seatNumber)) {
+            throw new IllegalStateException("Место уже занято");
+        }
+
+        BigDecimal price = priceStrategyFactory.chooseFor(trip).calculate(trip, 1);
+
+        trip.setSeatsAvailable(trip.getSeatsAvailable() - 1);
+        Ticket ticket = new Ticket();
+        ticket.setTrip(trip);
+        ticket.setUser(user);
+        ticket.setSeatNumber(seatNumber);
         ticket.setPrice(price);
         ticket.setBookedAt(LocalDateTime.now());
         ticket.setStatus(TicketStatus.BOOKED);

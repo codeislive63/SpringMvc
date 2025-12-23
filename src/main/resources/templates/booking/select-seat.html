@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+    <title>Выбор места • Railway Booker</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body class="app-bg">
+
+<header th:replace="~{fragments/topbar :: topbar}"></header>
+
+<main class="page">
+    <section class="welcome">
+        <h1>Выбор места</h1>
+        <p>Пожалуйста, выберите место для бронирования.</p>
+    </section>
+
+    <section class="cards-grid">
+        <article class="card">
+            <!-- Single-trip booking -->
+            <div th:if="${tripId != null}">
+                <p>Рейс: <b th:text="${tripId}"></b></p>
+                <form th:action="@{/booking/reserve}" method="post">
+                    <input type="hidden" name="tripId" th:value="${tripId}"/>
+                    <label for="seat">Место:</label>
+                    <select id="seat" name="seat">
+                        <option th:each="s : ${seats}" th:value="${s}" th:text="${s}"></option>
+                    </select>
+                    <button class="btn primary" type="submit">Забронировать</button>
+                </form>
+            </div>
+
+            <!-- Transfer booking -->
+            <div th:if="${tripId1 != null}">
+                <p>Маршрут с пересадкой: <b th:text="${tripId1}"></b> + <b th:text="${tripId2}"></b></p>
+                <form th:action="@{/booking/reserve}" method="post">
+                    <input type="hidden" name="tripId1" th:value="${tripId1}"/>
+                    <input type="hidden" name="tripId2" th:value="${tripId2}"/>
+                    <div>
+                        <label for="seat1">Место в первом рейсе:</label>
+                        <select id="seat1" name="seat1">
+                            <option th:each="s1 : ${seats1}" th:value="${s1}" th:text="${s1}"></option>
+                        </select>
+                    </div>
+                    <div style="margin-top: 8px;">
+                        <label for="seat2">Место во втором рейсе:</label>
+                        <select id="seat2" name="seat2">
+                            <option th:each="s2 : ${seats2}" th:value="${s2}" th:text="${s2}"></option>
+                        </select>
+                    </div>
+                    <button class="btn primary" type="submit" style="margin-top: 12px;">Забронировать</button>
+                </form>
+            </div>
+
+            <div class="actions" style="margin-top: 16px;">
+                <a class="btn" th:href="@{/routes/search}">Назад</a>
+            </div>
+        </article>
+    </section>
+</main>
+
+</body>
+</html>
