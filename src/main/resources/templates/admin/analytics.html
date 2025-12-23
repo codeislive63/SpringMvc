@@ -13,7 +13,7 @@
 <main class="page">
     <section class="welcome">
         <h1>Аналитика</h1>
-        <p>Раздел доступен только администраторам. Здесь собраны основные показатели о рейсах и билетах.</p>
+        <p>Здесь собраны основные показатели о рейсах и билетах</p>
     </section>
 
     <section class="cards-grid">
@@ -38,13 +38,15 @@
 </main>
 
 <script th:inline="javascript">
-    const ocLabels    = [[${ocLabels}]];
-    const ocData      = [[${ocData}]];
-    const demandLabels= [[${demandLabels}]];
-    const demandValues= [[${demandValues}]];
-    const statusLabels= [[${statusLabels}]];
-    const statusValues= [[${statusValues}]];
+    /*<![CDATA[*/
+    const ocLabels     = [[${ocLabels}]];
+    const ocData       = [[${ocData}]];
+    const demandLabels = [[${demandLabels}]];
+    const demandValues = [[${demandValues}]];
+    const statusLabels = [[${statusLabels}]];
+    const statusValues = [[${statusValues}]];
 
+    // --- Заполняемость рейсов ---
     new Chart(document.getElementById('occupancyChart'), {
         type: 'bar',
         data: {
@@ -69,8 +71,6 @@
     });
 
     // --- Спрос по дням ---
-    const demandLabels = Object.keys(demandByDate);
-    const demandValues = Object.values(demandByDate);
     new Chart(document.getElementById('demandChart'), {
         type: 'line',
         data: {
@@ -92,8 +92,6 @@
     });
 
     // --- Статусы билетов ---
-    const statusLabels = Object.keys(statusDist);
-    const statusValues = Object.values(statusDist);
     new Chart(document.getElementById('statusChart'), {
         type: 'pie',
         data: {
@@ -101,10 +99,10 @@
             datasets: [{
                 data: statusValues,
                 backgroundColor: [
-                    'rgba(16,185,129,0.6)',  // PAID
-                    'rgba(255,206,86,0.6)',  // BOOKED
-                    'rgba(239,68,68,0.6)',   // CANCELLED
-                    'rgba(107,114,128,0.6)'  // REFUNDED
+                    'rgba(16,185,129,0.6)',
+                    'rgba(255,206,86,0.6)',
+                    'rgba(239,68,68,0.6)',
+                    'rgba(107,114,128,0.6)'
                 ],
                 borderWidth: 1
             }]
@@ -113,7 +111,8 @@
             responsive: true
         }
     });
-    /* ]]> */
+    /*]]>*/
 </script>
+
 </body>
 </html>
