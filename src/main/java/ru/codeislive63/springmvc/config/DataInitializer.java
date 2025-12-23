@@ -36,8 +36,8 @@ public class DataInitializer implements CommandLineRunner {
         Station orsha = adminService.createStation("ORS", "Орша");
         Station smolensk = adminService.createStation("SML", "Смоленск");
 
-        Train t1 = adminService.createTrain("TRAIN-1", "Скорый 001", 120);
-        Train t2 = adminService.createTrain("TRAIN-2", "Региональный 045", 80);
+        Train t1 = adminService.createTrain("TRAIN-1", "Скорый 001", 30);
+        Train t2 = adminService.createTrain("TRAIN-2", "Региональный 045", 30);
 
         Route route1 = adminService.createRoute(minsk.getId(), gomel.getId(), 320, "Минск — Гомель");
         Route route2 = adminService.createRoute(minsk.getId(), vitebsk.getId(), 280, "Минск — Витебск");

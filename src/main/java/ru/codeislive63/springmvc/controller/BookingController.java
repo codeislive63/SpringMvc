@@ -8,8 +8,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.codeislive63.springmvc.domain.entity.Payment;
 import ru.codeislive63.springmvc.domain.entity.Ticket;
+import ru.codeislive63.springmvc.domain.entity.Trip;
 import ru.codeislive63.springmvc.security.UserPrincipal;
 import ru.codeislive63.springmvc.service.BookingService;
+import ru.codeislive63.springmvc.service.TripService;
 
 import java.util.List;
 
@@ -19,6 +21,7 @@ import java.util.List;
 public class BookingController {
 
     private final BookingService bookingService;
+    private final TripService tripService;
 
     @PostMapping("/{tripId}")
     public ResponseEntity<Ticket> book(@PathVariable Long tripId,
@@ -49,15 +52,24 @@ public class BookingController {
                         @RequestParam(required = false) Long tripId1,
                         @RequestParam(required = false) Long tripId2,
                         Model model) {
-        // If single trip selected, prepare available seats
+        // If single trip selected, prepare available seats and route info
         if (tripId != null) {
+            Trip trip = tripService.getTrip(tripId);
             model.addAttribute("tripId", tripId);
+            model.addAttribute("trip", trip);
+            model.addAttribute("routeLabel", routeLabel(trip));
             model.addAttribute("seats", bookingService.availableSeats(tripId));
         }
-        // If two trips selected (transfer), prepare seats for both legs
+        // If two trips selected (transfer), prepare seats for both legs and route info
         if (tripId1 != null && tripId2 != null) {
+            Trip tripA = tripService.getTrip(tripId1);
+            Trip tripB = tripService.getTrip(tripId2);
             model.addAttribute("tripId1", tripId1);
             model.addAttribute("tripId2", tripId2);
+            model.addAttribute("tripA", tripA);
+            model.addAttribute("tripB", tripB);
+            model.addAttribute("routeLabelA", routeLabel(tripA));
+            model.addAttribute("routeLabelB", routeLabel(tripB));
             model.addAttribute("seats1", bookingService.availableSeats(tripId1));
             model.addAttribute("seats2", bookingService.availableSeats(tripId2));
         }
@@ -89,5 +101,21 @@ public class BookingController {
             throw new IllegalArgumentException("Неверные параметры для бронирования");
         }
         return "booking/confirmation";
+    }
+
+    /**
+     * Формирует краткое название маршрута (откуда — куда) для отображения.
+     *
+     * @param trip объект поездки
+     * @return строка вида «Минск — Орша»
+     */
+    private String routeLabel(Trip trip) {
+        if (trip == null || trip.getRoute() == null) {
+            return "Маршрут";
+        }
+        var r = trip.getRoute();
+        var from = (r.getOrigin() != null && r.getOrigin().getName() != null) ? r.getOrigin().getName() : "";
+        var to = (r.getDestination() != null && r.getDestination().getName() != null) ? r.getDestination().getName() : "";
+        return String.format("%s — %s", from, to);
     }
 }

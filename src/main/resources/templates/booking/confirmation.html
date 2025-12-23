@@ -22,15 +22,15 @@
             <p>Рейс: <b th:text="${t.trip.id}"></b></p>
             <p>Место: <b th:text="${t.seatNumber}"></b></p>
             <p>Цена: <b th:text="${t.price}"></b></p>
-            <p>Статус: <b th:text="${t.status}"></b></p>
+            <p>Статус: <b th:text="${t.status.label}"></b></p>
             <form th:action="@{/booking/pay/{id}(id=${t.id})}" method="post">
                 <button class="btn primary" type="submit">Оплатить</button>
             </form>
         </article>
 
         <div class="actions" style="margin-top: 16px;">
-            <a class="btn" th:href="@{/booking/my}">Мои билеты</a>
-            <a class="btn" th:href="@{/routes/search}" style="margin-left: 8px;">Вернуться к поиску</a>
+            <a class="btn secondary" th:href="@{/booking/my}">Мои билеты</a>
+            <a class="btn" th:href="@{/routes/search}">Вернуться к поиску</a>
         </div>
     </section>
 </main>

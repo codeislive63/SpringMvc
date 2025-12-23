@@ -6,6 +6,40 @@
     <meta charset="UTF-8">
     <title>Выбор места • Railway Booker</title>
     <link rel="stylesheet" th:href="@{/css/app.css}">
+    <style>
+        .hint { margin-top: 10px; opacity: .8; font-size: 14px; }
+        .muted { opacity: .85; }
+        .seat-grid { display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; }
+        .seat {
+            min-width: 46px;
+            height: 40px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,.18);
+            background: rgba(255,255,255,.06);
+            color: #fff;
+            cursor: pointer;
+            transition: transform .08s ease, background .12s ease, border-color .12s ease;
+        }
+        .seat:hover { background: rgba(255,255,255,.10); transform: translateY(-1px); }
+        .seat.is-selected {
+            border-color: rgba(120,110,255,.9);
+            background: rgba(120,110,255,.22);
+            outline: 2px solid rgba(120,110,255,.35);
+        }
+        .card.is-disabled { opacity: .45; pointer-events: none; }
+        .card-header { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; }
+        .chip {
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(255,255,255,.08);
+            border: 1px solid rgba(255,255,255,.12);
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .card h3 { margin: 0 0 8px 0; }
+        .row { display:flex; gap:16px; flex-wrap:wrap; margin-top:8px; }
+        .row p { margin: 0; }
+    </style>
 </head>
 <body class="app-bg">
 
@@ -14,52 +48,144 @@
 <main class="page">
     <section class="welcome">
         <h1>Выбор места</h1>
-        <p>Пожалуйста, выберите место для бронирования.</p>
+        <p class="muted">Сначала выберите место для первого сегмента. Для маршрута с пересадкой второй сегмент станет активен после выбора места в первом.</p>
     </section>
 
     <section class="cards-grid">
-        <article class="card">
-            <!-- Single-trip booking -->
-            <div th:if="${tripId != null}">
-                <p>Рейс: <b th:text="${tripId}"></b></p>
-                <form th:action="@{/booking/reserve}" method="post">
-                    <input type="hidden" name="tripId" th:value="${tripId}"/>
-                    <label for="seat">Место:</label>
-                    <select id="seat" name="seat">
-                        <option th:each="s : ${seats}" th:value="${s}" th:text="${s}"></option>
-                    </select>
-                    <button class="btn primary" type="submit">Забронировать</button>
-                </form>
-            </div>
-
-            <!-- Transfer booking -->
-            <div th:if="${tripId1 != null}">
-                <p>Маршрут с пересадкой: <b th:text="${tripId1}"></b> + <b th:text="${tripId2}"></b></p>
-                <form th:action="@{/booking/reserve}" method="post">
-                    <input type="hidden" name="tripId1" th:value="${tripId1}"/>
-                    <input type="hidden" name="tripId2" th:value="${tripId2}"/>
+        <!-- SINGLE TRIP -->
+        <div th:if="${tripId != null}" style="width: 100%;">
+            <article class="card">
+                <div class="card-header">
                     <div>
-                        <label for="seat1">Место в первом рейсе:</label>
-                        <select id="seat1" name="seat1">
-                            <option th:each="s1 : ${seats1}" th:value="${s1}" th:text="${s1}"></option>
-                        </select>
+                        <h3 th:text="${routeLabel}">Маршрут</h3>
+                        <div class="row">
+                            <p>Рейс: <b th:text="${tripId}"></b></p>
+                            <p th:if="${trip != null}">
+                                Свободных мест: <b th:text="${#lists.size(seats)}"></b>
+                            </p>
+                        </div>
                     </div>
-                    <div style="margin-top: 8px;">
-                        <label for="seat2">Место во втором рейсе:</label>
-                        <select id="seat2" name="seat2">
-                            <option th:each="s2 : ${seats2}" th:value="${s2}" th:text="${s2}"></option>
-                        </select>
-                    </div>
-                    <button class="btn primary" type="submit" style="margin-top: 12px;">Забронировать</button>
+                    <div class="chip">Сегмент 1</div>
+                </div>
+
+                <div class="hint">Выберите место</div>
+                <div class="seat-grid" data-target="seat">
+                    <button type="button"
+                            class="seat"
+                            th:each="s : ${seats}"
+                            th:text="${s}"
+                            th:attr="data-seat=${s}"
+                            onclick="pickSeat('seat', this)">
+                    </button>
+                </div>
+
+                <form th:action="@{/booking/reserve}" method="post" class="actions" style="margin-top: 16px;">
+                    <input type="hidden" name="tripId" th:value="${tripId}"/>
+                    <input type="hidden" name="seat" id="seat"/>
+
+                    <button class="btn primary" type="submit" id="reserveBtnSingle" disabled>Забронировать</button>
+                    <a class="btn secondary" th:href="@{/routes/search}">Назад</a>
                 </form>
+            </article>
+        </div>
+
+        <!-- TRANSFER (2 segments) -->
+        <div th:if="${tripId1 != null}" style="width: 100%;">
+            <div class="cards-grid">
+                <!-- CARD 1 -->
+                <article class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3 th:text="${routeLabelA}">Маршрут 1</h3>
+                            <div class="row">
+                                <p>Рейс: <b th:text="${tripId1}"></b></p>
+                                <p>Свободных мест: <b th:text="${#lists.size(seats1)}"></b></p>
+                            </div>
+                        </div>
+                        <div class="chip">Сегмент 1</div>
+                    </div>
+
+                    <div class="hint">Сначала выберите место для первого сегмента</div>
+                    <div class="seat-grid" data-target="seat1">
+                        <button type="button"
+                                class="seat"
+                                th:each="s1 : ${seats1}"
+                                th:text="${s1}"
+                                th:attr="data-seat=${s1}"
+                                onclick="pickSeat('seat1', this)">
+                        </button>
+                    </div>
+                </article>
+
+                <!-- CARD 2 (disabled until seat1 picked) -->
+                <article class="card is-disabled" id="card2">
+                    <div class="card-header">
+                        <div>
+                            <h3 th:text="${routeLabelB}">Маршрут 2</h3>
+                            <div class="row">
+                                <p>Рейс: <b th:text="${tripId2}"></b></p>
+                                <p>Свободных мест: <b th:text="${#lists.size(seats2)}"></b></p>
+                            </div>
+                        </div>
+                        <div class="chip">Сегмент 2</div>
+                    </div>
+
+                    <div class="hint">Станет доступно после выбора места в сегменте 1</div>
+                    <div class="seat-grid" data-target="seat2">
+                        <button type="button"
+                                class="seat"
+                                th:each="s2 : ${seats2}"
+                                th:text="${s2}"
+                                th:attr="data-seat=${s2}"
+                                onclick="pickSeat('seat2', this)">
+                        </button>
+                    </div>
+                </article>
             </div>
 
-            <div class="actions" style="margin-top: 16px;">
-                <a class="btn" th:href="@{/routes/search}">Назад</a>
-            </div>
-        </article>
+            <form th:action="@{/booking/reserve}" method="post" class="actions" style="margin-top: 16px;">
+                <input type="hidden" name="tripId1" th:value="${tripId1}"/>
+                <input type="hidden" name="tripId2" th:value="${tripId2}"/>
+                <input type="hidden" name="seat1" id="seat1"/>
+                <input type="hidden" name="seat2" id="seat2"/>
+
+                <button class="btn primary" type="submit" id="reserveBtnTransfer" disabled>Забронировать</button>
+                <a class="btn secondary" th:href="@{/routes/search}">Назад</a>
+            </form>
+        </div>
     </section>
 </main>
+
+<script>
+    function pickSeat(hiddenId, btn) {
+        const grid = btn.closest('.seat-grid');
+        if (grid) {
+            grid.querySelectorAll('.seat').forEach(b => b.classList.remove('is-selected'));
+        }
+        btn.classList.add('is-selected');
+
+        const hidden = document.getElementById(hiddenId);
+        if (hidden) hidden.value = btn.dataset.seat;
+
+        if (hiddenId === 'seat1') {
+            const card2 = document.getElementById('card2');
+            if (card2) card2.classList.remove('is-disabled');
+        }
+
+        const singleBtn = document.getElementById('reserveBtnSingle');
+        if (singleBtn) {
+            const seat = document.getElementById('seat')?.value;
+            singleBtn.disabled = !(seat && seat.length > 0);
+        }
+
+        const transferBtn = document.getElementById('reserveBtnTransfer');
+        if (transferBtn) {
+            const seat1 = document.getElementById('seat1')?.value;
+            const seat2 = document.getElementById('seat2')?.value;
+            transferBtn.disabled = !(seat1 && seat2);
+        }
+    }
+</script>
 
 </body>
 </html>
