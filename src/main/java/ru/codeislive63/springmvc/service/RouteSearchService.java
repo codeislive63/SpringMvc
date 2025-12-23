@@ -66,12 +66,11 @@ public class RouteSearchService {
             LocalDateTime minDep = first.getArrivalTime().plus(minTransfer);
             LocalDateTime maxDep = first.getArrivalTime().plus(maxTransfer);
 
-            if (maxDep.isBefore(fromDt) || minDep.isAfter(toDt)) {
+            if (maxDep.isBefore(fromDt)) {
                 continue;
             }
 
             LocalDateTime realMin = minDep.isBefore(fromDt) ? fromDt : minDep;
-
             List<Trip> seconds = tripRepository.findSecondLegs(transferId, destinationId, realMin, searchEnd);
 
             for (Trip second : seconds) {

@@ -71,12 +71,13 @@ public class AdminService {
         trip.setDepartureTime(departure);
         trip.setArrivalTime(arrival);
         trip.setBasePrice(basePrice);
-        trip.setSeatsAvailable(train.getSeatCapacity());
+        trip.setSeatsAvailable(Math.min(train.getSeatCapacity(), 50));
         return tripRepository.save(trip);
     }
 
     public boolean hasAnyData() {
-        return stationRepository.count() > 0 || routeRepository.count() > 0 || tripRepository.count() > 0;
+        return stationRepository.count() > 0 || routeRepository.count() > 0
+                || trainRepository.count() > 0 || tripRepository.count() > 0;
     }
 }
 

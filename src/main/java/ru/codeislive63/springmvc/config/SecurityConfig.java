@@ -26,15 +26,10 @@ public class SecurityConfig {
                         auth.requestMatchers(
                                         "/", "/index",
                                         "/login", "/register",
-                                        "/search",
+                                        "routes/search",
                                         "/trips/**",
                                         "/css/**", "/js/**", "/images/**"
                                 ).permitAll()
-
-                                .requestMatchers(
-                                        "/routes/**"
-                                )
-                                .permitAll()
 
                                 .requestMatchers(
                                         "/booking/**",

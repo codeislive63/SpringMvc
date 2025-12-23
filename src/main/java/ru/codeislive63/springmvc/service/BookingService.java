@@ -1,6 +1,7 @@
 package ru.codeislive63.springmvc.service;
 
 import jakarta.transaction.Transactional;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.codeislive63.springmvc.domain.PaymentStatus;
@@ -38,7 +39,18 @@ public class BookingService {
             throw new IllegalStateException("Нет свободных мест");
         }
 
-        int nextSeat = trip.getTrain().getSeatCapacity() - trip.getSeatsAvailable() + 1;
+        List<Integer> freeSeats = availableSeats(tripId);
+
+        if (freeSeats.isEmpty())
+        {
+            throw new IllegalStateException("Нет свободных мест");
+        }
+        int nextSeat = freeSeats.getFirst();
+        return getTicket(trip, user, nextSeat);
+    }
+
+    @NonNull
+    private Ticket getTicket(Trip trip, UserAccount user, int nextSeat) {
         BigDecimal price = priceStrategyFactory.chooseFor(trip).calculate(trip, 1);
 
         trip.setSeatsAvailable(trip.getSeatsAvailable() - 1);
@@ -65,7 +77,8 @@ public class BookingService {
      */
     public List<Integer> availableSeats(Long tripId) {
         Trip trip = tripService.getTrip(tripId);
-        int capacity = trip.getTrain().getSeatCapacity();
+
+        int capacity = Math.min(trip.getTrain().getSeatCapacity(), 50);
         List<TicketStatus> reservedStatuses = List.of(TicketStatus.BOOKED, TicketStatus.PAID);
         List<Integer> booked = ticketRepository.findBookedSeats(tripId, reservedStatuses);
         List<Integer> free = new ArrayList<>();
@@ -91,7 +104,8 @@ public class BookingService {
         Trip trip = tripService.getTrip(tripId);
         UserAccount user = userService.getUser(userId);
 
-        int capacity = trip.getTrain().getSeatCapacity();
+        int capacity = Math.min(trip.getTrain().getSeatCapacity(), 50);
+
         if (seatNumber < 1 || seatNumber > capacity) {
             throw new IllegalArgumentException("Неверный номер места");
         }
@@ -105,20 +119,7 @@ public class BookingService {
             throw new IllegalStateException("Место уже занято");
         }
 
-        BigDecimal price = priceStrategyFactory.chooseFor(trip).calculate(trip, 1);
-
-        trip.setSeatsAvailable(trip.getSeatsAvailable() - 1);
-        Ticket ticket = new Ticket();
-        ticket.setTrip(trip);
-        ticket.setUser(user);
-        ticket.setSeatNumber(seatNumber);
-        ticket.setPrice(price);
-        ticket.setBookedAt(LocalDateTime.now());
-        ticket.setStatus(TicketStatus.BOOKED);
-
-        Ticket saved = ticketRepository.save(ticket);
-        tripService.save(trip);
-        return saved;
+        return getTicket(trip, user, seatNumber);
     }
 
     @Transactional

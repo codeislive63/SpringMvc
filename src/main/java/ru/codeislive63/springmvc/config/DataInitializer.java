@@ -22,12 +22,12 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        userService.register("admin@example.com", "admin123", "Администратор", RoleType.ADMIN);
-        userService.register("customer@example.com", "cust123", "Пассажир", RoleType.CUSTOMER);
-
         if (adminService.hasAnyData()) {
             return;
         }
+
+        userService.register("admin@example.com", "admin123", "Администратор", RoleType.ADMIN);
+        userService.register("customer@example.com", "cust123", "Пассажир", RoleType.CUSTOMER);
 
         Station minsk = adminService.createStation("MSK", "Минск");
         Station gomel = adminService.createStation("GML", "Гомель");

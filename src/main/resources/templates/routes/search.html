@@ -13,7 +13,7 @@
 <main class="page">
     <section class="welcome">
         <h1>Поиск маршрута</h1>
-        <p>Выберите станции отправления и назначения, а также период поездки.</p>
+        <p>Выберите станции отправления и назначения, а также дату поездки</p>
 
         <div th:if="${error}" class="alert error" th:text="${error}"></div>
     </section>
@@ -25,9 +25,21 @@
                 <div class="form-group">
                     <label for="fromPointId">Откуда</label>
                     <div class="select-wrapper">
-                        <select id="fromPointId" class="custom-select" th:field="*{fromPointId}" required>
-                            <option value="" disabled selected>Выберите станцию</option>
-                            <option th:each="s : ${stations}" th:value="${s.id}" th:text="${s.name}"></option>
+                        <select id="fromPointId"
+                                class="custom-select"
+                                th:field="*{fromPointId}"
+                                required>
+                            <!-- placeholder выбран, если значение поля fromPointId не задано -->
+                            <option value="" disabled
+                                    th:selected="${#fields.field('fromPointId').value() == null}">
+                                Выберите станцию
+                            </option>
+                            <!-- остальные варианты -->
+                            <option th:each="s : ${stations}"
+                                    th:value="${s.id}"
+                                    th:text="${s.name}"
+                                    th:selected="${#fields.field('fromPointId').value() == s.id}">
+                            </option>
                         </select>
                     </div>
                 </div>
@@ -35,9 +47,19 @@
                 <div class="form-group">
                     <label for="toPointId">Куда</label>
                     <div class="select-wrapper">
-                        <select id="toPointId" class="custom-select" th:field="*{toPointId}" required>
-                            <option value="" disabled selected>Выберите станцию</option>
-                            <option th:each="s : ${stations}" th:value="${s.id}" th:text="${s.name}"></option>
+                        <select id="toPointId"
+                                class="custom-select"
+                                th:field="*{toPointId}"
+                                required>
+                            <option value="" disabled
+                                    th:selected="${#fields.field('toPointId').value() == null}">
+                                Выберите станцию
+                            </option>
+                            <option th:each="s : ${stations}"
+                                    th:value="${s.id}"
+                                    th:text="${s.name}"
+                                    th:selected="${#fields.field('toPointId').value() == s.id}">
+                            </option>
                         </select>
                     </div>
                 </div>
