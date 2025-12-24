@@ -13,11 +13,6 @@
             Поиск маршрутов
         </a>
 
-        <span class="user-name"
-              sec:authorize="isAuthenticated()"
-              sec:authentication="principal.user.fullName">
-        </span>
-
         <!-- отображать только для роли ADMIN -->
         <a class="btn ghost" th:href="@{/admin/analytics}"
            sec:authorize="hasRole('ADMIN')">
