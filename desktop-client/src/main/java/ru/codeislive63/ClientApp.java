@@ -13,17 +13,23 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebHistory;
 import javafx.scene.web.WebView;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ClientApp extends Application {
@@ -35,8 +41,11 @@ public class ClientApp extends Application {
     private static final long WAIT_DEADLINE_MS = 30_000;
     private static final long RETRY_DELAY_MS = 500;
 
+    private static final String REPORT_PATH = "/admin/dashboard/report.xlsx";
+
     private final HttpClient http = HttpClient.newBuilder()
-            .connectTimeout(CONNECT_TIMEOUT)
+            .cookieHandler(CookieHandler.getDefault()) // важно для сессий
+            .followRedirects(HttpClient.Redirect.NORMAL)
             .build();
 
     private String homeUrl;
@@ -92,6 +101,23 @@ public class ClientApp extends Application {
         history.currentIndexProperty().addListener((obs, oldV, newV) -> updateNavButtons.run());
         history.getEntries().addListener((javafx.collections.ListChangeListener<WebHistory.Entry>) c -> updateNavButtons.run());
 
+        engine.locationProperty().addListener((obs, oldUrl, newUrl) -> {
+            if (newUrl == null) return;
+
+            if (newUrl.contains(REPORT_PATH)) {
+                Platform.runLater(() -> {
+                    engine.getLoadWorker().cancel();
+                    if (oldUrl != null && !oldUrl.contains(REPORT_PATH)) {
+                        engine.load(oldUrl);
+                    } else {
+                        engine.load(homeUrl);
+                    }
+                    downloadXlsx(stage, newUrl);
+                });
+            }
+        });
+
+
         engine.loadContent(loadingHtml(homeUrl));
 
         engine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
@@ -111,6 +137,40 @@ public class ClientApp extends Application {
         stage.setScene(new Scene(root, 1200, 800));
         stage.show();
     }
+
+    private void downloadXlsx(Stage stage, String url) {
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Сохранить отчёт");
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("Excel (*.xlsx)", "*.xlsx"));
+        fc.setInitialFileName("analytics-report.xlsx");
+
+        var file = fc.showSaveDialog(stage);
+        if (file == null) return;
+
+        HttpRequest req = HttpRequest.newBuilder(URI.create(url))
+                .GET()
+                .build();
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                byte[] bytes = http.send(req, HttpResponse.BodyHandlers.ofByteArray()).body();
+                Files.write(file.toPath(), bytes);
+
+                Platform.runLater(() -> {
+                    Alert a = new Alert(Alert.AlertType.INFORMATION, "Отчёт сохранён:\n" + file.getAbsolutePath(), ButtonType.OK);
+                    a.setHeaderText(null);
+                    a.showAndWait();
+                });
+            } catch (Exception ex) {
+                Platform.runLater(() -> {
+                    Alert a = new Alert(Alert.AlertType.ERROR, "Не удалось скачать отчёт:\n" + ex.getMessage(), ButtonType.OK);
+                    a.setHeaderText(null);
+                    a.showAndWait();
+                });
+            }
+        });
+    }
+
 
     private WebEngine getWebEngine(WebView webView) {
         WebEngine engine = webView.getEngine();
@@ -276,6 +336,7 @@ public class ClientApp extends Application {
     }
 
     public static void main(String[] args) {
+        CookieHandler.setDefault(new CookieManager(null, CookiePolicy.ACCEPT_ALL));
         launch(args);
     }
 }

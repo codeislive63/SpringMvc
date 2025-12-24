@@ -564,6 +564,20 @@
             childTicket: document.getElementById('pChildTicket').checked
         };
 
+        data.name = fullNameOf(data);
+
+        const docMap = {
+            PASSPORT: 'Паспорт',
+            FOREIGN_PASSPORT: 'Загранпаспорт',
+            ID: 'ID карта',
+            BIRTH_CERT: 'Свидетельство о рождении'
+        };
+
+        data.document = `${docMap[data.docType] || 'Документ'} ${data.docNumber || ''}`.trim();
+
+        data.benefitType = data.benefit || '';
+        data.loyaltyNumber = data.loyalty || '';
+
         const idx = passengers.findIndex(x => x.id === data.id);
         if (idx >= 0) passengers[idx] = data;
         else passengers.push(data);
