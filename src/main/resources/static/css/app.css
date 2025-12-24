@@ -1167,8 +1167,8 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 
 .ticket-collapse summary {
     cursor: pointer;
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    justify-content: normal;
     gap: 8px;
     list-style: none;
     align-items: center;
