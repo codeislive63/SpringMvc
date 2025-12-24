@@ -19,7 +19,7 @@
 
     <section class="cards-grid">
         <article class="card" th:each="t : ${tickets}">
-            <p>Рейс: <b th:text="${t.trip.id}"></b></p>
+            <p>Рейс: <b th:text="${t.trip.route.getName()}"></b></p>
             <p>Место: <b th:text="${t.seatNumber}"></b></p>
             <p>Цена: <b th:text="${t.price}"></b></p>
             <p>Статус: <b th:text="${t.status.label}"></b></p>
