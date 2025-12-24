@@ -1479,10 +1479,20 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 .ticket-summary {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.ticket-summary .ticket-main {
+    flex: 1 1 520px;
+    min-width: 0;
     display: grid;
-    grid-template-columns: 1.4fr 1fr 0.8fr 0.9fr;
-    gap: 10px;
-    align-items: center;
+    grid-template-columns: minmax(0, 0.7fr) minmax(0, 1fr);
+    gap: 12px 18px;
+    align-items: start;
 }
 
 .ticket-summary .route {
@@ -1497,8 +1507,8 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 .ticket-meta {
     margin-top: 6px;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    gap: 8px;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px 16px;
 }
 
 .ticket-meta .label {
