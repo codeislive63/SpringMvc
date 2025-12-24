@@ -9,18 +9,18 @@
     </div>
 
     <div class="topbar-right">
-        <a class="btn ghost" th:href="@{/routes/search}">
+        <a class="btn ghost" th:href="@{/routes/search}"
+            sec:authorize="hasRole('CUSTOMER')">
             Поиск маршрутов
         </a>
 
-        <!-- отображать только для роли ADMIN -->
         <a class="btn ghost" th:href="@{/admin/analytics}"
            sec:authorize="hasRole('ADMIN')">
-            Аналитика
+            Управление
         </a>
 
         <a class="btn ghost" th:href="@{/tickets}"
-           sec:authorize="isAuthenticated()">
+           sec:authorize="hasRole('CUSTOMER')">
             Мои билеты
         </a>
 
@@ -34,7 +34,6 @@
             <button class="btn ghost" type="submit">Выйти</button>
         </form>
 
-        <!-- когда гость -->
         <a class="btn ghost" th:href="@{/login}"
            sec:authorize="isAnonymous()">
             Войти
