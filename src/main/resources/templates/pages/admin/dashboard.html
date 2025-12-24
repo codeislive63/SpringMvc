@@ -8,20 +8,19 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        /* Выравниваем сетку: колонок столько, сколько помещается по ширине, с одинаковыми промежутками */
         .cards-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 16px;
-            align-items: stretch;  /* заставляет элементы растягиваться по высоте */
+            align-items: stretch;
         }
-        /* Каждая карточка – flex‑контейнер, чтобы график растягивался вертикально */
+
         .cards-grid .card {
             display: flex;
             flex-direction: column;
-            min-height: 260px;      /* минимальная высота; можно увеличить при желании */
+            min-height: 260px;
         }
-        /* Холст с диаграммой растягивается, заполняя свободное место */
+
         .cards-grid .card canvas {
             flex-grow: 1;
         }
@@ -97,7 +96,6 @@
     const routeDemandLabels = [[${routeDemandLabels}]];
     const routeDemandValues = [[${routeDemandValues}]];
 
-    // --- Заполняемость рейсов ---
     new Chart(document.getElementById('occupancyChart'), {
         type: 'bar',
         data: {
@@ -121,7 +119,6 @@
         }
     });
 
-    // --- Спрос по дням ---
     new Chart(document.getElementById('demandChart'), {
         type: 'line',
         data: {
@@ -142,7 +139,6 @@
         }
     });
 
-    // --- Выручка по маршрутам ---
     new Chart(document.getElementById('revenueChart'), {
         type: 'bar',
         data: {
@@ -166,7 +162,6 @@
         }
     });
 
-    // --- Отмены по маршрутам ---
     new Chart(document.getElementById('cancelChart'), {
         type: 'bar',
         data: {
@@ -188,7 +183,6 @@
         }
     });
 
-    // --- Общий спрос по маршрутам ---
     new Chart(document.getElementById('routeDemandChart'), {
         type: 'bar',
         data: {
@@ -210,7 +204,6 @@
         }
     });
 
-    // --- Статусы билетов ---
     new Chart(document.getElementById('statusChart'), {
         type: 'pie',
         data: {

@@ -2,9 +2,6 @@ package ru.codeislive63.springmvc.web.dto;
 
 import lombok.Data;
 
-/**
- * Данные формы бронирования и выбора дополнительных услуг.
- */
 @Data
 public class BookingRequest {
     private Long tripId;

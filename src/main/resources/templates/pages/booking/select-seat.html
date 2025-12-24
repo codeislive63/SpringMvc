@@ -10,11 +10,10 @@
     <style>
         /* ===== fixes only for JavaFX WebView ===== */
         .is-javafx .extras-grid{
-            /* вместо grid — flex, WebView так стабильнее */
             display: flex !important;
             flex-wrap: wrap !important;
             margin: -6px !important;
-            gap: 0 !important; /* gap иногда ломается */
+            gap: 0 !important;
         }
 
         .is-javafx .extras-grid > *{
@@ -22,13 +21,10 @@
             margin: 6px !important;
         }
 
-        /* чтобы "Питание" не пыталось span 2 (grid-column в WebView может глючить) */
         .is-javafx .extras-grid .form-group{
             width: calc(100% - 12px) !important;
         }
 
-        /* главная причина "налезания": у flex-элементов min-width:auto
-           и текст не ужимается — ставим min-width:0 и разрешаем перенос */
         .is-javafx .service-card{
             display: flex !important;
             align-items: center !important;
@@ -49,7 +45,6 @@
             overflow-wrap: anywhere !important;
         }
 
-        /* на узких окнах — в одну колонку */
         @media (max-width: 980px){
             .is-javafx .extras-grid > *{
                 width: calc(100% - 12px) !important;
@@ -270,7 +265,6 @@
             </div>
 
             <div class="booking-secondary">
-                <!-- Данные пассажира -->
                 <article class="card wide-card passenger-card">
                     <div class="section-title">
                         <div>

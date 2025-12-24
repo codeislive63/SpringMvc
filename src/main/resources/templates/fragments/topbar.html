@@ -23,25 +23,6 @@
            sec:authorize="hasRole('CUSTOMER')">
             Личный кабинет
         </a>
-<!--        <a class="btn ghost" th:href="@{/routes/search}"-->
-<!--            sec:authorize="hasRole('CUSTOMER')">-->
-<!--            Поиск маршрутов-->
-<!--        </a>-->
-
-<!--        <a class="btn ghost" th:href="@{/admin/analytics}"-->
-<!--           sec:authorize="hasRole('ADMIN')">-->
-<!--            Управление-->
-<!--        </a>-->
-
-<!--        <a class="btn ghost" th:href="@{/tickets}"-->
-<!--           sec:authorize="hasRole('CUSTOMER')">-->
-<!--            Мои билеты-->
-<!--        </a>-->
-
-<!--        <a class="btn ghost" th:href="@{/profile}"-->
-<!--           sec:authorize="isAuthenticated()">-->
-<!--            Личный кабинет-->
-<!--        </a>-->
 
         <form th:action="@{/logout}" method="post"
               sec:authorize="isAuthenticated()">
