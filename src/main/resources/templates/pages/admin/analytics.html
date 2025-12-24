@@ -14,25 +14,48 @@
     <section class="welcome">
         <h1>Аналитика</h1>
         <p>Здесь собраны основные показатели о рейсах и билетах</p>
+        <div class="actions">
+            <a class="btn secondary" th:href="@{/admin/panel/routes}">Маршруты</a>
+            <a class="btn secondary" th:href="@{/admin/panel/trips}">Рейсы</a>
+            <a class="btn secondary" th:href="@{/admin/panel/trains}">Поезда</a>
+            <a class="btn primary" th:href="@{/admin/analytics/report.xlsx}">Скачать отчёт (XLSX)</a>
+        </div>
     </section>
 
     <section class="cards-grid">
-        <!-- Диаграмма заполняемости рейсов -->
         <article class="card">
             <h2>Заполняемость рейсов</h2>
-            <canvas id="occupancyChart" width="400" height="200"></canvas>
+            <p class="muted">Доля занятых мест по каждому рейсу</p>
+            <canvas id="occupancyChart" width="400" height="220"></canvas>
         </article>
 
-        <!-- Линейный график спроса по дням -->
         <article class="card">
-            <h2>Количество проданных / забронированных билетов (14 дней)</h2>
-            <canvas id="demandChart" width="400" height="200"></canvas>
+            <h2>Количество билетов (14 дней)</h2>
+            <p class="muted">Сумма оплаченных и забронированных по дням</p>
+            <canvas id="demandChart" width="400" height="220"></canvas>
         </article>
 
-        <!-- Круговая диаграмма статусов билетов -->
         <article class="card">
             <h2>Распределение билетов по статусам</h2>
-            <canvas id="statusChart" width="400" height="200"></canvas>
+            <canvas id="statusChart" width="400" height="220"></canvas>
+        </article>
+
+        <article class="card">
+            <h2>Выручка по маршрутам</h2>
+            <p class="muted">Только оплаченные билеты</p>
+            <canvas id="revenueChart" width="400" height="220"></canvas>
+        </article>
+
+        <article class="card">
+            <h2>Отмены и возвраты</h2>
+            <p class="muted">По маршрутам</p>
+            <canvas id="cancelChart" width="400" height="220"></canvas>
+        </article>
+
+        <article class="card">
+            <h2>Спрос по направлениям</h2>
+            <p class="muted">Все билеты (бронь + покупка)</p>
+            <canvas id="routeDemandChart" width="400" height="220"></canvas>
         </article>
     </section>
 </main>
@@ -45,6 +68,12 @@
     const demandValues = [[${demandValues}]];
     const statusLabels = [[${statusLabels}]];
     const statusValues = [[${statusValues}]];
+    const revenueLabels = [[${revenueLabels}]];
+    const revenueValues = [[${revenueValues}]];
+    const cancelLabels = [[${cancelLabels}]];
+    const cancelValues = [[${cancelValues}]];
+    const routeDemandLabels = [[${routeDemandLabels}]];
+    const routeDemandValues = [[${routeDemandValues}]];
 
     // --- Заполняемость рейсов ---
     new Chart(document.getElementById('occupancyChart'), {
@@ -87,6 +116,74 @@
             responsive: true,
             scales: {
                 y: { beginAtZero: true }
+            }
+        }
+    });
+
+    // --- Выручка по маршрутам ---
+    new Chart(document.getElementById('revenueChart'), {
+        type: 'bar',
+        data: {
+            labels: revenueLabels,
+            datasets: [{
+                label: 'BYN',
+                data: revenueValues,
+                backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                borderColor: 'rgba(59, 130, 246, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            indexAxis: 'y',
+            scales: {
+                x: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // --- Отмены по маршрутам ---
+    new Chart(document.getElementById('cancelChart'), {
+        type: 'bar',
+        data: {
+            labels: cancelLabels,
+            datasets: [{
+                label: 'Количество',
+                data: cancelValues,
+                backgroundColor: 'rgba(239, 68, 68, 0.6)',
+                borderColor: 'rgba(239, 68, 68, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            indexAxis: 'y',
+            scales: {
+                x: { beginAtZero: true }
+            }
+        }
+    });
+
+    // --- Общий спрос по маршрутам ---
+    new Chart(document.getElementById('routeDemandChart'), {
+        type: 'bar',
+        data: {
+            labels: routeDemandLabels,
+            datasets: [{
+                label: 'Билетов',
+                data: routeDemandValues,
+                backgroundColor: 'rgba(16, 185, 129, 0.6)',
+                borderColor: 'rgba(16, 185, 129, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            indexAxis: 'y',
+            scales: {
+                x: { beginAtZero: true }
             }
         }
     });

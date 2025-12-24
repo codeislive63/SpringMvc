@@ -136,9 +136,13 @@ a {
     border: var(--border-subtle);
     box-shadow: var(--shadow-soft);
     padding: 24px 22px;
-    max-width: 480px;
+    max-width: 520px;
     width: 100%;
     backdrop-filter: blur(24px);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
 }
 
 .cards-grid .card {
@@ -161,6 +165,25 @@ a {
 .card p {
     margin: 0 0 8px;
     color: var(--muted);
+}
+
+.card .actions {
+    margin-top: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.ticket-card .ticket-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+    padding: 12px 0;
+}
+
+.ticket-card .metric {
+    font-size: 1.1rem;
+    margin: 0;
 }
 
 .card-header {
@@ -196,6 +219,48 @@ a {
     justify-content: space-between;
     align-items: center;
     gap: 12px;
+}
+
+.autocomplete {
+    position: relative;
+}
+
+.autocomplete input[type="text"] {
+    width: 100%;
+}
+
+.suggestions {
+    position: absolute;
+    inset: calc(100% + 4px) 0 auto 0;
+    background: rgba(15, 23, 42, 0.98);
+    border: var(--border-subtle);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-soft);
+    display: none;
+    z-index: 12;
+    max-height: 240px;
+    overflow: auto;
+}
+
+.suggestions.is-open {
+    display: block;
+}
+
+.suggestion-row {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    color: var(--text);
+    text-align: left;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.suggestion-row:hover,
+.suggestion-row:focus {
+    background: rgba(99, 102, 241, 0.12);
+    color: #fff;
 }
 
 .actions,
