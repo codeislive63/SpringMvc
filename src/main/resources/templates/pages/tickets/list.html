@@ -1,47 +1,10 @@
 <!DOCTYPE html>
 <html lang="ru"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+      xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Мои билеты • Railway Booker</title>
     <link rel="stylesheet" th:href="@{/css/app.css}">
-    <style>
-        /* Стили для раскрывающихся карточек билетов */
-        .ticket-collapse {
-            border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 12px;
-            margin-bottom: 12px;
-            overflow: hidden;
-        }
-        .ticket-collapse summary {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            padding: 12px 16px;
-            list-style: none;
-        }
-        .ticket-collapse summary::-webkit-details-marker {
-            display: none;
-        }
-        .ticket-collapse summary .status-chip {
-            background: rgba(255,255,255,0.1);
-            padding: 2px 6px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-        }
-        .ticket-collapse .details-body {
-            padding: 12px 16px;
-            border-top: 1px solid rgba(255,255,255,0.15);
-        }
-        .ticket-collapse .actions {
-            margin-top: 8px;
-            display: flex;
-            gap: 8px;
-        }
-    </style>
 </head>
 <body class="app-bg">
 
@@ -61,14 +24,34 @@
         <div th:each="t : ${tickets}">
             <details class="ticket-collapse">
                 <summary>
-                    <div>
-                        <span th:text="${#temporals.format(t.trip.departureTime,'dd.MM.yyyy HH:mm')}"></span>
-                        <strong th:text="${t.trip.route.origin.name + ' — ' + t.trip.route.destination.name}"></strong>
-                        <span th:text="'Место ' + ${t.seatNumber}"></span>
-                        <span th:text="${#numbers.formatDecimal(t.price,1,'COMMA',2,'POINT')} + ' BYN'"></span>
+                    <div class="ticket-summary">
+                        <div>
+                            <div class="ticket-route" th:text="${t.trip.route.origin.name + ' — ' + t.trip.route.destination.name}">Маршрут</div>
+
+                            <div class="ticket-meta">
+                                <div class="meta-item">
+                                    <div class="label">Дата</div>
+                                    <div class="value" th:text="${#temporals.format(t.trip.departureTime,'dd.MM.yyyy')}">24.12.2025</div>
+                                </div>
+                                <div class="meta-item">
+                                    <div class="label">Время</div>
+                                    <div class="value" th:text="${#temporals.format(t.trip.departureTime,'HH:mm')}">17:15</div>
+                                </div>
+                                <div class="meta-item">
+                                    <div class="label">Место</div>
+                                    <div class="value" th:text="${t.seatNumber}">11</div>
+                                </div>
+                                <div class="meta-item">
+                                    <div class="label">Стоимость</div>
+                                    <div class="value" th:text="${#numbers.formatDecimal(t.price,1,'COMMA',2,'POINT')} + ' BYN'">12.00 BYN</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <span class="status-chip" th:text="${t.status.label}">СТАТУС</span>
                     </div>
-                    <span class="status-chip" th:text="${t.status.label}"></span>
                 </summary>
+
                 <div class="details-body">
                     <!-- Пассажир -->
                     <div th:if="${t.passengerDetails != null}">

@@ -4,77 +4,6 @@
     <meta charset="UTF-8">
     <title>Личный кабинет • Railway Booker</title>
     <link rel="stylesheet" th:href="@{/css/app.css}">
-    <style>
-        /* Сетка: слева вкладки, справа содержимое */
-        .profile-layout { display:flex; gap:24px; align-items:flex-start; }
-        .profile-tabs { display:flex; flex-direction:column; gap:8px; min-width:200px; position:sticky; top:84px; }
-        .profile-tabs button {
-            padding:10px 14px;
-            border:1px solid rgba(255,255,255,.15);
-            background: rgba(255,255,255,.04);
-            color:#fff;
-            border-radius:12px;
-            cursor:pointer;
-            text-align:left;
-            transition: background .12s, border-color .12s;
-        }
-        .profile-tabs button.is-active {
-            background: rgba(99,102,241,.6);
-            border-color: rgba(99,102,241,1);
-        }
-        .tab-content { flex:1; }
-        .tab-content.is-hidden { display:none; }
-
-        /* Карточка билета (summary) */
-        .ticket-collapse { border:1px solid rgba(255,255,255,.15); border-radius:14px; margin-bottom:12px; overflow:hidden; }
-        .ticket-collapse summary { cursor:pointer; padding:12px 14px; list-style:none; }
-        .ticket-collapse summary::-webkit-details-marker { display:none; }
-
-        .ticket-summary { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; }
-        .ticket-route { font-weight:800; font-size:16px; margin-bottom:8px; }
-        .ticket-meta {
-            display:grid;
-            grid-template-columns: repeat(4, minmax(120px, 1fr));
-            gap:8px 10px;
-        }
-        @media (max-width: 980px) {
-            .profile-layout { flex-direction:column; }
-            .profile-tabs { position:static; min-width:auto; width:100%; flex-direction:row; flex-wrap:wrap; }
-            .ticket-meta { grid-template-columns: repeat(2, minmax(120px, 1fr)); }
-        }
-
-        .meta-item { padding:8px 10px; border:1px solid rgba(255,255,255,.10); background: rgba(255,255,255,.03); border-radius:12px; }
-        .meta-item .label { font-size:12px; opacity:.75; }
-        .meta-item .value { font-size:14px; font-weight:700; margin-top:2px; }
-
-        .status-chip { background: rgba(255,255,255,.10); padding:6px 10px; border-radius:999px; font-size:12px; white-space:nowrap; }
-        .details-body { padding:12px 14px; border-top:1px solid rgba(255,255,255,.12); }
-        .details-body .actions { margin-top:10px; display:flex; gap:10px; flex-wrap:wrap; }
-
-        /* Пассажиры: список */
-        .passengers-grid { display:grid; grid-template-columns: 1fr; gap:10px; margin-top:12px; }
-        .passenger-row {
-            display:flex; justify-content:space-between; gap:12px; align-items:center;
-            padding:10px 12px; border:1px solid rgba(255,255,255,.12);
-            background: rgba(255,255,255,.03); border-radius:14px;
-        }
-        .passenger-row .title { font-weight:800; }
-        .passenger-row .meta { font-size:12px; opacity:.75; margin-top:2px; }
-        .passenger-actions { display:flex; gap:8px; flex-wrap:wrap; }
-        .form-grid { display:grid; gap:12px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
-        .form-group label { display:block; margin-bottom:6px; opacity:.85; }
-        .form-group input, .form-group select {
-            width:100%; padding:10px 12px; border-radius:12px;
-            border:1px solid rgba(255,255,255,.15);
-            background: rgba(255,255,255,.03); color:#fff;
-            outline:none;
-        }
-        .form-group input:focus, .form-group select:focus {
-            border-color: rgba(99,102,241,.9);
-            box-shadow: 0 0 0 4px rgba(99,102,241,.18);
-        }
-        .muted { opacity:.75; }
-    </style>
 </head>
 
 <body class="app-bg">
@@ -104,72 +33,125 @@
                 <h2>Учётная запись</h2>
                 <p class="muted">Основные данные и бонусы.</p>
 
-                <div class="info-grid">
-                    <div class="info-tile">
-                        <div class="label">Пользователь</div>
-                        <span class="value" th:text="${user.fullName}">Пассажир</span>
-                    </div>
-                    <div class="info-tile">
-                        <div class="label">Email</div>
-                        <span class="value" th:text="${user.email}">customer@example.com</span>
-                    </div>
-                    <div class="info-tile">
-                        <div class="label">Уровень</div>
-                        <span class="value" th:text="${loyaltyTier}">Базовый</span>
-                    </div>
-                    <div class="info-tile">
-                        <div class="label">Бонусные баллы</div>
-                        <span class="value" th:text="${loyaltyPoints}">0</span>
-                    </div>
-                </div>
+                <dl class="kv">
+                    <dt>Пользователь</dt>
+                    <dd th:text="${user.fullName}">Пассажир</dd>
 
-                <!-- “Сохранённые пассажиры/документы” убрали полностью -->
+                    <dt>Email</dt>
+                    <dd th:text="${user.email}">customer@example.com</dd>
+
+                    <dt>Уровень</dt>
+                    <dd th:text="${loyaltyTier}">Базовый</dd>
+
+                    <dt>Бонусные баллы</dt>
+                    <dd th:text="${loyaltyPoints}">160</dd>
+                </dl>
             </article>
         </div>
 
-        <!-- ПАССАЖИРЫ (CRUD в браузере, общий storage с выбором места) -->
         <div class="tab-content is-hidden" id="tabPassengers">
             <article class="card">
-                <h2>Пассажиры</h2>
-                <p class="muted">
-                    Это шаблоны пассажиров, которые сохраняются в браузере (localStorage).
-                    Они будут доступны и на странице выбора места (ключ: <b>rb-passenger-templates</b>).
-                </p>
-
-                <div class="form-grid" style="margin-top:12px;">
-                    <div class="form-group">
-                        <label for="pName">ФИО</label>
-                        <input id="pName" type="text" placeholder="Иванов Иван">
+                <div class="passenger-list__header">
+                    <div>
+                        <h2>Пассажиры</h2>
+                        <p class="muted">Шаблоны пассажиров сохраняются в браузере и доступны при оформлении.</p>
                     </div>
-                    <div class="form-group">
-                        <label for="pDoc">Документ</label>
-                        <input id="pDoc" type="text" placeholder="Паспорт 00 00 №123456">
-                    </div>
-                    <div class="form-group">
-                        <label for="pBenefit">Льготы</label>
-                        <select id="pBenefit">
-                            <option value="">Без льготы</option>
-                            <option value="student">Студент</option>
-                            <option value="pensioner">Пенсионер</option>
-                            <option value="military">Военная</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="pLoyalty">Номер бонусной карты</label>
-                        <input id="pLoyalty" type="text" placeholder="RB-000001">
-                    </div>
-                    <div class="form-group" style="display:flex; align-items:center; gap:10px;">
-                        <input id="pChild" type="checkbox">
-                        <label for="pChild" style="margin:0;">Детский билет (50% скидка)</label>
-                    </div>
+                    <button class="btn primary" type="button" onclick="startCreatePassenger()">Добавить пассажира</button>
                 </div>
 
-                <div class="actions" style="margin-top:12px;">
-                    <button class="btn primary" type="button" onclick="savePassenger()">Сохранить</button>
-                    <button class="btn secondary" type="button" onclick="resetPassengerForm()">Очистить</button>
-                </div>
+                <div class="passengers-layout" style="margin-top: 12px;">
+                    <!-- LIST -->
+                    <div class="passenger-list">
+                        <div class="passenger-search">
+                            <span style="opacity:.7">🔎</span>
+                            <input id="passengerSearch" type="text" placeholder="Поиск по имени или документу" oninput="renderPassengerList()">
+                        </div>
+                        <div id="passengerList"></div>
+                        <p class="muted" id="passengerEmpty" style="display:none;">Пока нет пассажиров. Нажми «Добавить пассажира».</p>
+                    </div>
 
-                <div class="passengers-grid" id="passengersList"></div>
+                    <!-- EDITOR -->
+                    <div>
+                        <article class="card" style="margin:0;">
+                            <h3 id="passengerEditorTitle">Новый пассажир</h3>
+                            <p class="muted">Заполни данные и сохрани.</p>
+
+                            <div class="form-grid" style="margin-top: 10px;">
+                                <div class="form-group">
+                                    <label>Фамилия</label>
+                                    <input id="pLastName" type="text" placeholder="Иванов">
+                                </div>
+                                <div class="form-group">
+                                    <label>Имя</label>
+                                    <input id="pFirstName" type="text" placeholder="Иван">
+                                </div>
+                                <div class="form-group">
+                                    <label>Отчество</label>
+                                    <input id="pMiddleName" type="text" placeholder="Иванович">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Пол</label>
+                                    <div class="row" style="gap:8px;">
+                                        <button class="btn ghost" type="button" id="pGenderM" onclick="setGender('M')">Мужской</button>
+                                        <button class="btn ghost" type="button" id="pGenderF" onclick="setGender('F')">Женский</button>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Дата рождения</label>
+                                    <input id="pBirthDate" type="date">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Тип документа</label>
+                                    <div class="select-wrapper">
+                                        <select id="pDocType" class="custom-select">
+                                            <option value="PASSPORT">Паспорт</option>
+                                            <option value="FOREIGN_PASSPORT">Загранпаспорт</option>
+                                            <option value="ID">ID-карта</option>
+                                            <option value="BIRTH_CERT">Свидетельство о рождении</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Номер документа</label>
+                                    <input id="pDocNumber" type="text" placeholder="00 00 №123456">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Льготы</label>
+                                    <div class="select-wrapper">
+                                        <select id="pBenefit" class="custom-select">
+                                            <option value="">Без льготы</option>
+                                            <option value="student">Студент</option>
+                                            <option value="pensioner">Пенсионер</option>
+                                            <option value="military">Военная</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Номер бонусной карты</label>
+                                    <input id="pLoyalty" type="text" placeholder="RB-000001">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="muted">
+                                        <input type="checkbox" id="pChildTicket">
+                                        Детский билет (50% скидка)
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="actions mt-16">
+                                <button class="btn primary" type="button" onclick="savePassenger()">Сохранить</button>
+                                <button class="btn ghost" type="button" onclick="resetPassengerForm()">Очистить</button>
+                            </div>
+                        </article>
+                    </div>
+                </div>
             </article>
         </div>
 
@@ -354,108 +336,190 @@
         });
     });
 
-    // Пассажиры (общий localStorage с booking/select-seat: PASSENGER_STORAGE_KEY = 'rb-passenger-templates')
     const PASSENGER_STORAGE_KEY = 'rb-passenger-templates';
-    let editingId = null;
+    let editingPassengerId = null;
+    let currentGender = '';
 
     function loadPassengers() {
         try {
             const raw = localStorage.getItem(PASSENGER_STORAGE_KEY);
             return raw ? JSON.parse(raw) : [];
         } catch (e) {
-            console.warn('Не удалось прочитать passengers', e);
+            console.warn('loadPassengers failed', e);
             return [];
         }
     }
+
     function persistPassengers(list) {
         localStorage.setItem(PASSENGER_STORAGE_KEY, JSON.stringify(list));
     }
 
-    function renderPassengers() {
-        const root = document.getElementById('passengersList');
-        if (!root) return;
-        const items = loadPassengers();
-
-        if (!items.length) {
-            root.innerHTML = '<p class="muted">Пока нет пассажиров. Добавь шаблон — он появится и в выборе места.</p>';
-            return;
-        }
-
-        root.innerHTML = items.map(p => `
-            <div class="passenger-row">
-                <div>
-                    <div class="title">${escapeHtml(p.name || 'Пассажир')}</div>
-                    <div class="meta">${escapeHtml(p.document || '')}${p.benefit ? ' • ' + escapeHtml(p.benefit) : ''}${p.childTicket ? ' • детский' : ''}</div>
-                </div>
-                <div class="passenger-actions">
-                    <button class="btn" type="button" onclick="editPassenger('${p.id}')">Изменить</button>
-                    <button class="btn danger" type="button" onclick="deletePassenger('${p.id}')">Удалить</button>
-                </div>
-            </div>
-        `).join('');
+    function initialsOf(p) {
+        const a = (p.lastName || '').trim().charAt(0);
+        const b = (p.firstName || '').trim().charAt(0);
+        return (a + b).toUpperCase() || 'P';
     }
 
-    function resetPassengerForm() {
-        editingId = null;
-        document.getElementById('pName').value = '';
-        document.getElementById('pDoc').value = '';
+    function fullNameOf(p) {
+        return [p.lastName, p.firstName, p.middleName].filter(Boolean).join(' ').trim();
+    }
+
+    function docLabel(p) {
+        const map = {
+            PASSPORT: 'Паспорт',
+            FOREIGN_PASSPORT: 'Загранпаспорт',
+            ID: 'ID',
+            BIRTH_CERT: 'Свидетельство'
+        };
+        const t = map[p.docType] || 'Документ';
+        return `${t} ${p.docNumber || ''}`.trim();
+    }
+
+    function renderPassengerList() {
+        const listEl = document.getElementById('passengerList');
+        const emptyEl = document.getElementById('passengerEmpty');
+        if (!listEl) return;
+
+        const q = (document.getElementById('passengerSearch')?.value || '').toLowerCase().trim();
+        const passengers = loadPassengers();
+
+        const filtered = q
+            ? passengers.filter(p =>
+                fullNameOf(p).toLowerCase().includes(q) ||
+                (p.docNumber || '').toLowerCase().includes(q)
+            )
+            : passengers;
+
+        listEl.innerHTML = '';
+
+        if (filtered.length === 0) {
+            if (emptyEl) emptyEl.style.display = passengers.length ? 'block' : 'block';
+            return;
+        }
+        if (emptyEl) emptyEl.style.display = 'none';
+
+        filtered.forEach(p => {
+            const btn = document.createElement('div');
+            btn.className = 'passenger-item';
+            btn.onclick = () => startEditPassenger(p.id);
+
+            btn.innerHTML = `
+        <div class="passenger-avatar">${initialsOf(p)}</div>
+        <div class="passenger-main">
+          <div class="passenger-name">${fullNameOf(p) || 'Пассажир'}</div>
+          <div class="passenger-meta">
+            ${p.birthDate ? `д.р. ${p.birthDate}` : ''}${p.birthDate ? ' • ' : ''}${docLabel(p)}
+          </div>
+        </div>
+        <div class="row" style="gap:8px;">
+          <button class="icon-btn" type="button" title="Редактировать" onclick="event.stopPropagation(); startEditPassenger('${p.id}')">✎</button>
+          <button class="icon-btn danger" type="button" title="Удалить" onclick="event.stopPropagation(); deletePassenger('${p.id}')">🗑</button>
+        </div>
+      `;
+            listEl.appendChild(btn);
+        });
+    }
+
+    function startCreatePassenger() {
+        editingPassengerId = null;
+        document.getElementById('passengerEditorTitle').textContent = 'Новый пассажир';
+        resetPassengerForm(false);
+    }
+
+    function startEditPassenger(id) {
+        const passengers = loadPassengers();
+        const p = passengers.find(x => x.id === id);
+        if (!p) return;
+
+        editingPassengerId = id;
+        document.getElementById('passengerEditorTitle').textContent = 'Редактирование пассажира';
+
+        document.getElementById('pLastName').value = p.lastName || '';
+        document.getElementById('pFirstName').value = p.firstName || '';
+        document.getElementById('pMiddleName').value = p.middleName || '';
+        document.getElementById('pBirthDate').value = p.birthDate || '';
+        document.getElementById('pDocType').value = p.docType || 'PASSPORT';
+        document.getElementById('pDocNumber').value = p.docNumber || '';
+        document.getElementById('pBenefit').value = p.benefit || '';
+        document.getElementById('pLoyalty').value = p.loyalty || '';
+        document.getElementById('pChildTicket').checked = !!p.childTicket;
+
+        setGender(p.gender || '');
+    }
+
+    function setGender(g) {
+        currentGender = g;
+        const m = document.getElementById('pGenderM');
+        const f = document.getElementById('pGenderF');
+        if (!m || !f) return;
+
+        m.classList.toggle('primary', g === 'M');
+        f.classList.toggle('primary', g === 'F');
+        m.classList.toggle('ghost', g !== 'M');
+        f.classList.toggle('ghost', g !== 'F');
+    }
+
+    function resetPassengerForm(clearList = true) {
+        document.getElementById('pLastName').value = '';
+        document.getElementById('pFirstName').value = '';
+        document.getElementById('pMiddleName').value = '';
+        document.getElementById('pBirthDate').value = '';
+        document.getElementById('pDocType').value = 'PASSPORT';
+        document.getElementById('pDocNumber').value = '';
         document.getElementById('pBenefit').value = '';
         document.getElementById('pLoyalty').value = '';
-        document.getElementById('pChild').checked = false;
+        document.getElementById('pChildTicket').checked = false;
+        setGender('');
+        if (clearList) renderPassengerList();
     }
 
     function savePassenger() {
-        const name = document.getElementById('pName').value.trim();
-        const doc = document.getElementById('pDoc').value.trim();
-        if (!name || !doc) {
-            alert('Заполни ФИО и документ.');
+        const lastName = document.getElementById('pLastName').value.trim();
+        const firstName = document.getElementById('pFirstName').value.trim();
+        const docNumber = document.getElementById('pDocNumber').value.trim();
+
+        if (!lastName || !firstName || !docNumber) {
+            alert('Заполни минимум: Фамилия, Имя, Номер документа.');
             return;
         }
 
-        const list = loadPassengers();
-        const payload = {
-            id: editingId || (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())),
-            name,
-            document: doc,
+        const passengers = loadPassengers();
+        const data = {
+            id: editingPassengerId || (crypto.randomUUID ? crypto.randomUUID() : String(Date.now())),
+            lastName,
+            firstName,
+            middleName: document.getElementById('pMiddleName').value.trim(),
+            gender: currentGender,
+            birthDate: document.getElementById('pBirthDate').value,
+            docType: document.getElementById('pDocType').value,
+            docNumber,
             benefit: document.getElementById('pBenefit').value,
             loyalty: document.getElementById('pLoyalty').value.trim(),
-            childTicket: document.getElementById('pChild').checked
+            childTicket: document.getElementById('pChildTicket').checked
         };
 
-        const idx = list.findIndex(x => x.id === payload.id);
-        if (idx >= 0) list[idx] = payload;
-        else list.push(payload);
+        const idx = passengers.findIndex(x => x.id === data.id);
+        if (idx >= 0) passengers[idx] = data;
+        else passengers.push(data);
 
-        persistPassengers(list);
-        resetPassengerForm();
-        renderPassengers();
-    }
+        persistPassengers(passengers);
+        editingPassengerId = data.id;
 
-    function editPassenger(id) {
-        const p = loadPassengers().find(x => x.id === id);
-        if (!p) return;
-        editingId = p.id;
-        document.getElementById('pName').value = p.name || '';
-        document.getElementById('pDoc').value = p.document || '';
-        document.getElementById('pBenefit').value = p.benefit || '';
-        document.getElementById('pLoyalty').value = p.loyalty || '';
-        document.getElementById('pChild').checked = !!p.childTicket;
+        renderPassengerList();
+        alert('Пассажир сохранён');
     }
 
     function deletePassenger(id) {
         if (!confirm('Удалить пассажира?')) return;
-        const next = loadPassengers().filter(x => x.id !== id);
-        persistPassengers(next);
-        if (editingId === id) resetPassengerForm();
-        renderPassengers();
-    }
-
-    function escapeHtml(s) {
-        return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+        const passengers = loadPassengers().filter(x => x.id !== id);
+        persistPassengers(passengers);
+        if (editingPassengerId === id) startCreatePassenger();
+        renderPassengerList();
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        renderPassengers();
+        renderPassengerList();
+        startCreatePassenger();
     });
 </script>
 
