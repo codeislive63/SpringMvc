@@ -11,231 +11,294 @@
 
 <header th:replace="~{fragments/topbar :: topbar}"></header>
 
-<main class="page">
+<main class="page page-wide">
     <section class="welcome">
         <h1>Выбор места</h1>
-        <p class="muted">Сначала выберите место для первого сегмента. Для маршрута с пересадкой второй сегмент станет активен после выбора места в первом.</p>
+        <p class="muted">Сначала выберите место для первого сегмента. Для маршрута с пересадкой второй сегмент станет активен после выбора места в первом. Свободные места подсвечены зелёным, занятые — серым.</p>
     </section>
 
     <form th:action="@{/booking/reserve}" method="post">
-        <section class="cards-grid">
-            <!-- SINGLE TRIP -->
-            <div th:if="${tripId != null}" class="stacked-grid">
-                <article class="card">
-                    <div class="card-header">
-                        <div>
-                            <h3 th:text="${routeLabel}">Маршрут</h3>
-                            <div class="row">
-                                <p>Рейс: <b th:text="${tripId}"></b></p>
-                                <p th:if="${trip != null}">
-                                    Свободных мест: <b th:text="${#lists.size(seats)}"></b>
-                                </p>
-                                <p th:if="${trip != null}">
-                                    Поезд: <b th:text="${trip.train.name}"></b>
-                                </p>
+        <section class="booking-shell">
+            <div class="booking-primary">
+                <!-- SINGLE TRIP -->
+                <div th:if="${tripId != null}" class="stacked-grid">
+                    <article class="card seat-card">
+                        <div class="card-header between">
+                            <div>
+                                <p class="eyebrow">Сегмент 1</p>
+                                <h3 th:text="${routeLabel}">Маршрут</h3>
+                                <div class="row wrap">
+                                    <span class="metric">Рейс: <b th:text="${tripId}"></b></span>
+                                    <span class="metric" th:if="${trip != null}">
+                                        Свободных мест: <b th:text="${#lists.size(seats)}"></b>
+                                    </span>
+                                    <span class="metric" th:if="${trip != null}">
+                                        Поезд: <b th:text="${trip.train.name}"></b>
+                                    </span>
+                                </div>
+                                <div class="info-grid" th:if="${trip != null}">
+                                    <span class="pill" th:text="${trip.train.type.label}"></span>
+                                    <span class="pill" th:text="${trip.train.carClass.label}"></span>
+                                    <span class="pill" th:if="${trip.train.wifiAvailable}">Wi‑Fi</span>
+                                    <span class="pill" th:if="${trip.train.diningAvailable}">Питание</span>
+                                    <span class="pill" th:if="${trip.train.powerOutlets}">Розетки</span>
+                                </div>
                             </div>
-                            <div class="info-grid" th:if="${trip != null}">
-                                <span class="pill" th:text="${trip.train.type.label}"></span>
-                                <span class="pill" th:text="${trip.train.carClass.label}"></span>
-                                <span class="pill" th:if="${trip.train.wifiAvailable}">Wi‑Fi</span>
-                                <span class="pill" th:if="${trip.train.diningAvailable}">Питание</span>
-                                <span class="pill" th:if="${trip.train.powerOutlets}">Розетки</span>
+                            <div class="seat-callout">
+                                <p class="muted">Выберите место на схеме вагона.</p>
+                                <p class="pill soft">Для бронирования нужно отметить место.</p>
                             </div>
                         </div>
-                        <div class="chip">Сегмент 1</div>
-                    </div>
 
-                    <div class="hint">Выберите место на схеме вагона</div>
-                    <div class="legend">
-                        <span class="legend-item"><span class="legend-swatch"></span>Свободно</span>
-                        <span class="legend-item"><span class="legend-swatch busy"></span>Занято</span>
-                        <span class="legend-item"><span class="legend-swatch selected"></span>Вы выбрали</span>
-                    </div>
-                    <div class="seat-grid" data-target="seat">
+                        <div class="legend emphasised">
+                            <span class="legend-item"><span class="legend-swatch free"></span>Свободно</span>
+                            <span class="legend-item"><span class="legend-swatch busy"></span>Занято</span>
+                            <span class="legend-item"><span class="legend-swatch selected"></span>Вы выбрали</span>
+                        </div>
+                        <div class="seat-grid" data-target="seat">
+                            <button type="button"
+                                    class="seat"
+                                    th:each="s : ${seatMap}"
+                                    th:text="${s.seatNumber}"
+                                    th:classappend="${!s.available} ? ' is-busy' : ' is-free'"
+                                    th:disabled="${!s.available}"
+                                    th:attr="data-seat=${s.seatNumber}"
+                                    onclick="pickSeat('seat', this)">
+                            </button>
+                        </div>
+
+                        <div class="hint" th:if="${trip != null and trip.route != null}">
+                            Остановки: <span th:each="stop,iter : ${trip.route.stops}">
+                                <span th:text="${stop}"></span><span th:if="${!iter.last}"> • </span>
+                            </span>
+                        </div>
+                    </article>
+                </div>
+
+                <!-- TRANSFER (2 segments) -->
+                <div th:if="${tripId1 != null}" class="stacked-grid">
+                    <div class="segment-switcher">
                         <button type="button"
-                                class="seat"
-                                th:each="s : ${seatMap}"
-                                th:text="${s.seatNumber}"
-                                th:classappend="${!s.available} ? ' is-busy' : ''"
-                                th:disabled="${!s.available}"
-                                th:attr="data-seat=${s.seatNumber}"
-                                onclick="pickSeat('seat', this)">
+                                class="segment-tab is-active"
+                                data-target="segment1Panel"
+                                onclick="switchSegment('segment1Panel')">
+                            <div class="segment-tab__top">
+                                <span class="eyebrow">Сегмент 1</span>
+                                <span class="pill soft" th:text="${routeLabelA}">Маршрут 1</span>
+                            </div>
+                            <div class="segment-tab__bottom">
+                                <span class="muted">Рейс <b th:text="${tripId1}"></b></span>
+                                <span class="pill muted">Свободно <b th:text="${#lists.size(seats1)}"></b></span>
+                            </div>
+                        </button>
+                        <button type="button"
+                                class="segment-tab is-disabled"
+                                data-target="segment2Panel"
+                                id="segment2Tab"
+                                onclick="switchSegment('segment2Panel')"
+                                disabled>
+                            <div class="segment-tab__top">
+                                <span class="eyebrow">Сегмент 2</span>
+                                <span class="pill soft" th:text="${routeLabelB}">Маршрут 2</span>
+                            </div>
+                            <div class="segment-tab__bottom">
+                                <span class="muted">Рейс <b th:text="${tripId2}"></b></span>
+                                <span class="pill muted">Свободно <b th:text="${#lists.size(seats2)}"></b></span>
+                                <span class="pill danger is-inline" id="segment2Lock">Откроется после выбора места</span>
+                            </div>
                         </button>
                     </div>
 
-                    <div class="hint" th:if="${trip != null and trip.route != null}">
-                        Остановки: <span th:each="stop,iter : ${trip.route.stops}">
-                            <span th:text="${stop}"></span><span th:if="${!iter.last}"> • </span>
-                        </span>
+                    <div class="segment-panels">
+                        <!-- CARD 1 -->
+                        <article class="card seat-card" id="segment1Panel" data-panel>
+                            <div class="card-header between">
+                                <div>
+                                    <h3 th:text="${routeLabelA}">Маршрут 1</h3>
+                                    <div class="row wrap">
+                                        <p>Рейс: <b th:text="${tripId1}"></b></p>
+                                        <p>Свободных мест: <b th:text="${#lists.size(seats1)}"></b></p>
+                                    </div>
+                                    <div class="info-grid" th:if="${tripA != null}">
+                                        <span class="pill" th:text="${tripA.train.type.label}"></span>
+                                        <span class="pill" th:text="${tripA.train.carClass.label}"></span>
+                                        <span class="pill" th:if="${tripA.train.wifiAvailable}">Wi‑Fi</span>
+                                        <span class="pill" th:if="${tripA.train.diningAvailable}">Питание</span>
+                                        <span class="pill" th:if="${tripA.train.powerOutlets}">Розетки</span>
+                                    </div>
+                                </div>
+                                <div class="seat-callout">
+                                    <p class="muted">Сначала выберите место для первого сегмента.</p>
+                                    <p class="pill soft">Затем сразу перейдёте ко второму.</p>
+                                </div>
+                            </div>
+
+                            <div class="legend emphasised">
+                                <span class="legend-item"><span class="legend-swatch free"></span>Свободно</span>
+                                <span class="legend-item"><span class="legend-swatch busy"></span>Занято</span>
+                                <span class="legend-item"><span class="legend-swatch selected"></span>Вы выбрали</span>
+                            </div>
+                            <div class="seat-grid" data-target="seat1">
+                                <button type="button"
+                                        class="seat"
+                                        th:each="s1 : ${seatMap1}"
+                                        th:text="${s1.seatNumber}"
+                                        th:classappend="${!s1.available} ? ' is-busy' : ' is-free'"
+                                        th:disabled="${!s1.available}"
+                                        th:attr="data-seat=${s1.seatNumber}"
+                                        onclick="pickSeat('seat1', this)">
+                                </button>
+                            </div>
+                            <div class="hint" th:if="${tripA != null and tripA.route != null}">
+                                Остановки: <span th:each="stop,iter : ${tripA.route.stops}">
+                                    <span th:text="${stop}"></span><span th:if="${!iter.last}"> • </span>
+                                </span>
+                            </div>
+                        </article>
+
+                        <!-- CARD 2 (hidden until seat1 picked) -->
+                        <article class="card seat-card is-hidden" id="segment2Panel" data-panel>
+                            <div class="card-header between">
+                                <div>
+                                    <h3 th:text="${routeLabelB}">Маршрут 2</h3>
+                                    <div class="row wrap">
+                                        <p>Рейс: <b th:text="${tripId2}"></b></p>
+                                        <p>Свободных мест: <b th:text="${#lists.size(seats2)}"></b></p>
+                                    </div>
+                                    <div class="info-grid" th:if="${tripB != null}">
+                                        <span class="pill" th:text="${tripB.train.type.label}"></span>
+                                        <span class="pill" th:text="${tripB.train.carClass.label}"></span>
+                                        <span class="pill" th:if="${tripB.train.wifiAvailable}">Wi‑Fi</span>
+                                        <span class="pill" th:if="${tripB.train.diningAvailable}">Питание</span>
+                                        <span class="pill" th:if="${tripB.train.powerOutlets}">Розетки</span>
+                                    </div>
+                                </div>
+                                <div class="seat-callout muted" id="segment2Hint">
+                                    Станет доступно после выбора места в сегменте 1.
+                                </div>
+                            </div>
+
+                            <div class="legend emphasised">
+                                <span class="legend-item"><span class="legend-swatch free"></span>Свободно</span>
+                                <span class="legend-item"><span class="legend-swatch busy"></span>Занято</span>
+                                <span class="legend-item"><span class="legend-swatch selected"></span>Вы выбрали</span>
+                            </div>
+                            <div class="seat-grid" data-target="seat2">
+                                <button type="button"
+                                        class="seat"
+                                        th:each="s2 : ${seatMap2}"
+                                        th:text="${s2.seatNumber}"
+                                        th:classappend="${!s2.available} ? ' is-busy' : ' is-free'"
+                                        th:disabled="${!s2.available}"
+                                        th:attr="data-seat=${s2.seatNumber}"
+                                        onclick="pickSeat('seat2', this)">
+                                </button>
+                            </div>
+                            <div class="hint" th:if="${tripB != null and tripB.route != null}">
+                                Остановки: <span th:each="stop,iter : ${tripB.route.stops}">
+                                    <span th:text="${stop}"></span><span th:if="${!iter.last}"> • </span>
+                                </span>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </div>
+
+            <div class="booking-secondary">
+                <article class="card">
+                    <div class="section-title">
+                        <div>
+                            <h3>Данные пассажира</h3>
+                            <p class="muted">Заполните данные или выберите готового пассажира.</p>
+                        </div>
+                        <div class="chip">Пассажир</div>
+                    </div>
+
+                    <div class="passenger-toolbar">
+                        <div class="select-wrapper wide">
+                            <select id="passengerSelector" class="custom-select" onchange="handlePassengerSelect(this)">
+                                <option value="">Новый пассажир</option>
+                            </select>
+                        </div>
+                        <button class="btn ghost" type="button" onclick="savePassengerTemplate()">Сохранить как шаблон</button>
+                    </div>
+                    <p class="small">Сохранённые пассажиры остаются в браузере и помогут бронировать быстрее.</p>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="passengerName">ФИО</label>
+                            <input id="passengerName" name="passengerName" type="text" placeholder="Иванов Иван" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="passengerDocument">Документ</label>
+                            <input id="passengerDocument" name="passengerDocument" type="text" placeholder="Паспорт 00 00 №123456" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="benefitType">Льготы</label>
+                            <div class="select-wrapper">
+                                <select id="benefitType" name="benefitType" class="custom-select">
+                                    <option value="">Без льготы</option>
+                                    <option value="student">Студент</option>
+                                    <option value="pensioner">Пенсионер</option>
+                                    <option value="military">Военная</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="loyaltyNumber">Номер бонусной карты</label>
+                            <input id="loyaltyNumber" name="loyaltyNumber" type="text" placeholder="RB-000001">
+                        </div>
+                    </div>
+                    <div class="form-group mt-10">
+                        <label class="muted">
+                            <input type="checkbox" name="childTicket" id="childTicket" value="true"> Детский билет (50% скидка)
+                        </label>
+                    </div>
+                </article>
+
+                <article class="card">
+                    <div class="section-title">
+                        <div>
+                            <h3>Дополнительные услуги</h3>
+                            <p class="muted">Добавьте питание, страховку или сопутствующие опции.</p>
+                        </div>
+                        <div class="chip">Сервисы</div>
+                    </div>
+                    <div class="extras">
+                        <div class="form-group">
+                            <label for="mealOption">Питание</label>
+                            <div class="select-wrapper">
+                                <select id="mealOption" name="mealOption" class="custom-select">
+                                    <option value="">Без питания</option>
+                                    <option value="standard">Стандарт</option>
+                                    <option value="vegan">Веган</option>
+                                    <option value="kids">Детское</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="muted">
+                                <input type="checkbox" name="insuranceIncluded" value="true"> Страхование поездки
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="muted">
+                                <input type="checkbox" name="transferIncluded" value="true"> Трансфер / такси по прибытии
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="muted">
+                                <input type="checkbox" name="baggageSelected" value="true"> Дополнительный багаж
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="muted">
+                                <input type="checkbox" name="petTravel" value="true"> Перевозка животных
+                            </label>
+                        </div>
                     </div>
                 </article>
             </div>
-
-            <!-- TRANSFER (2 segments) -->
-            <div th:if="${tripId1 != null}" class="stacked-grid">
-                <div class="cards-grid">
-                    <!-- CARD 1 -->
-                    <article class="card">
-                        <div class="card-header">
-                            <div>
-                                <h3 th:text="${routeLabelA}">Маршрут 1</h3>
-                                <div class="row">
-                                    <p>Рейс: <b th:text="${tripId1}"></b></p>
-                                    <p>Свободных мест: <b th:text="${#lists.size(seats1)}"></b></p>
-                                </div>
-                                <div class="info-grid" th:if="${tripA != null}">
-                                    <span class="pill" th:text="${tripA.train.type.label}"></span>
-                                    <span class="pill" th:text="${tripA.train.carClass.label}"></span>
-                                    <span class="pill" th:if="${tripA.train.wifiAvailable}">Wi‑Fi</span>
-                                    <span class="pill" th:if="${tripA.train.diningAvailable}">Питание</span>
-                                    <span class="pill" th:if="${tripA.train.powerOutlets}">Розетки</span>
-                                </div>
-                            </div>
-                            <div class="chip">Сегмент 1</div>
-                        </div>
-
-                        <div class="hint">Сначала выберите место для первого сегмента</div>
-                        <div class="seat-grid" data-target="seat1">
-                            <button type="button"
-                                    class="seat"
-                                    th:each="s1 : ${seatMap1}"
-                                    th:text="${s1.seatNumber}"
-                                    th:classappend="${!s1.available} ? ' is-busy' : ''"
-                                    th:disabled="${!s1.available}"
-                                    th:attr="data-seat=${s1.seatNumber}"
-                                    onclick="pickSeat('seat1', this)">
-                            </button>
-                        </div>
-                        <div class="hint" th:if="${tripA != null and tripA.route != null}">
-                            Остановки: <span th:each="stop,iter : ${tripA.route.stops}">
-                                <span th:text="${stop}"></span><span th:if="${!iter.last}"> • </span>
-                            </span>
-                        </div>
-                    </article>
-
-                    <!-- CARD 2 (disabled until seat1 picked) -->
-                    <article class="card is-disabled" id="card2">
-                        <div class="card-header">
-                            <div>
-                                <h3 th:text="${routeLabelB}">Маршрут 2</h3>
-                                <div class="row">
-                                    <p>Рейс: <b th:text="${tripId2}"></b></p>
-                                    <p>Свободных мест: <b th:text="${#lists.size(seats2)}"></b></p>
-                                </div>
-                                <div class="info-grid" th:if="${tripB != null}">
-                                    <span class="pill" th:text="${tripB.train.type.label}"></span>
-                                    <span class="pill" th:text="${tripB.train.carClass.label}"></span>
-                                    <span class="pill" th:if="${tripB.train.wifiAvailable}">Wi‑Fi</span>
-                                    <span class="pill" th:if="${tripB.train.diningAvailable}">Питание</span>
-                                    <span class="pill" th:if="${tripB.train.powerOutlets}">Розетки</span>
-                                </div>
-                            </div>
-                            <div class="chip">Сегмент 2</div>
-                        </div>
-
-                        <div class="hint">Станет доступно после выбора места в сегменте 1</div>
-                        <div class="seat-grid" data-target="seat2">
-                            <button type="button"
-                                    class="seat"
-                                    th:each="s2 : ${seatMap2}"
-                                    th:text="${s2.seatNumber}"
-                                    th:classappend="${!s2.available} ? ' is-busy' : ''"
-                                    th:disabled="${!s2.available}"
-                                    th:attr="data-seat=${s2.seatNumber}"
-                                    onclick="pickSeat('seat2', this)">
-                            </button>
-                        </div>
-                        <div class="hint" th:if="${tripB != null and tripB.route != null}">
-                            Остановки: <span th:each="stop,iter : ${tripB.route.stops}">
-                                <span th:text="${stop}"></span><span th:if="${!iter.last}"> • </span>
-                            </span>
-                        </div>
-                    </article>
-                </div>
-            </div>
-
-            <article class="card">
-                <div class="section-title">
-                    <div>
-                        <h3>Данные пассажира</h3>
-                        <p class="muted">Заполните данные, чтобы билет был оформлен корректно.</p>
-                    </div>
-                    <div class="chip">Пассажир</div>
-                </div>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="passengerName">ФИО</label>
-                        <input id="passengerName" name="passengerName" type="text" placeholder="Иванов Иван" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="passengerDocument">Документ</label>
-                        <input id="passengerDocument" name="passengerDocument" type="text" placeholder="Паспорт 00 00 №123456" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="benefitType">Льготы</label>
-                        <div class="select-wrapper">
-                            <select id="benefitType" name="benefitType" class="custom-select">
-                                <option value="">Без льготы</option>
-                                <option value="student">Студент</option>
-                                <option value="pensioner">Пенсионер</option>
-                                <option value="military">Военная</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="loyaltyNumber">Номер бонусной карты</label>
-                        <input id="loyaltyNumber" name="loyaltyNumber" type="text" placeholder="RB-000001">
-                    </div>
-                </div>
-                <div class="form-group mt-10">
-                    <label class="muted">
-                        <input type="checkbox" name="childTicket" value="true"> Детский билет (50% скидка)
-                    </label>
-                </div>
-            </article>
-
-            <article class="card">
-                <div class="section-title">
-                    <div>
-                        <h3>Дополнительные услуги</h3>
-                        <p class="muted">Добавьте питание, страховку или сопутствующие опции.</p>
-                    </div>
-                    <div class="chip">Сервисы</div>
-                </div>
-                <div class="extras">
-                    <div class="form-group">
-                        <label for="mealOption">Питание</label>
-                        <div class="select-wrapper">
-                            <select id="mealOption" name="mealOption" class="custom-select">
-                                <option value="">Без питания</option>
-                                <option value="standard">Стандарт</option>
-                                <option value="vegan">Веган</option>
-                                <option value="kids">Детское</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="muted">
-                            <input type="checkbox" name="insuranceIncluded" value="true"> Страхование поездки
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label class="muted">
-                            <input type="checkbox" name="transferIncluded" value="true"> Трансфер / такси по прибытии
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label class="muted">
-                            <input type="checkbox" name="baggageSelected" value="true"> Дополнительный багаж
-                        </label>
-                    </div>
-                    <div class="form-group">
-                        <label class="muted">
-                            <input type="checkbox" name="petTravel" value="true"> Перевозка животных
-                        </label>
-                    </div>
-                </div>
-            </article>
         </section>
 
         <input type="hidden" name="tripId" th:value="${tripId}"/>
@@ -244,6 +307,25 @@
         <input type="hidden" name="seat" id="seat"/>
         <input type="hidden" name="seat1" id="seat1"/>
         <input type="hidden" name="seat2" id="seat2"/>
+
+        <div class="selection-summary">
+            <div class="summary-item" th:if="${tripId != null}">
+                <p class="muted">Сегмент 1</p>
+                <p class="summary-value" id="seatSummarySingle">Не выбрано</p>
+            </div>
+            <div class="summary-item" th:if="${tripId1 != null}">
+                <p class="muted">Сегмент 1</p>
+                <p class="summary-value" id="seatSummary1">Не выбрано</p>
+            </div>
+            <div class="summary-item" th:if="${tripId1 != null}">
+                <p class="muted">Сегмент 2</p>
+                <p class="summary-value" id="seatSummary2">Не выбрано</p>
+            </div>
+            <div class="summary-item important">
+                <p class="muted">Пассажир</p>
+                <p class="summary-value" id="passengerSummary">Введите данные или выберите сохранённого</p>
+            </div>
+        </div>
 
         <div class="actions mt-16">
             <button class="btn primary" type="submit" id="reserveBtnSingle" th:if="${tripId != null}" disabled>Забронировать</button>
@@ -265,10 +347,36 @@
         if (hidden) hidden.value = btn.dataset.seat;
 
         if (hiddenId === 'seat1') {
-            const card2 = document.getElementById('card2');
-            if (card2) card2.classList.remove('is-disabled');
+            enableSecondSegment();
         }
 
+        syncActions();
+        updateSelectionSummary();
+    }
+
+    function enableSecondSegment() {
+        const tab = document.getElementById('segment2Tab');
+        const lock = document.getElementById('segment2Lock');
+        const hint = document.getElementById('segment2Hint');
+        if (tab) {
+            tab.disabled = false;
+            tab.classList.remove('is-disabled');
+        }
+        if (lock) lock.classList.add('is-hidden');
+        if (hint) hint.classList.remove('muted');
+        switchSegment('segment2Panel');
+    }
+
+    function switchSegment(targetId) {
+        document.querySelectorAll('[data-panel]').forEach(panel => {
+            panel.classList.toggle('is-hidden', panel.id !== targetId);
+        });
+        document.querySelectorAll('.segment-tab').forEach(tab => {
+            tab.classList.toggle('is-active', tab.dataset.target === targetId);
+        });
+    }
+
+    function syncActions() {
         const singleBtn = document.getElementById('reserveBtnSingle');
         if (singleBtn) {
             const seat = document.getElementById('seat')?.value;
@@ -281,7 +389,121 @@
             const seat2 = document.getElementById('seat2')?.value;
             transferBtn.disabled = !(seat1 && seat2);
         }
+
+        updatePassengerSummary();
     }
+
+    function updateSelectionSummary() {
+        const seat = document.getElementById('seat')?.value;
+        const seat1 = document.getElementById('seat1')?.value;
+        const seat2 = document.getElementById('seat2')?.value;
+        const single = document.getElementById('seatSummarySingle');
+        if (single) single.textContent = seat ? `Место ${seat}` : 'Не выбрано';
+        const s1 = document.getElementById('seatSummary1');
+        if (s1) s1.textContent = seat1 ? `Место ${seat1}` : 'Не выбрано';
+        const s2 = document.getElementById('seatSummary2');
+        if (s2) s2.textContent = seat2 ? `Место ${seat2}` : 'Не выбрано';
+    }
+
+    const PASSENGER_STORAGE_KEY = 'rb-passenger-templates';
+
+    function loadPassengers() {
+        try {
+            const raw = localStorage.getItem(PASSENGER_STORAGE_KEY);
+            return raw ? JSON.parse(raw) : [];
+        } catch (e) {
+            console.warn('Не удалось загрузить сохранённых пассажиров', e);
+            return [];
+        }
+    }
+
+    function persistPassengers(list) {
+        localStorage.setItem(PASSENGER_STORAGE_KEY, JSON.stringify(list));
+    }
+
+    function renderPassengerOptions(selectedId) {
+        const select = document.getElementById('passengerSelector');
+        if (!select) return;
+        const saved = loadPassengers();
+        select.innerHTML = '<option value=\"\">Новый пассажир</option>';
+        saved.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.id;
+            opt.textContent = p.name || 'Пассажир';
+            select.appendChild(opt);
+        });
+        if (selectedId) select.value = selectedId;
+    }
+
+    function handlePassengerSelect(selectEl) {
+        const saved = loadPassengers();
+        const current = saved.find(p => p.id === selectEl.value);
+        if (!current) {
+            clearPassengerForm();
+            updatePassengerSummary();
+            return;
+        }
+        setPassengerForm(current);
+        updatePassengerSummary();
+    }
+
+    function clearPassengerForm() {
+        document.getElementById('passengerName').value = '';
+        document.getElementById('passengerDocument').value = '';
+        document.getElementById('benefitType').value = '';
+        document.getElementById('loyaltyNumber').value = '';
+        const child = document.getElementById('childTicket');
+        if (child) child.checked = false;
+    }
+
+    function setPassengerForm(passenger) {
+        document.getElementById('passengerName').value = passenger.name || '';
+        document.getElementById('passengerDocument').value = passenger.document || '';
+        document.getElementById('benefitType').value = passenger.benefit || '';
+        document.getElementById('loyaltyNumber').value = passenger.loyalty || '';
+        const child = document.getElementById('childTicket');
+        if (child) child.checked = !!passenger.childTicket;
+    }
+
+    function savePassengerTemplate() {
+        const name = document.getElementById('passengerName').value.trim();
+        const documentNumber = document.getElementById('passengerDocument').value.trim();
+        if (!name || !documentNumber) {
+            alert('Заполните ФИО и документ, чтобы сохранить пассажира.');
+            return;
+        }
+        const saved = loadPassengers();
+        const passenger = {
+            id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+            name,
+            document: documentNumber,
+            benefit: document.getElementById('benefitType').value,
+            loyalty: document.getElementById('loyaltyNumber').value,
+            childTicket: document.getElementById('childTicket')?.checked
+        };
+        saved.push(passenger);
+        persistPassengers(saved);
+        renderPassengerOptions(passenger.id);
+        updatePassengerSummary();
+    }
+
+    function updatePassengerSummary() {
+        const summary = document.getElementById('passengerSummary');
+        if (!summary) return;
+        const name = document.getElementById('passengerName')?.value;
+        const documentNumber = document.getElementById('passengerDocument')?.value;
+        summary.textContent = (name && documentNumber)
+            ? `${name}, ${documentNumber}`
+            : 'Введите данные или выберите сохранённого';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        renderPassengerOptions();
+        updateSelectionSummary();
+        syncActions();
+        const firstTab = document.querySelector('.segment-tab.is-active');
+        if (firstTab) switchSegment(firstTab.dataset.target);
+    });
 </script>
 
 </body>
