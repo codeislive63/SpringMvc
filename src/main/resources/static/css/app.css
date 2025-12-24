@@ -1027,3 +1027,133 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 .is-inline {
     display: inline-flex;
 }
+
+.ticket-collapse {
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+}
+
+.ticket-collapse summary {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    list-style: none;
+    align-items: center;
+}
+
+.ticket-collapse summary::-webkit-details-marker {
+    display:none;
+}
+
+.ticket-collapse .status {
+    background: rgba(255,255,255,0.1);
+    padding: 2px 6px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+}
+
+.admin-toolbar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 12px 0 18px;
+}
+
+.admin-toolbar .actions {
+    margin: 0; /* чтобы не ломало твой existing actions */
+}
+
+.searchbar {
+    flex: 1;
+    min-width: 320px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 10px 12px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.10);
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(8px);
+}
+
+.searchbar:focus-within {
+    border-color: rgba(99,102,241,0.55);
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+}
+
+.searchbar__icon {
+    width: 18px;
+    height: 18px;
+    opacity: .75;
+    flex: 0 0 auto;
+}
+
+.searchbar__field {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: rgba(255,255,255,0.95);
+    font-size: 14px;
+    line-height: 1;
+    padding: 6px 2px;
+}
+
+.searchbar__field::placeholder {
+    color: rgba(255,255,255,0.45);
+}
+
+.searchbar__clear {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.10);
+    background: rgba(255,255,255,0.03);
+    color: rgba(255,255,255,0.85);
+    cursor: pointer;
+    transition: .15s ease;
+}
+
+.searchbar__clear:hover {
+    background: rgba(255,255,255,0.06);
+}
+
+.searchbar__submit {
+    height: 34px;
+    padding: 0 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(99,102,241,0.22);
+    color: #fff;
+    cursor: pointer;
+    transition: .15s ease;
+    font-weight: 600;
+}
+
+.searchbar__submit:hover {
+    background: rgba(99,102,241,0.28);
+    border-color: rgba(99,102,241,0.45);
+}
+
+.searchbar__hint {
+    width: 100%;
+    margin-top: 8px;
+    color: rgba(255,255,255,0.45);
+    font-size: 12px;
+}
+
+/* mobile */
+@media (max-width: 900px) {
+    .searchbar {
+        min-width: 100%;
+    }
+}

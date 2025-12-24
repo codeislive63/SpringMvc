@@ -11,22 +11,55 @@
 <main class="page">
     <h1>Поезда</h1>
 
-    <a class="btn primary" th:href="@{/admin/panel/trains/new}">Добавить поезд</a>
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
 
-    <div th:if="${success}" class="notice success" th:text="${success}"></div>
-    <div th:if="${error}" class="notice error" th:text="${error}"></div>
+    <div class="admin-toolbar">
+        <div class="actions">
+            <a class="btn primary" th:href="@{/admin/panel/trains/new}">Добавить поезд</a>
+        </div>
 
-    <div class="cards-grid">
-        <article class="card" th:each="t : ${trains}">
-            <h3 th:text="${t.name}">Название</h3>
-            <p th:text="${t.code}">Код</p>
-            <p th:text="'Мест: ' + ${t.seatCapacity}">Мест</p>
+        <form method="get" class="searchbar" th:action="@{/admin/panel/trains}">
+            <svg class="searchbar__icon" viewBox="0 0 24 24" fill="none">
+                <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="currentColor" stroke-width="2"/>
+                <path d="M16.5 16.5 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
 
-            <form th:action="@{'/admin/panel/trains/' + ${t.id} + '/delete'}" method="post">
-                <button class="btn danger" type="submit">Удалить</button>
-            </form>
-        </article>
+            <input class="searchbar__field"
+                   type="text"
+                   name="q"
+                   placeholder="Поиск: название или код поезда…"
+                   th:value="${q}"/>
+
+            <a class="searchbar__clear"
+               th:if="${q != null and !q.isEmpty()}"
+               th:href="@{/admin/panel/trains}"
+               title="Очистить">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none">
+                    <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </a>
+
+            <button class="searchbar__submit" type="submit">Найти</button>
+        </form>
     </div>
+
+    <section class="cards-grid">
+        <article class="card" th:each="t : ${trains}">
+            <h3 th:text="${t.name}">Поезд</h3>
+            <p class="muted" th:text="'Код: ' + ${t.code}">Код</p>
+
+            <div class="actions">
+                <a class="btn" th:href="@{'/admin/panel/trains/' + ${t.id} + '/edit'}">Изменить</a>
+
+                <form th:action="@{'/admin/panel/trains/' + ${t.id} + '/delete'}"
+                      method="post"
+                      onsubmit="return confirm('Удалить поезд?')">
+                    <button class="btn danger" type="submit">Удалить</button>
+                </form>
+            </div>
+        </article>
+    </section>
 </main>
 </body>
 </html>

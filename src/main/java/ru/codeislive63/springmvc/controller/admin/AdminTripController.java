@@ -11,6 +11,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.codeislive63.springmvc.domain.TicketStatus;
 import ru.codeislive63.springmvc.domain.entity.Route;
 import ru.codeislive63.springmvc.domain.entity.Train;
+import ru.codeislive63.springmvc.domain.entity.Trip;
 import ru.codeislive63.springmvc.repository.RouteRepository;
 import ru.codeislive63.springmvc.repository.TicketRepository;
 import ru.codeislive63.springmvc.repository.TrainRepository;
@@ -20,6 +21,7 @@ import ru.codeislive63.springmvc.service.AdminService;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin/panel/trips")
@@ -33,9 +35,24 @@ public class AdminTripController {
     private final TrainRepository trainRepository;
     private final AdminService adminService;
 
-    @GetMapping
-    public String list(Model model) {
-        model.addAttribute("trips", tripRepository.findAll());
+    @GetMapping("")
+    public String listTrips(@RequestParam(value = "q", required = false) String query,
+                            Model model) {
+        List<Trip> trips = tripRepository.findAll();
+
+        if (query != null && !query.isBlank()) {
+            String lower = query.toLowerCase();
+            trips = trips.stream()
+                    .filter(t ->
+                            t.getRoute().getOrigin().getName().toLowerCase().contains(lower)
+                                    || t.getRoute().getDestination().getName().toLowerCase().contains(lower)
+                                    || t.getTrain().getName().toLowerCase().contains(lower)
+                                    || t.getTrain().getCode().toLowerCase().contains(lower)
+                    )
+                    .collect(Collectors.toList());
+        }
+        model.addAttribute("trips", trips);
+        model.addAttribute("q", query);
         return "pages/admin/trips/list";
     }
 

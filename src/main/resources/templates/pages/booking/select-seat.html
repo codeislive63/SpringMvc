@@ -1,11 +1,40 @@
 <!DOCTYPE html>
 <html lang="ru"
       xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+>
 <head>
     <meta charset="UTF-8">
     <title>Выбор места • Railway Booker</title>
     <link rel="stylesheet" th:href="@{/css/app.css}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <style>
+        .extras-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        .service-card {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: background 0.1s ease;
+        }
+        .service-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .service-card input[type="checkbox"] {
+            margin-right: 6px;
+        }
+        .service-icon {
+            font-size: 20px;
+            color: #fff;
+        }
+    </style>
 </head>
 <body class="app-bg">
 
@@ -68,7 +97,8 @@
                         </div>
 
                         <div class="hint" th:if="${trip != null and trip.route != null}">
-                            Остановки: <span th:each="stop,iter : ${trip.route.stops}">
+                            Остановки:
+                            <span th:each="stop,iter : ${trip.route.stops}">
                                 <span th:text="${stop}"></span><span th:if="${!iter.last}"> • </span>
                             </span>
                         </div>
@@ -78,6 +108,7 @@
                 <!-- TRANSFER (2 segments) -->
                 <div th:if="${tripId1 != null}" class="stacked-grid">
                     <div class="segment-switcher">
+                        <!-- вкладки сегментов -->
                         <button type="button"
                                 class="segment-tab is-active"
                                 data-target="segment1Panel"
@@ -110,7 +141,7 @@
                     </div>
 
                     <div class="segment-panels">
-                        <!-- CARD 1 -->
+                        <!-- Панель сегмента 1 -->
                         <article class="card seat-card" id="segment1Panel" data-panel>
                             <div class="card-header between">
                                 <div>
@@ -150,13 +181,14 @@
                                 </button>
                             </div>
                             <div class="hint" th:if="${tripA != null and tripA.route != null}">
-                                Остановки: <span th:each="stop,iter : ${tripA.route.stops}">
+                                Остановки:
+                                <span th:each="stop,iter : ${tripA.route.stops}">
                                     <span th:text="${stop}"></span><span th:if="${!iter.last}"> • </span>
                                 </span>
                             </div>
                         </article>
 
-                        <!-- CARD 2 (hidden until seat1 picked) -->
+                        <!-- Панель сегмента 2 (изначально скрыта) -->
                         <article class="card seat-card is-hidden" id="segment2Panel" data-panel>
                             <div class="card-header between">
                                 <div>
@@ -195,7 +227,8 @@
                                 </button>
                             </div>
                             <div class="hint" th:if="${tripB != null and tripB.route != null}">
-                                Остановки: <span th:each="stop,iter : ${tripB.route.stops}">
+                                Остановки:
+                                <span th:each="stop,iter : ${tripB.route.stops}">
                                     <span th:text="${stop}"></span><span th:if="${!iter.last}"> • </span>
                                 </span>
                             </div>
@@ -205,6 +238,7 @@
             </div>
 
             <div class="booking-secondary">
+                <!-- Данные пассажира -->
                 <article class="card">
                     <div class="section-title">
                         <div>
@@ -251,11 +285,13 @@
                     </div>
                     <div class="form-group mt-10">
                         <label class="muted">
-                            <input type="checkbox" name="childTicket" id="childTicket" value="true"> Детский билет (50% скидка)
+                            <input type="checkbox" name="childTicket" id="childTicket" value="true">
+                            Детский билет (50% скидка)
                         </label>
                     </div>
                 </article>
 
+                <!-- Дополнительные услуги -->
                 <article class="card">
                     <div class="section-title">
                         <div>
@@ -264,8 +300,28 @@
                         </div>
                         <div class="chip">Сервисы</div>
                     </div>
-                    <div class="extras">
-                        <div class="form-group">
+                    <div class="extras-grid">
+                        <label class="service-card">
+                            <input type="checkbox" name="insuranceIncluded" value="true">
+                            <span class="service-icon material-icons">health_and_safety</span>
+                            <span>Страхование поездки</span>
+                        </label>
+                        <label class="service-card">
+                            <input type="checkbox" name="transferIncluded" value="true">
+                            <span class="service-icon material-icons">local_taxi</span>
+                            <span>Трансфер / такси</span>
+                        </label>
+                        <label class="service-card">
+                            <input type="checkbox" name="baggageSelected" value="true">
+                            <span class="service-icon material-icons">luggage</span>
+                            <span>Дополнительный багаж</span>
+                        </label>
+                        <label class="service-card">
+                            <input type="checkbox" name="petTravel" value="true">
+                            <span class="service-icon material-icons">pets</span>
+                            <span>Перевозка животных</span>
+                        </label>
+                        <div class="form-group" style="grid-column: span 2;">
                             <label for="mealOption">Питание</label>
                             <div class="select-wrapper">
                                 <select id="mealOption" name="mealOption" class="custom-select">
@@ -276,31 +332,12 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label class="muted">
-                                <input type="checkbox" name="insuranceIncluded" value="true"> Страхование поездки
-                            </label>
-                        </div>
-                        <div class="form-group">
-                            <label class="muted">
-                                <input type="checkbox" name="transferIncluded" value="true"> Трансфер / такси по прибытии
-                            </label>
-                        </div>
-                        <div class="form-group">
-                            <label class="muted">
-                                <input type="checkbox" name="baggageSelected" value="true"> Дополнительный багаж
-                            </label>
-                        </div>
-                        <div class="form-group">
-                            <label class="muted">
-                                <input type="checkbox" name="petTravel" value="true"> Перевозка животных
-                            </label>
-                        </div>
                     </div>
                 </article>
             </div>
         </section>
 
+        <!-- Скрытые поля -->
         <input type="hidden" name="tripId" th:value="${tripId}"/>
         <input type="hidden" name="tripId1" th:value="${tripId1}"/>
         <input type="hidden" name="tripId2" th:value="${tripId2}"/>
@@ -308,6 +345,7 @@
         <input type="hidden" name="seat1" id="seat1"/>
         <input type="hidden" name="seat2" id="seat2"/>
 
+        <!-- Сводка выбора -->
         <div class="selection-summary">
             <div class="summary-item" th:if="${tripId != null}">
                 <p class="muted">Сегмент 1</p>
@@ -327,6 +365,7 @@
             </div>
         </div>
 
+        <!-- Кнопки -->
         <div class="actions mt-16">
             <button class="btn primary" type="submit" id="reserveBtnSingle" th:if="${tripId != null}" disabled>Забронировать</button>
             <button class="btn primary" type="submit" id="reserveBtnTransfer" th:if="${tripId1 != null}" disabled>Забронировать</button>

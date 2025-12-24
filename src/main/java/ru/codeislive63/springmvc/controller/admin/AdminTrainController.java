@@ -10,6 +10,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.codeislive63.springmvc.domain.entity.Train;
 import ru.codeislive63.springmvc.repository.TrainRepository;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Controller
 @RequestMapping("/admin/panel/trains")
 @PreAuthorize("hasRole('ADMIN')")
@@ -19,8 +22,21 @@ public class AdminTrainController {
     private final TrainRepository trainRepository;
 
     @GetMapping
-    public String list(Model model) {
-        model.addAttribute("trains", trainRepository.findAll());
+    public String list(@RequestParam(value = "q", required = false) String q, Model model) {
+        List<Train> trains = trainRepository.findAll();
+
+        if (q != null && !q.isBlank()) {
+            String s = q.toLowerCase();
+            trains = trains.stream()
+                    .filter(t ->
+                            (t.getName() != null && t.getName().toLowerCase().contains(s)) ||
+                                    (t.getCode() != null && t.getCode().toLowerCase().contains(s))
+                    )
+                    .collect(Collectors.toList());
+        }
+
+        model.addAttribute("trains", trains);
+        model.addAttribute("q", q == null ? "" : q);
         return "pages/admin/trains/list";
     }
 
@@ -51,7 +67,6 @@ public class AdminTrainController {
         }
         return "redirect:/admin/panel/trains";
     }
-
 
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable Long id, RedirectAttributes ra) {

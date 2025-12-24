@@ -6,6 +6,42 @@
     <meta charset="UTF-8">
     <title>Мои билеты • Railway Booker</title>
     <link rel="stylesheet" th:href="@{/css/app.css}">
+    <style>
+        /* Стили для раскрывающихся карточек билетов */
+        .ticket-collapse {
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+        .ticket-collapse summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 12px 16px;
+            list-style: none;
+        }
+        .ticket-collapse summary::-webkit-details-marker {
+            display: none;
+        }
+        .ticket-collapse summary .status-chip {
+            background: rgba(255,255,255,0.1);
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+        }
+        .ticket-collapse .details-body {
+            padding: 12px 16px;
+            border-top: 1px solid rgba(255,255,255,0.15);
+        }
+        .ticket-collapse .actions {
+            margin-top: 8px;
+            display: flex;
+            gap: 8px;
+        }
+    </style>
 </head>
 <body class="app-bg">
 
@@ -21,67 +57,60 @@
     </section>
 
     <section class="cards-grid">
-        <article class="card ticket-card" th:each="t : ${tickets}">
-            <div class="card-header between">
-                <div>
-                    <p class="eyebrow" th:text="${#temporals.format(t.trip.departureTime,'dd.MM.yyyy HH:mm')}">Дата</p>
-                    <h3 th:text="${t.trip.route.origin.name + ' — ' + t.trip.route.destination.name}">Маршрут</h3>
-                    <p class="muted" th:text="'Поезд ' + ${t.trip.train.name} + ' • ' + ${t.trip.train.code}">Поезд</p>
+        <!-- Список билетов -->
+        <div th:each="t : ${tickets}">
+            <details class="ticket-collapse">
+                <summary>
+                    <div>
+                        <span th:text="${#temporals.format(t.trip.departureTime,'dd.MM.yyyy HH:mm')}"></span>
+                        <strong th:text="${t.trip.route.origin.name + ' — ' + t.trip.route.destination.name}"></strong>
+                        <span th:text="'Место ' + ${t.seatNumber}"></span>
+                        <span th:text="${#numbers.formatDecimal(t.price,1,'COMMA',2,'POINT')} + ' BYN'"></span>
+                    </div>
+                    <span class="status-chip" th:text="${t.status.label}"></span>
+                </summary>
+                <div class="details-body">
+                    <!-- Пассажир -->
+                    <div th:if="${t.passengerDetails != null}">
+                        <p class="small muted">Пассажир:</p>
+                        <p><b th:text="${t.passengerDetails.fullName}"></b></p>
+                        <p th:if="${t.passengerDetails.documentNumber}">
+                            Документ: <span th:text="${t.passengerDetails.documentNumber}"></span>
+                        </p>
+                        <p th:if="${t.passengerDetails.benefitType}">
+                            Льгота: <span th:text="${t.passengerDetails.benefitType}"></span>
+                        </p>
+                        <p th:if="${t.passengerDetails.childTicket}">Детский тариф</p>
+                        <p th:if="${t.passengerDetails.loyaltyNumber}">
+                            Бонусная карта: <span th:text="${t.passengerDetails.loyaltyNumber}"></span>
+                        </p>
+                    </div>
+                    <!-- Услуги -->
+                    <div th:if="${t.additionalServices != null}">
+                        <p class="small muted">Услуги:</p>
+                        <p th:if="${t.additionalServices.mealOption != null && !t.additionalServices.mealOption.isEmpty()}">
+                            Питание: <span th:text="${t.additionalServices.mealOption}"></span>
+                        </p>
+                        <p th:if="${t.additionalServices.insuranceIncluded}">Страхование</p>
+                        <p th:if="${t.additionalServices.transferIncluded}">Трансфер</p>
+                        <p th:if="${t.additionalServices.baggageSelected}">Багаж</p>
+                        <p th:if="${t.additionalServices.petTravel}">Животные</p>
+                    </div>
+                    <!-- Кнопки -->
+                    <div class="actions">
+                        <form th:if="${t.status.name() == 'BOOKED' || t.status.name() == 'PAID'}"
+                              th:action="@{'/tickets/' + ${t.id} + '/refund'}"
+                              method="post"
+                              onsubmit="return confirm('Вернуть билет? Место станет доступно снова.')">
+                            <button class="btn danger" type="submit">Вернуть билет</button>
+                        </form>
+                        <a class="btn secondary" th:href="@{/routes/search}">Новый поиск</a>
+                    </div>
                 </div>
-                <span class="chip" th:text="${t.status.label}"></span>
-            </div>
+            </details>
+        </div>
 
-            <div class="ticket-grid">
-                <div>
-                    <p class="small muted">Место</p>
-                    <p class="metric"><b th:text="${t.seatNumber}">12</b></p>
-                </div>
-                <div>
-                    <p class="small muted">Цена</p>
-                    <p class="metric" th:text="${#numbers.formatDecimal(t.price,1,'COMMA',2,'POINT')} + ' BYN'">0</p>
-                </div>
-                <div>
-                    <p class="small muted">Статус</p>
-                    <p class="metric" th:text="${t.status.label}">---</p>
-                </div>
-            </div>
-
-            <div class="notice" th:if="${t.passengerDetails != null}">
-                <p class="small muted">Пассажир</p>
-                <p><b th:text="${t.passengerDetails.fullName}"></b></p>
-                <p th:if="${t.passengerDetails.documentNumber}">
-                    Документ: <span th:text="${t.passengerDetails.documentNumber}"></span>
-                </p>
-                <p th:if="${t.passengerDetails.benefitType}">
-                    Льгота: <span th:text="${t.passengerDetails.benefitType}"></span>
-                </p>
-                <p th:if="${t.passengerDetails.childTicket}">Детский тариф</p>
-                <p th:if="${t.passengerDetails.loyaltyNumber}">
-                    Бонусная карта: <span th:text="${t.passengerDetails.loyaltyNumber}"></span>
-                </p>
-            </div>
-
-            <div class="notice" th:if="${t.additionalServices != null}">
-                <p class="small muted">Услуги</p>
-                <p class="small" th:if="${t.additionalServices.mealOption != null and !t.additionalServices.mealOption.isEmpty()}"
-                   th:text="'Питание: ' + ${t.additionalServices.mealOption}"></p>
-                <p class="small" th:if="${t.additionalServices.insuranceIncluded}">Страхование</p>
-                <p class="small" th:if="${t.additionalServices.transferIncluded}">Трансфер</p>
-                <p class="small" th:if="${t.additionalServices.baggageSelected}">Багаж</p>
-                <p class="small" th:if="${t.additionalServices.petTravel}">Животные</p>
-            </div>
-
-            <div class="actions">
-                <form th:if="${t.status.name() == 'BOOKED' || t.status.name() == 'PAID'}"
-                      th:action="@{'/tickets/' + ${t.id} + '/refund'}"
-                      method="post"
-                      onsubmit="return confirm('Вернуть билет? Место станет доступно снова.')">
-                    <button class="btn danger" type="submit">Вернуть билет</button>
-                </form>
-                <a class="btn secondary" th:href="@{/routes/search}">Новый поиск</a>
-            </div>
-        </article>
-
+        <!-- Сообщение, если билетов нет -->
         <div th:if="${#lists.isEmpty(tickets)}" class="card">
             <h3>Пока нет билетов</h3>
             <p>Найдите рейс и купите билет — он появится здесь.</p>

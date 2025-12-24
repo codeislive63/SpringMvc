@@ -19,11 +19,11 @@ import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
-public class AdminAnalyticsController {
+public class AdminDashboardController {
 
     private final AnalyticsService analyticsService;
 
-    @GetMapping("/admin/analytics")
+    @GetMapping("/admin/dashboard")
     public String analytics(Model model) {
         var occupancies = analyticsService.getTripOccupancies();
         var demand = analyticsService.getDemandByDate(14);
@@ -71,10 +71,10 @@ public class AdminAnalyticsController {
         model.addAttribute("demandValues", demandValues);
         model.addAttribute("statusLabels", statusLabels);
         model.addAttribute("statusValues", statusValues);
-        return "pages/admin/analytics";
+        return "pages/admin/dashboard";
     }
 
-    @GetMapping("/admin/analytics/report.xlsx")
+    @GetMapping("/admin/dashboard/report.xlsx")
     @ResponseBody
     public ResponseEntity<ByteArrayResource> downloadReport() {
         byte[] data = analyticsService.buildReport();

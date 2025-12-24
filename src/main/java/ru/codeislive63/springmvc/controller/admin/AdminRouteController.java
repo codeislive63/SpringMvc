@@ -12,6 +12,9 @@ import ru.codeislive63.springmvc.repository.RouteRepository;
 import ru.codeislive63.springmvc.repository.StationRepository;
 import ru.codeislive63.springmvc.repository.TripRepository;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Controller
 @RequestMapping("/admin/panel/routes")
 @PreAuthorize("hasRole('ADMIN')")
@@ -23,8 +26,24 @@ public class AdminRouteController {
     private final TripRepository tripRepository;
 
     @GetMapping
-    public String list(Model model) {
-        model.addAttribute("routes", routeRepository.findAll());
+    public String list(@RequestParam(value = "q", required = false) String q, Model model) {
+        List<Route> routes = routeRepository.findAll();
+
+        if (q != null && !q.isBlank()) {
+            String s = q.toLowerCase();
+            routes = routes.stream()
+                    .filter(r ->
+                            (r.getName() != null && r.getName().toLowerCase().contains(s)) ||
+                                    (r.getOrigin() != null && r.getOrigin().getName() != null && r.getOrigin().getName().toLowerCase().contains(s)) ||
+                                    (r.getDestination() != null && r.getDestination().getName() != null && r.getDestination().getName().toLowerCase().contains(s)) ||
+                                    (r.getOrigin() != null && r.getOrigin().getCode() != null && r.getOrigin().getCode().toLowerCase().contains(s)) ||
+                                    (r.getDestination() != null && r.getDestination().getCode() != null && r.getDestination().getCode().toLowerCase().contains(s))
+                    )
+                    .collect(Collectors.toList());
+        }
+
+        model.addAttribute("routes", routes);
+        model.addAttribute("q", q == null ? "" : q);
         return "pages/admin/routes/list";
     }
 
@@ -48,10 +67,10 @@ public class AdminRouteController {
 
     @PostMapping("/create")
     public String create(@RequestParam(required = false) Long id,
-                       @RequestParam Long originId,
-                       @RequestParam Long destinationId,
-                       @RequestParam(required = false) String name,
-                       RedirectAttributes ra) {
+                         @RequestParam Long originId,
+                         @RequestParam Long destinationId,
+                         @RequestParam(required = false) String name,
+                         RedirectAttributes ra) {
 
         if (originId.equals(destinationId)) {
             ra.addFlashAttribute("error", "Станции отправления и назначения должны отличаться");

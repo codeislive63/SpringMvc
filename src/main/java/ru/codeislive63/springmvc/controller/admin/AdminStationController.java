@@ -10,6 +10,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.codeislive63.springmvc.domain.entity.Station;
 import ru.codeislive63.springmvc.repository.StationRepository;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Controller
 @RequestMapping("/admin/panel/stations")
 @PreAuthorize("hasRole('ADMIN')")
@@ -19,8 +22,21 @@ public class AdminStationController {
     private final StationRepository stationRepository;
 
     @GetMapping
-    public String list(Model model) {
-        model.addAttribute("stations", stationRepository.findAll());
+    public String list(@RequestParam(value = "q", required = false) String q, Model model) {
+        List<Station> stations = stationRepository.findAll();
+
+        if (q != null && !q.isBlank()) {
+            String s = q.toLowerCase();
+            stations = stations.stream()
+                    .filter(st ->
+                            (st.getName() != null && st.getName().toLowerCase().contains(s)) ||
+                                    (st.getCode() != null && st.getCode().toLowerCase().contains(s))
+                    )
+                    .collect(Collectors.toList());
+        }
+
+        model.addAttribute("stations", stations);
+        model.addAttribute("q", q == null ? "" : q);
         return "pages/admin/stations/list";
     }
 
@@ -52,7 +68,6 @@ public class AdminStationController {
         }
         return "redirect:/admin/panel/stations";
     }
-
 
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable Long id, RedirectAttributes ra) {

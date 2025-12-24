@@ -23,6 +23,12 @@ public class ProfileController {
     @GetMapping("/profile")
     public String profile(@AuthenticationPrincipal UserPrincipal principal, Model model) {
         var user = principal.user();
+
+        if (principal.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+            return "redirect:/admin/dashboard";
+        }
+
         List<Ticket> tickets = bookingService.myTickets(user.getId());
 
         List<Ticket> unpaid = tickets.stream()

@@ -3,18 +3,40 @@
       xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Аналитика • Railway Booker</title>
+    <title>Панель администратора</title>
     <link rel="stylesheet" th:href="@{/css/app.css}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* Выравниваем сетку: колонок столько, сколько помещается по ширине, с одинаковыми промежутками */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            align-items: stretch;  /* заставляет элементы растягиваться по высоте */
+        }
+        /* Каждая карточка – flex‑контейнер, чтобы график растягивался вертикально */
+        .cards-grid .card {
+            display: flex;
+            flex-direction: column;
+            min-height: 260px;      /* минимальная высота; можно увеличить при желании */
+        }
+        /* Холст с диаграммой растягивается, заполняя свободное место */
+        .cards-grid .card canvas {
+            flex-grow: 1;
+        }
+    </style>
+
 </head>
 <body class="app-bg">
 <header th:replace="~{fragments/topbar :: topbar}"></header>
 
 <main class="page">
     <section class="welcome">
-        <h1>Аналитика</h1>
+        <h1>Панель администратора</h1>
         <p>Здесь собраны основные показатели о рейсах и билетах</p>
         <div class="actions">
+            <a class="btn secondary" th:href="@{/admin/panel/stations}">Станции</a>
             <a class="btn secondary" th:href="@{/admin/panel/routes}">Маршруты</a>
             <a class="btn secondary" th:href="@{/admin/panel/trips}">Рейсы</a>
             <a class="btn secondary" th:href="@{/admin/panel/trains}">Поезда</a>

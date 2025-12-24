@@ -14,16 +14,42 @@
     <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
     <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
 
-    <div class="actions">
-        <a class="btn primary" th:href="@{/admin/panel/trips/new}">Добавить рейс</a>
-        <a class="btn secondary" th:href="@{/admin/panel/routes}">Маршруты</a>
-        <a class="btn secondary" th:href="@{/admin/panel/trains}">Поезда</a>
+    <div class="admin-toolbar">
+        <div class="actions">
+            <a class="btn primary" th:href="@{/admin/panel/trips/new}">Добавить рейс</a>
+        </div>
+
+        <form method="get" class="searchbar" th:action="@{/admin/panel/trips}">
+            <!-- icon -->
+            <svg class="searchbar__icon" viewBox="0 0 24 24" fill="none">
+                <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="currentColor" stroke-width="2"/>
+                <path d="M16.5 16.5 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+
+            <input class="searchbar__field"
+                   type="text"
+                   name="q"
+                   placeholder="Поиск: станция, маршрут, поезд или код…"
+                   th:value="${q}"/>
+
+            <!-- clear (показываем только если q не пустой) -->
+            <a class="searchbar__clear"
+               th:if="${q != null and !q.isEmpty()}"
+               th:href="@{/admin/panel/trips}"
+               title="Очистить">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none">
+                    <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </a>
+
+            <button class="searchbar__submit" type="submit">Найти</button>
+        </form>
     </div>
 
     <section class="cards-grid">
         <article class="card" th:each="trip : ${trips}">
             <h3 th:text="${trip.route.name}">Маршрут</h3>
-            <p th:text="${trip.route.origin.name + ' — ' + trip.route.destination.name}">От-До</p>
+            <p class="muted" th:text="${trip.route.origin.name + ' — ' + trip.route.destination.name}">От-До</p>
             <p th:text="'Поезд: ' + ${trip.train.name} + ' (' + ${trip.train.code} + ')'">Поезд</p>
             <p th:text="'Отправление: ' + ${#temporals.format(trip.departureTime,'dd.MM.yyyy HH:mm')}">Отправление</p>
             <p th:text="'Прибытие: ' + ${#temporals.format(trip.arrivalTime,'dd.MM.yyyy HH:mm')}">Прибытие</p>

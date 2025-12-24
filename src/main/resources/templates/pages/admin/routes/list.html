@@ -14,19 +14,48 @@
     <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
     <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
 
-    <a class="btn primary" th:href="@{/admin/panel/routes/new}">Добавить маршрут</a>
+    <div class="admin-toolbar">
+        <div class="actions">
+            <a class="btn primary" th:href="@{/admin/panel/routes/new}">Добавить маршрут</a>
+        </div>
+
+        <form method="get" class="searchbar" th:action="@{/admin/panel/routes}">
+            <svg class="searchbar__icon" viewBox="0 0 24 24" fill="none">
+                <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" stroke="currentColor" stroke-width="2"/>
+                <path d="M16.5 16.5 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+
+            <input class="searchbar__field"
+                   type="text"
+                   name="q"
+                   placeholder="Поиск: название, станции, коды…"
+                   th:value="${q}"/>
+
+            <a class="searchbar__clear"
+               th:if="${q != null and !q.isEmpty()}"
+               th:href="@{/admin/panel/routes}"
+               title="Очистить">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none">
+                    <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </a>
+
+            <button class="searchbar__submit" type="submit">Найти</button>
+        </form>
+    </div>
 
     <section class="cards-grid">
         <article class="card" th:each="r : ${routes}">
             <h3 th:text="${r.name}">Маршрут</h3>
-            <p th:text="${r.origin.name + ' — ' + r.destination.name}">От-До</p>
+            <p class="muted" th:text="${r.origin.name + ' — ' + r.destination.name}">От-До</p>
+            <p class="muted" th:text="'Коды: ' + ${r.origin.code} + ' → ' + ${r.destination.code}">Коды</p>
 
             <div class="actions">
                 <a class="btn" th:href="@{'/admin/panel/routes/' + ${r.id} + '/edit'}">Изменить</a>
 
                 <form th:action="@{'/admin/panel/routes/' + ${r.id} + '/delete'}"
                       method="post"
-                      onsubmit="return confirm('Удалить маршрут?')">
+                      onsubmit="return confirm('Удалить маршрут? Если есть рейсы — удалить нельзя.')">
                     <button class="btn danger" type="submit">Удалить</button>
                 </form>
             </div>

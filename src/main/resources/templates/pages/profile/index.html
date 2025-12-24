@@ -1,11 +1,76 @@
 <!DOCTYPE html>
 <html lang="ru"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+      xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Личный кабинет • Railway Booker</title>
     <link rel="stylesheet" th:href="@{/css/app.css}">
+    <style>
+        /* Сетка для профиля: слева вкладки, справа содержимое */
+        .profile-layout {
+            display: flex;
+            gap: 24px;
+        }
+        .profile-tabs {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 180px;
+        }
+        .profile-tabs button {
+            padding: 10px 14px;
+            border: 1px solid rgba(255,255,255,.15);
+            background: rgba(255,255,255,.04);
+            color: #fff;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: left;
+            transition: background .1s;
+        }
+        .profile-tabs button.is-active {
+            background: rgba(99,102,241,.6);
+            border-color: rgba(99,102,241,1);
+        }
+        .tab-content {
+            flex: 1;
+        }
+        .tab-content.is-hidden {
+            display: none;
+        }
+        .ticket-collapse {
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            overflow: hidden;
+        }
+        .ticket-collapse summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 10px 14px;
+            list-style: none;
+        }
+        .ticket-collapse summary::-webkit-details-marker {
+            display: none;
+        }
+        .ticket-collapse .details-body {
+            padding: 10px 14px;
+            border-top: 1px solid rgba(255,255,255,0.15);
+        }
+        .ticket-collapse .status-chip {
+            background: rgba(255,255,255,0.1);
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+        }
+        .ticket-collapse .actions {
+            margin-top: 8px;
+            display: flex;
+            gap: 8px;
+        }
+    </style>
 </head>
 <body class="app-bg">
 
@@ -18,92 +83,145 @@
         <p>Email: <span th:text="${user.email}">email</span></p>
     </section>
 
-    <section class="cards-grid">
-        <article class="card">
-            <h2>Профиль и бонусы</h2>
-            <p class="muted">Настройки вашего аккаунта, сохранённые пассажиры и программы лояльности.</p>
-            <div class="row">
-                <p>Текущий уровень: <b th:text="${loyaltyTier}">Базовый</b></p>
-                <p>Бонусные баллы: <b th:text="${loyaltyPoints}">0</b></p>
-            </div>
-            <div>
-                <p class="small">Сохранённые пассажиры</p>
-                <div class="actions" th:if="${!#lists.isEmpty(savedPassengers)}">
-                    <span class="badge" th:each="p : ${savedPassengers}" th:text="${p}"></span>
-                </div>
-                <p th:if="${#lists.isEmpty(savedPassengers)}" class="muted">Пока нет сохранённых пассажиров.</p>
-            </div>
-            <div class="mt-10">
-                <p class="small">Сохранённые документы</p>
-                <div class="actions" th:if="${!#lists.isEmpty(savedDocuments)}">
-                    <span class="badge" th:each="d : ${savedDocuments}" th:text="${d}"></span>
-                </div>
-                <p th:if="${#lists.isEmpty(savedDocuments)}" class="muted">Добавьте документы при оформлении билета — они сохранятся автоматически.</p>
-            </div>
-        </article>
+    <section class="profile-layout">
+        <!-- Навигация по вкладкам -->
+        <nav class="profile-tabs">
+            <button type="button" class="is-active" data-target="tabProfile">Профиль</button>
+            <button type="button" data-target="tabBookings">Активные брони</button>
+            <button type="button" data-target="tabPurchases">Покупки</button>
+            <button type="button" data-target="tabCancelled">Отменённые</button>
+        </nav>
 
-        <!-- Активные (неоплаченные) брони -->
-        <article class="card">
-            <h2>Активные брони</h2>
-            <div th:if="${#lists.isEmpty(unpaidTickets)}">
-                <p>Нет активных бронирований.</p>
-            </div>
-            <div th:each="t : ${unpaidTickets}">
-                <h3 th:text="${t.trip.route.origin.name + ' — ' + t.trip.route.destination.name}">Маршрут</h3>
-                <p th:text="'Отправление: ' + ${#temporals.format(t.trip.departureTime, 'dd.MM.yyyy HH:mm')}"></p>
-                <p th:text="'Место: ' + ${t.seatNumber}"></p>
-                <p th:text="'Цена: ' + ${#numbers.formatDecimal(t.price, 1, 'COMMA', 2, 'POINT')} + ' BYN'"></p>
-                <p>Статус: <span th:text="${t.status.label}"></span></p>
-                <div class="actions">
-                    <form th:action="@{/booking/pay/{id}(id=${t.id})}" method="post">
-                        <button class="btn primary" type="submit">Оплатить</button>
-                    </form>
-                    <form th:action="@{/tickets/{id}/refund(id=${t.id})}" method="post"
-                          onsubmit="return confirm('Отменить бронь? Место станет доступно снова.')">
-                        <button class="btn danger" type="submit">Отменить</button>
-                    </form>
+        <!-- Содержимое вкладок -->
+        <div class="tab-content" id="tabProfile">
+            <article class="card">
+                <h2>Профиль и бонусы</h2>
+                <p class="muted">Настройки аккаунта, сохранённые пассажиры и программы лояльности.</p>
+                <div class="row">
+                    <p>Текущий уровень: <b th:text="${loyaltyTier}">Базовый</b></p>
+                    <p>Бонусные баллы: <b th:text="${loyaltyPoints}">0</b></p>
                 </div>
-                <hr>
-            </div>
-        </article>
+                <div>
+                    <p class="small">Сохранённые пассажиры</p>
+                    <div class="actions" th:if="${!#lists.isEmpty(savedPassengers)}">
+                        <span class="badge" th:each="p : ${savedPassengers}" th:text="${p}"></span>
+                    </div>
+                    <p th:if="${#lists.isEmpty(savedPassengers)}" class="muted">Пока нет сохранённых пассажиров.</p>
+                </div>
+                <div class="mt-10">
+                    <p class="small">Сохранённые документы</p>
+                    <div class="actions" th:if="${!#lists.isEmpty(savedDocuments)}">
+                        <span class="badge" th:each="d : ${savedDocuments}" th:text="${d}"></span>
+                    </div>
+                    <p th:if="${#lists.isEmpty(savedDocuments)}" class="muted">Добавьте документы при оформлении билета — они сохранятся автоматически.</p>
+                </div>
+            </article>
+        </div>
 
-        <!-- Оплаченные билеты -->
-        <article class="card">
-            <h2>Покупки</h2>
-            <div th:if="${#lists.isEmpty(paidTickets)}">
-                <p>Нет оплаченных билетов.</p>
-            </div>
-            <div th:each="t : ${paidTickets}">
-                <h3 th:text="${t.trip.route.origin.name + ' — ' + t.trip.route.destination.name}">Маршрут</h3>
-                <p th:text="'Отправление: ' + ${#temporals.format(t.trip.departureTime, 'dd.MM.yyyy HH:mm')}"></p>
-                <p th:text="'Место: ' + ${t.seatNumber}"></p>
-                <p th:text="'Цена: ' + ${#numbers.formatDecimal(t.price, 1, 'COMMA', 2, 'POINT')} + ' BYN'"></p>
-                <p>Статус: <span th:text="${t.status.label}"></span></p>
-                <!-- разрешаем возврат даже для оплаченных билетов -->
-                <form th:action="@{/tickets/{id}/refund(id=${t.id})}" method="post"
-                      onsubmit="return confirm('Вернуть билет? Средства будут возвращены.')">
-                    <button class="btn danger" type="submit">Вернуть</button>
-                </form>
-                <hr>
-            </div>
-        </article>
+        <div class="tab-content is-hidden" id="tabBookings">
+            <article class="card">
+                <h2>Активные брони</h2>
+                <div th:if="${#lists.isEmpty(unpaidTickets)}">
+                    <p>Нет активных бронирований.</p>
+                </div>
+                <div th:each="t : ${unpaidTickets}">
+                    <details class="ticket-collapse">
+                        <summary>
+                            <div>
+                                <span th:text="${#temporals.format(t.trip.departureTime,'dd.MM.yyyy HH:mm')}"></span>
+                                <strong th:text="${t.trip.route.origin.name + ' — ' + t.trip.route.destination.name}"></strong>
+                                <span th:text="'Место ' + ${t.seatNumber}"></span>
+                                <span th:text="${#numbers.formatDecimal(t.price,1,'COMMA',2,'POINT')} + ' BYN'"></span>
+                            </div>
+                            <span class="status-chip" th:text="${t.status.label}"></span>
+                        </summary>
+                        <div class="details-body">
+                            <p>Статус: <span th:text="${t.status.label}"></span></p>
+                            <div class="actions">
+                                <form th:action="@{/booking/pay/{id}(id=${t.id})}" method="post">
+                                    <button class="btn primary" type="submit">Оплатить</button>
+                                </form>
+                                <form th:action="@{/tickets/{id}/refund(id=${t.id})}" method="post"
+                                      onsubmit="return confirm('Отменить бронь? Место станет доступно снова.')">
+                                    <button class="btn danger" type="submit">Отменить</button>
+                                </form>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </article>
+        </div>
 
-        <!-- Отменённые/возвращённые -->
-        <article class="card">
-            <h2>Отменённые билеты</h2>
-            <div th:if="${#lists.isEmpty(cancelledTickets)}">
-                <p>Нет отменённых или возвращённых билетов.</p>
-            </div>
-            <div th:each="t : ${cancelledTickets}">
-                <h3 th:text="${t.trip.route.origin.name + ' — ' + t.trip.route.destination.name}">Маршрут</h3>
-                <p th:text="'Отправление: ' + ${#temporals.format(t.trip.departureTime, 'dd.MM.yyyy HH:mm')}"></p>
-                <p th:text="'Место: ' + ${t.seatNumber}"></p>
-                <p th:text="'Цена: ' + ${#numbers.formatDecimal(t.price, 1, 'COMMA', 2, 'POINT')} + ' BYN'"></p>
-                <p>Статус: <span th:text="${t.status.label}"></span></p>
-                <hr>
-            </div>
-        </article>
+        <div class="tab-content is-hidden" id="tabPurchases">
+            <article class="card">
+                <h2>Покупки</h2>
+                <div th:if="${#lists.isEmpty(paidTickets)}">
+                    <p>Нет оплаченных билетов.</p>
+                </div>
+                <div th:each="t : ${paidTickets}">
+                    <details class="ticket-collapse">
+                        <summary>
+                            <div>
+                                <span th:text="${#temporals.format(t.trip.departureTime,'dd.MM.yyyy HH:mm')}"></span>
+                                <strong th:text="${t.trip.route.origin.name + ' — ' + t.trip.route.destination.name}"></strong>
+                                <span th:text="'Место ' + ${t.seatNumber}"></span>
+                                <span th:text="${#numbers.formatDecimal(t.price,1,'COMMA',2,'POINT')} + ' BYN'"></span>
+                            </div>
+                            <span class="status-chip" th:text="${t.status.label}"></span>
+                        </summary>
+                        <div class="details-body">
+                            <p>Статус: <span th:text="${t.status.label}"></span></p>
+                            <form th:action="@{/tickets/{id}/refund(id=${t.id})}" method="post"
+                                  onsubmit="return confirm('Вернуть билет? Средства будут возвращены.')">
+                                <button class="btn danger" type="submit">Вернуть</button>
+                            </form>
+                        </div>
+                    </details>
+                </div>
+            </article>
+        </div>
+
+        <div class="tab-content is-hidden" id="tabCancelled">
+            <article class="card">
+                <h2>Отменённые билеты</h2>
+                <div th:if="${#lists.isEmpty(cancelledTickets)}">
+                    <p>Нет отменённых или возвращённых билетов.</p>
+                </div>
+                <div th:each="t : ${cancelledTickets}">
+                    <details class="ticket-collapse">
+                        <summary>
+                            <div>
+                                <span th:text="${#temporals.format(t.trip.departureTime,'dd.MM.yyyy HH:mm')}"></span>
+                                <strong th:text="${t.trip.route.origin.name + ' — ' + t.trip.route.destination.name}"></strong>
+                                <span th:text="'Место ' + ${t.seatNumber}"></span>
+                                <span th:text="${#numbers.formatDecimal(t.price,1,'COMMA',2,'POINT')} + ' BYN'"></span>
+                            </div>
+                            <span class="status-chip" th:text="${t.status.label}"></span>
+                        </summary>
+                        <div class="details-body">
+                            <p>Статус: <span th:text="${t.status.label}"></span></p>
+                        </div>
+                    </details>
+                </div>
+            </article>
+        </div>
     </section>
 </main>
+
+<script>
+    // Скрипт для переключения вкладок в личном кабинете
+    document.querySelectorAll('.profile-tabs button').forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Делаем все вкладки скрытыми и убираем активность
+            document.querySelectorAll('.tab-content').forEach(div => div.classList.add('is-hidden'));
+            document.querySelectorAll('.profile-tabs button').forEach(b => b.classList.remove('is-active'));
+            // Показываем выбранную
+            const targetId = btn.dataset.target;
+            document.getElementById(targetId).classList.remove('is-hidden');
+            btn.classList.add('is-active');
+        });
+    });
+</script>
+
 </body>
 </html>
