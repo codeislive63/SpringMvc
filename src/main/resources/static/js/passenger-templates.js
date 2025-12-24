@@ -1,4 +1,3 @@
-// /static/js/passenger-templates.js
 (() => {
     const STORAGE_KEY = "rb-passenger-templates"; // оставляем тот же ключ, чтобы не потерять старые данные
 
@@ -30,7 +29,6 @@
         const s = String(doc || "").trim();
         if (!s) return { docType: "", docNumber: "" };
 
-        // "Паспорт 00 00 №123456" -> docType="Паспорт", docNumber="00 00 №123456"
         const parts = s.split(/\s+/);
         if (parts.length === 1) return { docType: "", docNumber: s };
 
@@ -38,7 +36,6 @@
     }
 
     function normalizePassenger(p) {
-        // already v2?
         const hasV2 =
             p && (("lastName" in p) || ("firstName" in p) || ("docType" in p) || ("docNumber" in p));
 
@@ -70,8 +67,8 @@
             lastName: n.lastName,
             firstName: n.firstName,
             middleName: n.middleName,
-            gender: "",          // в legacy не было
-            birthDate: "",       // в legacy не было
+            gender: "",
+            birthDate: "",
             docType: d.docType,
             docNumber: d.docNumber,
             benefitType: p?.benefit || "",
@@ -84,7 +81,6 @@
         const raw = loadRawList();
         const normalized = raw.map(normalizePassenger);
 
-        // если нашли legacy-объекты — перезапишем в v2, чтобы дальше всё было едино
         const changed =
             raw.length !== normalized.length ||
             raw.some((p, i) => JSON.stringify(p) !== JSON.stringify(normalized[i]));
