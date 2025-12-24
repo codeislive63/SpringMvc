@@ -58,6 +58,6 @@ public class AdminAnalyticsController {
         model.addAttribute("demandValues", demandValues);
         model.addAttribute("statusLabels", statusLabels);
         model.addAttribute("statusValues", statusValues);
-        return "admin/analytics";
+        return "pages/admin/analytics";
     }
 }

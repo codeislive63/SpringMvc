@@ -6,80 +6,6 @@
     <meta charset="UTF-8">
     <title>Результаты • Railway Booker</title>
     <link rel="stylesheet" th:href="@{/css/app.css}">
-
-    <!-- Локальные стили только для этой страницы -->
-    <style>
-        .results-grid { gap: 20px; }
-        .trip-card { padding: 22px; }
-        .trip-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
-        .trip-title { margin: 0; font-size: 22px; font-weight: 700; }
-        .chip {
-            display: inline-flex; align-items: center;
-            padding: 6px 10px; border-radius: 999px;
-            background: rgba(255,255,255,.08);
-            border: 1px solid rgba(255,255,255,.12);
-            font-size: 13px; opacity: .95;
-        }
-        .summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
-        .summary .item {
-            padding: 10px 12px; border-radius: 14px;
-            background: rgba(255,255,255,.05);
-            border: 1px solid rgba(255,255,255,.10);
-        }
-        .summary .label { font-size: 12px; opacity: .7; }
-        .summary .value { font-size: 16px; font-weight: 700; margin-top: 2px; }
-
-        .legs { margin-top: 16px; display: grid; gap: 12px; }
-        .leg {
-            padding: 14px 14px;
-            border-radius: 16px;
-            background: rgba(255,255,255,.04);
-            border: 1px solid rgba(255,255,255,.10);
-        }
-        .leg-route { font-weight: 700; font-size: 16px; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-        .leg-time { margin-top: 6px; font-size: 13px; opacity: .85; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-        .leg-meta { margin-top: 6px; font-size: 13px; opacity: .75; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-        .divider { height: 1px; background: rgba(255,255,255,.12); margin: 16px 0; border: 0; }
-
-        .actions { display: flex; gap: 12px; flex-wrap: wrap; }
-        .btn.secondary {
-            background: rgba(255,255,255,.06);
-            border: 1px solid rgba(255,255,255,.14);
-            color: rgba(255,255,255,.92);
-            text-decoration: none;
-        }
-        .btn.secondary:hover { filter: brightness(1.06); }
-        .muted { opacity: .75; }
-        .pill { padding: 4px 8px; border-radius: 10px; background: rgba(99,102,241,.14); border: 1px solid rgba(99,102,241,.3); font-size: 12px; }
-        .pill.soft { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.14); }
-        .stops { margin: 8px 0 0; padding: 0; list-style: none; display: flex; gap: 8px; flex-wrap: wrap; }
-        .stops li { font-size: 12px; padding: 6px 10px; border-radius: 999px; border: 1px dashed rgba(255,255,255,.16); opacity: .8; }
-
-        .filter-card {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-
-        .filter-badges {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 4px;
-        }
-
-        .filter-badges .chip {
-            display: inline-flex;
-            align-items: center;
-            padding: 6px 12px;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.14);
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.9);
-            white-space: nowrap;
-        }
-    </style>
 </head>
 
 <body class="app-bg">
@@ -120,7 +46,7 @@
         <article class="card trip-card" th:if="${#lists.isEmpty(itineraries)}">
             <h2 class="trip-title">Ничего не найдено</h2>
             <p class="muted">Попробуйте изменить дату или станции.</p>
-            <div class="actions" style="margin-top: 14px;">
+            <div class="actions mt-14">
                 <a class="btn secondary" th:href="@{/routes/search}">Назад к поиску</a>
             </div>
         </article>

@@ -36,7 +36,7 @@ public class AdminTripController {
     @GetMapping
     public String list(Model model) {
         model.addAttribute("trips", tripRepository.findAll());
-        return "admin/trips/list";
+        return "pages/admin/trips/list";
     }
 
     @GetMapping("/new")
@@ -45,7 +45,7 @@ public class AdminTripController {
         List<Train> trains = trainRepository.findAll();
         model.addAttribute("routes", routes);
         model.addAttribute("trains", trains);
-        return "admin/trips/form";
+        return "pages/admin/trips/form";
     }
 
     @PostMapping("/create")

@@ -43,7 +43,7 @@ public class ProfileController {
         model.addAttribute("savedDocuments", extractDocuments(tickets));
         model.addAttribute("loyaltyPoints", paid.size() * 120 + unpaid.size() * 40);
         model.addAttribute("loyaltyTier", determineTier(paid.size()));
-        return "profile";
+        return "pages/profile/index";
     }
 
     private List<String> extractPassengers(List<Ticket> tickets, String fallback) {

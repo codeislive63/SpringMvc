@@ -83,11 +83,11 @@
 
     <!-- нет рейсов -->
     <section th:if="${#lists.isEmpty(trips)}">
-        <article class="card" style="max-width: 520px;">
+        <article class="card card-narrow">
             <p class="muted">
                 На выбранную дату не найдено подходящих рейсов.
             </p>
-            <div class="card-actions" style="margin-top: 12px;">
+            <div class="card-actions">
                 <a class="btn primary" th:href="@{/trips/search}">Вернуться к поиску</a>
             </div>
         </article>

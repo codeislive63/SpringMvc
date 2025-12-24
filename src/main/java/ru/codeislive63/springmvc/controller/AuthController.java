@@ -16,13 +16,13 @@ public class AuthController {
         if (principal != null) {
             return "redirect:/dashboard";
         }
-        return "login";
+        return "pages/auth/login";
     }
 
     @GetMapping("/dashboard")
     public String dashboard(@AuthenticationPrincipal UserPrincipal principal,
                             Model model) {
         model.addAttribute("user", principal.user());
-        return "dashboard";
+        return "pages/dashboard/index";
     }
 }
