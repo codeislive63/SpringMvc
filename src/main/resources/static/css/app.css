@@ -1157,3 +1157,39 @@ input[type="time"]::-webkit-calendar-picker-indicator {
         min-width: 100%;
     }
 }
+
+/* --- booking UX: фиксируем правую колонку и вкладки сегментов --- */
+.booking-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    gap: 18px;
+    align-items: start;
+}
+
+.booking-secondary {
+    position: sticky;
+    top: 84px;
+    align-self: start;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* чтобы переключатель сегментов не “уплывал” при скролле */
+.segment-switcher {
+    position: sticky;
+    top: 84px;
+    z-index: 5;
+    padding: 10px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(10, 15, 25, .55);
+    backdrop-filter: blur(10px);
+}
+
+/* мобильная адаптация */
+@media (max-width: 980px) {
+    .booking-shell { grid-template-columns: 1fr; }
+    .booking-secondary { position: static; }
+    .segment-switcher { position: static; }
+}
