@@ -1,6 +1,7 @@
 package ru.codeislive63;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.concurrent.Worker;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -16,18 +17,36 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Objects;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ClientApp extends Application {
 
-    private static final String DEFAULT_URL = "http://localhost:8080/";
+    private static final String DEFAULT_URL = "http://localhost:8080/routes/search";
+
+    private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(2);
+    private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(2);
+    private static final long WAIT_DEADLINE_MS = 30_000;
+    private static final long RETRY_DELAY_MS = 500;
+
+    private final HttpClient http = HttpClient.newBuilder()
+            .connectTimeout(CONNECT_TIMEOUT)
+            .build();
+
     private String homeUrl;
+
+    private final AtomicBoolean waitingNow = new AtomicBoolean(false);
 
     @Override
     public void start(Stage stage) {
         homeUrl = resolveServerUrl();
+        homeUrl = normalizeUrlNoTrailingSlash(homeUrl);
 
         WebView webView = new WebView();
         WebEngine engine = getWebEngine(webView);
@@ -54,8 +73,11 @@ public class ClientApp extends Application {
             }
         });
 
-        refreshBtn.setOnAction(e -> engine.reload());
-        homeBtn.setOnAction(e -> engine.load(homeUrl));
+        refreshBtn.setOnAction(e -> {
+            loadWhenServerReady(engine, homeUrl, true);
+        });
+
+        homeBtn.setOnAction(e -> loadWhenServerReady(engine, homeUrl, true));
 
         ToolBar toolbar = new ToolBar(backBtn, forwardBtn, refreshBtn, homeBtn);
         toolbar.setPadding(new Insets(6));
@@ -70,7 +92,16 @@ public class ClientApp extends Application {
         history.currentIndexProperty().addListener((obs, oldV, newV) -> updateNavButtons.run());
         history.getEntries().addListener((javafx.collections.ListChangeListener<WebHistory.Entry>) c -> updateNavButtons.run());
 
-        engine.load(homeUrl);
+        engine.loadContent(loadingHtml(homeUrl));
+
+        engine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
+            if (newState == Worker.State.FAILED) {
+                engine.loadContent(serverDownHtml(homeUrl));
+            }
+        });
+
+        loadWhenServerReady(engine, homeUrl, false);
+
         updateNavButtons.run();
 
         BorderPane root = new BorderPane(webView);
@@ -81,7 +112,7 @@ public class ClientApp extends Application {
         stage.show();
     }
 
-    private static WebEngine getWebEngine(WebView webView) {
+    private WebEngine getWebEngine(WebView webView) {
         WebEngine engine = webView.getEngine();
         engine.setJavaScriptEnabled(true);
 
@@ -104,7 +135,7 @@ public class ClientApp extends Application {
         });
 
         engine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
-            if (Objects.requireNonNull(newState) == Worker.State.SUCCEEDED) {
+            if (newState == Worker.State.SUCCEEDED) {
                 try {
                     engine.executeScript("document.documentElement.classList.add('is-javafx');");
                 } catch (Exception ignored) { }
@@ -114,20 +145,79 @@ public class ClientApp extends Application {
         return engine;
     }
 
+    private void loadWhenServerReady(WebEngine engine, String url, boolean force) {
+        if (!force && waitingNow.get()) return;
+        if (force) waitingNow.set(false);
+
+        if (!waitingNow.compareAndSet(false, true)) return;
+
+        Platform.runLater(() -> engine.loadContent(loadingHtml(url)));
+
+        Thread t = new Thread(() -> {
+            long deadline = System.currentTimeMillis() + WAIT_DEADLINE_MS;
+
+            while (System.currentTimeMillis() < deadline) {
+                if (isServerUp(url)) {
+                    Platform.runLater(() -> engine.load(url));
+                    waitingNow.set(false);
+                    return;
+                }
+
+                try {
+                    Thread.sleep(RETRY_DELAY_MS);
+                } catch (InterruptedException ignored) {
+                    break;
+                }
+            }
+
+            waitingNow.set(false);
+
+            Platform.runLater(() -> {
+                engine.loadContent(serverDownHtml(url));
+                Alert a = new Alert(Alert.AlertType.ERROR,
+                        "Сервер не отвечает: " + url + "\n\nЗапусти сервер и нажми Reload.",
+                        ButtonType.OK);
+                a.setHeaderText("Railway Booker");
+                a.showAndWait();
+            });
+        });
+
+        t.setDaemon(true);
+        t.start();
+    }
+
+    private boolean isServerUp(String url) {
+        try {
+            HttpRequest req = HttpRequest.newBuilder(URI.create(url))
+                    .timeout(REQUEST_TIMEOUT)
+                    .GET()
+                    .build();
+
+            HttpResponse<Void> resp = http.send(req, HttpResponse.BodyHandlers.discarding());
+            int code = resp.statusCode();
+
+            return code >= 200 && code < 500;
+        } catch (Exception ignored) {
+            return false;
+        }
+    }
+
     private String resolveServerUrl() {
         String fromArgs = getParameters().getNamed().get("serverUrl");
-
         if (fromArgs != null && !fromArgs.isBlank()) {
-            return normalizeUrl(fromArgs);
+            return fromArgs.trim();
         }
 
         Properties props = new Properties();
+
         try (InputStream is = ClientApp.class.getClassLoader().getResourceAsStream("client.properties")) {
             if (is != null) {
                 props.load(is);
+
                 String fromProps = props.getProperty("server.url");
+
                 if (fromProps != null && !fromProps.isBlank()) {
-                    return normalizeUrl(fromProps);
+                    return fromProps.trim();
                 }
             }
         } catch (IOException ignored) { }
@@ -135,18 +225,57 @@ public class ClientApp extends Application {
         return DEFAULT_URL;
     }
 
-    private String normalizeUrl(String url) {
+    private String normalizeUrlNoTrailingSlash(String url) {
         String u = url.trim();
-
-        if (!u.endsWith("/")) {
-            u += "/";
+        if (!u.startsWith("http://") && !u.startsWith("https://")) {
+            u = "http://" + u;
         }
-
         return u;
     }
 
+    private String loadingHtml(String url) {
+        return """
+        <html>
+          <head>
+            <meta charset="UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          </head>
+          <body style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding: 24px;">
+            <h2>Railway Booker</h2>
+            <p>Жду пока сервер поднимется…</p>
+            <p style="opacity: 0.7;">%s</p>
+            <div style="margin-top:16px; width: 260px; height: 10px; background: #e5e7eb; border-radius: 999px; overflow:hidden;">
+              <div style="width: 40%%; height: 100%%; background: #3b82f6; border-radius: 999px; animation: move 1s infinite ease-in-out;"></div>
+            </div>
+            <style>
+              @keyframes move { 0%% { transform: translateX(-50%%);} 50%% { transform: translateX(150%%);} 100%% { transform: translateX(-50%%);} }
+            </style>
+          </body>
+        </html>
+        """.formatted(escape(url));
+    }
+
+    private String serverDownHtml(String url) {
+        return """
+        <html>
+          <head><meta charset="UTF-8" /></head>
+          <body style="font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; padding: 24px;">
+            <h2>Сервер недоступен</h2>
+            <p>Не удалось подключиться к:</p>
+            <p style="opacity: 0.7;">%s</p>
+            <p>Запусти сервер и нажми <b>Reload</b>.</p>
+          </body>
+        </html>
+        """.formatted(escape(url));
+    }
+
+    private String escape(String s) {
+        return s.replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;");
+    }
+
     public static void main(String[] args) {
-        System.setProperty("prism.order", "sw");
         launch(args);
     }
 }
