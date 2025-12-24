@@ -44,8 +44,10 @@ public class BookingController {
     }
 
     @GetMapping("/my")
-    public ResponseEntity<List<Ticket>> my(@AuthenticationPrincipal UserPrincipal principal) {
-        return ResponseEntity.ok(bookingService.myTickets(principal.user().getId()));
+    public String my(@AuthenticationPrincipal UserPrincipal principal, Model model) {
+        List<Ticket> tickets = bookingService.myTickets(principal.user().getId());
+        model.addAttribute("tickets", tickets);
+        return "pages/tickets/list";
     }
 
     @GetMapping("/start")

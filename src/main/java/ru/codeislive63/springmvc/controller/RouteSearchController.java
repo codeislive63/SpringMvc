@@ -11,7 +11,9 @@ import ru.codeislive63.springmvc.domain.TrainType;
 import ru.codeislive63.springmvc.repository.StationRepository;
 import ru.codeislive63.springmvc.service.RouteSearchService;
 import ru.codeislive63.springmvc.web.dto.RouteSearchRequest;
+import ru.codeislive63.springmvc.web.dto.StationSuggestion;
 
+import java.util.List;
 import java.util.Objects;
 
 @Controller
@@ -44,8 +46,27 @@ public class RouteSearchController {
             return "pages/routes/search";
         }
 
+        if (req.getFromPointId() == null || req.getToPointId() == null) {
+            model.addAttribute("error", "Выберите станции из подсказок, чтобы найти рейсы.");
+            return "pages/routes/search";
+        }
+
         model.addAttribute("req", req);
         model.addAttribute("itineraries", routeSearchService.search(req));
         return "pages/routes/results";
+    }
+
+    @ResponseBody
+    @GetMapping("/stations")
+    public List<StationSuggestion> stations(@RequestParam("q") String query) {
+        String q = query == null ? "" : query.trim();
+        if (q.isBlank()) {
+            return List.of();
+        }
+        return stationRepository
+                .findTop10ByNameContainingIgnoreCaseOrCodeContainingIgnoreCase(q, q)
+                .stream()
+                .map(s -> new StationSuggestion(s.getId(), s.getName(), s.getCode()))
+                .toList();
     }
 }

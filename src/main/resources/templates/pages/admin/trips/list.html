@@ -14,7 +14,11 @@
     <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
     <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
 
-    <a class="btn primary" th:href="@{/admin/panel/trips/new}">Добавить рейс</a>
+    <div class="actions">
+        <a class="btn primary" th:href="@{/admin/panel/trips/new}">Добавить рейс</a>
+        <a class="btn secondary" th:href="@{/admin/panel/routes}">Маршруты</a>
+        <a class="btn secondary" th:href="@{/admin/panel/trains}">Поезда</a>
+    </div>
 
     <section class="cards-grid">
         <article class="card" th:each="trip : ${trips}">
@@ -26,8 +30,7 @@
             <p th:text="'Цена: ' + ${#numbers.formatDecimal(trip.basePrice,1,'COMMA',2,'POINT')} + ' BYN'">Цена</p>
 
             <div class="actions">
-                <!-- редактирование рейса можно добавить позже -->
-                <!-- <a class="btn" th:href="@{'/admin/panel/trips/' + ${trip.id} + '/edit'}">Изменить</a> -->
+                <a class="btn" th:href="@{'/admin/panel/trips/' + ${trip.id} + '/edit'}">Изменить</a>
 
                 <form th:action="@{'/admin/panel/trips/' + ${trip.id} + '/delete'}"
                       method="post"

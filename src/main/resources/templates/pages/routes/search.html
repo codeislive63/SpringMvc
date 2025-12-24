@@ -23,37 +23,30 @@
             <form class="form" th:action="@{/routes/search}" th:object="${req}" method="get">
 
                 <div class="form-group">
-                    <label for="fromPointId">Откуда</label>
-                    <div class="select-wrapper">
-                        <select id="fromPointId"
-                                class="custom-select"
-                                name="fromPointId"
-                                required>
-                            <!-- placeholder: выбран по умолчанию, если в запросе нет fromPointId -->
-                            <option value="" disabled th:selected="${req.fromPointId == null}">Выберите станцию</option>
-                            <option th:each="s : ${stations}"
-                                    th:value="${s.id}"
-                                    th:text="${s.name}"
-                                    th:selected="${req.fromPointId != null and req.fromPointId == s.id}">
-                            </option>
-                        </select>
+                    <label for="fromPointName">Откуда</label>
+                    <div class="autocomplete">
+                        <input id="fromPointName"
+                               type="text"
+                               name="fromPointName"
+                               placeholder="Начните вводить город или станцию"
+                               autocomplete="off"
+                               th:value="${req.fromPointName}">
+                        <input type="hidden" id="fromPointId" name="fromPointId" th:value="${req.fromPointId}">
+                        <div class="suggestions" id="fromPointSuggestions"></div>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="toPointId">Куда</label>
-                    <div class="select-wrapper">
-                        <select id="toPointId"
-                                class="custom-select"
-                                name="toPointId"
-                                required>
-                            <option value="" disabled th:selected="${req.toPointId == null}">Выберите станцию</option>
-                            <option th:each="s : ${stations}"
-                                    th:value="${s.id}"
-                                    th:text="${s.name}"
-                                    th:selected="${req.toPointId != null and req.toPointId == s.id}">
-                            </option>
-                        </select>
+                    <label for="toPointName">Куда</label>
+                    <div class="autocomplete">
+                        <input id="toPointName"
+                               type="text"
+                               name="toPointName"
+                               placeholder="Начните вводить город или станцию"
+                               autocomplete="off"
+                               th:value="${req.toPointName}">
+                        <input type="hidden" id="toPointId" name="toPointId" th:value="${req.toPointId}">
+                        <div class="suggestions" id="toPointSuggestions"></div>
                     </div>
                 </div>
 
@@ -112,9 +105,87 @@
 </main>
 
 <script>
+    const debounce = (fn, delay = 180) => {
+        let t;
+        return (...args) => {
+            clearTimeout(t);
+            t = setTimeout(() => fn(...args), delay);
+        };
+    };
+
+    async function fetchStations(query) {
+        const resp = await fetch(`/routes/stations?q=${encodeURIComponent(query)}`);
+        if (!resp.ok) return [];
+        return resp.json();
+    }
+
+    function wireAutocomplete(inputId, hiddenId, listId) {
+        const input = document.getElementById(inputId);
+        const hidden = document.getElementById(hiddenId);
+        const list = document.getElementById(listId);
+        if (!input || !hidden || !list) return;
+
+        const render = (items) => {
+            list.innerHTML = "";
+            if (!items.length) {
+                list.classList.remove("is-open");
+                return;
+            }
+            items.forEach(item => {
+                const row = document.createElement("button");
+                row.type = "button";
+                row.className = "suggestion-row";
+                row.textContent = `${item.name} (${item.code})`;
+                row.addEventListener("click", () => {
+                    input.value = item.name;
+                    hidden.value = item.id;
+                    list.classList.remove("is-open");
+                    input.setCustomValidity("");
+                });
+                list.appendChild(row);
+            });
+            list.classList.add("is-open");
+        };
+
+        const handleInput = debounce(async () => {
+            const q = input.value.trim();
+            hidden.value = "";
+            if (q.length < 2) {
+                list.classList.remove("is-open");
+                return;
+            }
+            const items = await fetchStations(q);
+            render(items);
+        });
+
+        input.addEventListener("input", handleInput);
+        input.addEventListener("focus", () => input.dispatchEvent(new Event("input")));
+        document.addEventListener("click", (e) => {
+            if (!list.contains(e.target) && e.target !== input) {
+                list.classList.remove("is-open");
+            }
+        });
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
         const d = document.getElementById("departureDate");
         if (d && !d.value) d.value = new Date().toISOString().slice(0,10);
+
+        wireAutocomplete("fromPointName", "fromPointId", "fromPointSuggestions");
+        wireAutocomplete("toPointName", "toPointId", "toPointSuggestions");
+
+        const form = document.querySelector("form.form");
+        form?.addEventListener("submit", (e) => {
+            const fromId = document.getElementById("fromPointId");
+            const toId = document.getElementById("toPointId");
+            if (!fromId.value || !toId.value) {
+                e.preventDefault();
+                if (!fromId.value) document.getElementById("fromPointName").setCustomValidity("Выберите станцию из списка");
+                if (!toId.value) document.getElementById("toPointName").setCustomValidity("Выберите станцию из списка");
+                (document.getElementById("fromPointName").reportValidity());
+                (document.getElementById("toPointName").reportValidity());
+            }
+        });
     });
 </script>
 

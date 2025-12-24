@@ -45,6 +45,7 @@ public class AdminTripController {
         List<Train> trains = trainRepository.findAll();
         model.addAttribute("routes", routes);
         model.addAttribute("trains", trains);
+        model.addAttribute("trip", new ru.codeislive63.springmvc.domain.entity.Trip());
         return "pages/admin/trips/form";
     }
 
@@ -92,6 +93,45 @@ public class AdminTripController {
         tripRepository.deleteById(id);
 
         ra.addFlashAttribute("success", "Рейс удалён");
+        return "redirect:/admin/panel/trips";
+    }
+
+    @GetMapping("/{id}/edit")
+    public String edit(@PathVariable Long id, Model model, RedirectAttributes ra) {
+        var trip = tripRepository.findById(id).orElse(null);
+        if (trip == null) {
+            ra.addFlashAttribute("error", "Рейс не найден");
+            return "redirect:/admin/panel/trips";
+        }
+        model.addAttribute("trip", trip);
+        model.addAttribute("routes", routeRepository.findAll());
+        model.addAttribute("trains", trainRepository.findAll());
+        return "pages/admin/trips/form";
+    }
+
+    @PostMapping("/{id}/update")
+    public String update(@PathVariable Long id,
+                         @RequestParam Long routeId,
+                         @RequestParam Long trainId,
+                         @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime departure,
+                         @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime arrival,
+                         @RequestParam BigDecimal basePrice,
+                         RedirectAttributes ra) {
+        var trip = tripRepository.findById(id).orElse(null);
+        if (trip == null) {
+            ra.addFlashAttribute("error", "Рейс не найден");
+            return "redirect:/admin/panel/trips";
+        }
+
+        trip.setRoute(routeRepository.findById(routeId)
+                .orElseThrow(() -> new IllegalArgumentException("Маршрут не найден")));
+        trip.setTrain(trainRepository.findById(trainId)
+                .orElseThrow(() -> new IllegalArgumentException("Поезд не найден")));
+        trip.setDepartureTime(departure);
+        trip.setArrivalTime(arrival);
+        trip.setBasePrice(basePrice);
+        tripRepository.save(trip);
+        ra.addFlashAttribute("success", "Рейс обновлён");
         return "redirect:/admin/panel/trips";
     }
 }

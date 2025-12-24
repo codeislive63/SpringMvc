@@ -21,24 +21,48 @@
     </section>
 
     <section class="cards-grid">
-        <article class="card" th:each="t : ${tickets}">
-            <h3 th:text="${t.trip.route.origin.name + ' — ' + t.trip.route.destination.name}">Маршрут</h3>
-
-            <p th:text="'Поезд: ' + ${t.trip.train.name} + ' (' + ${t.trip.train.code} + ')'">Поезд</p>
-            <p th:text="'Отправление: ' + ${#temporals.format(t.trip.departureTime,'dd.MM.yyyy HH:mm')}">Отправление</p>
-            <p th:text="'Место: ' + ${t.seatNumber}">Место</p>
-            <p th:text="'Цена: ' + ${#numbers.formatDecimal(t.price,1,'COMMA',2,'POINT')} + ' BYN'">Цена</p>
-
-            <p th:text="'Статус: ' + ${t.status.label}">Статус</p>
-            <div th:if="${t.passengerDetails != null}" class="notice">
-                <p><b>Пассажир:</b> <span th:text="${t.passengerDetails.fullName}"></span></p>
-                <p th:if="${t.passengerDetails.documentNumber}"><b>Документ:</b> <span th:text="${t.passengerDetails.documentNumber}"></span></p>
-                <p th:if="${t.passengerDetails.benefitType}"><b>Льгота:</b> <span th:text="${t.passengerDetails.benefitType}"></span></p>
-                <p th:if="${t.passengerDetails.childTicket}">Детский тариф</p>
-                <p th:if="${t.passengerDetails.loyaltyNumber}"><b>Бонусная карта:</b> <span th:text="${t.passengerDetails.loyaltyNumber}"></span></p>
+        <article class="card ticket-card" th:each="t : ${tickets}">
+            <div class="card-header between">
+                <div>
+                    <p class="eyebrow" th:text="${#temporals.format(t.trip.departureTime,'dd.MM.yyyy HH:mm')}">Дата</p>
+                    <h3 th:text="${t.trip.route.origin.name + ' — ' + t.trip.route.destination.name}">Маршрут</h3>
+                    <p class="muted" th:text="'Поезд ' + ${t.trip.train.name} + ' • ' + ${t.trip.train.code}">Поезд</p>
+                </div>
+                <span class="chip" th:text="${t.status.label}"></span>
             </div>
-            <div th:if="${t.additionalServices != null}" class="notice">
-                <p><b>Услуги:</b></p>
+
+            <div class="ticket-grid">
+                <div>
+                    <p class="small muted">Место</p>
+                    <p class="metric"><b th:text="${t.seatNumber}">12</b></p>
+                </div>
+                <div>
+                    <p class="small muted">Цена</p>
+                    <p class="metric" th:text="${#numbers.formatDecimal(t.price,1,'COMMA',2,'POINT')} + ' BYN'">0</p>
+                </div>
+                <div>
+                    <p class="small muted">Статус</p>
+                    <p class="metric" th:text="${t.status.label}">---</p>
+                </div>
+            </div>
+
+            <div class="notice" th:if="${t.passengerDetails != null}">
+                <p class="small muted">Пассажир</p>
+                <p><b th:text="${t.passengerDetails.fullName}"></b></p>
+                <p th:if="${t.passengerDetails.documentNumber}">
+                    Документ: <span th:text="${t.passengerDetails.documentNumber}"></span>
+                </p>
+                <p th:if="${t.passengerDetails.benefitType}">
+                    Льгота: <span th:text="${t.passengerDetails.benefitType}"></span>
+                </p>
+                <p th:if="${t.passengerDetails.childTicket}">Детский тариф</p>
+                <p th:if="${t.passengerDetails.loyaltyNumber}">
+                    Бонусная карта: <span th:text="${t.passengerDetails.loyaltyNumber}"></span>
+                </p>
+            </div>
+
+            <div class="notice" th:if="${t.additionalServices != null}">
+                <p class="small muted">Услуги</p>
                 <p class="small" th:if="${t.additionalServices.mealOption != null and !t.additionalServices.mealOption.isEmpty()}"
                    th:text="'Питание: ' + ${t.additionalServices.mealOption}"></p>
                 <p class="small" th:if="${t.additionalServices.insuranceIncluded}">Страхование</p>
@@ -54,6 +78,7 @@
                       onsubmit="return confirm('Вернуть билет? Место станет доступно снова.')">
                     <button class="btn danger" type="submit">Вернуть билет</button>
                 </form>
+                <a class="btn secondary" th:href="@{/routes/search}">Новый поиск</a>
             </div>
         </article>
 

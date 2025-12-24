@@ -16,7 +16,7 @@
 
 <main class="page">
     <section class="welcome">
-        <h1>Новый рейс</h1>
+        <h1 th:text="${trip != null and trip.id != null ? 'Редактирование рейса' : 'Новый рейс'}">Новый рейс</h1>
         <p>Выберите маршрут (станция → станция), поезд и время отправления/прибытия.</p>
 
         <!-- Подсказка если маршрутов нет -->
@@ -32,7 +32,9 @@
 
     <section class="cards-grid">
         <article class="card search-card">
-            <form class="form" th:action="@{/admin/panel/trips/create}" method="post">
+            <form class="form"
+                  th:action="${trip != null and trip.id != null} ? @{'/admin/panel/trips/' + ${trip.id} + '/update'} : @{/admin/panel/trips/create}"
+                  method="post">
 
                 <!-- Маршрут -->
                 <div class="form-group">
@@ -40,10 +42,11 @@
                     <div class="select-wrapper">
                         <select name="routeId" id="routeId" class="custom-select"
                                 th:disabled="${#lists.isEmpty(routes)}" required>
-                            <option value="" disabled selected>Выберите маршрут</option>
+                            <option value="" disabled th:selected="${trip == null || trip.route == null}">Выберите маршрут</option>
                             <option th:each="r : ${routes}"
                                     th:value="${r.id}"
-                                    th:text="${r.origin.name + ' — ' + r.destination.name}">
+                                    th:text="${r.origin.name + ' — ' + r.destination.name}"
+                                    th:selected="${trip != null and trip.route != null and trip.route.id == r.id}">
                             </option>
                         </select>
                     </div>
@@ -54,10 +57,11 @@
                     <label for="trainId">Поезд</label>
                     <div class="select-wrapper">
                         <select name="trainId" id="trainId" class="custom-select" required>
-                            <option value="" disabled selected>Выберите поезд</option>
+                            <option value="" disabled th:selected="${trip == null || trip.train == null}">Выберите поезд</option>
                             <option th:each="t : ${trains}"
                                     th:value="${t.id}"
-                                    th:text="${t.name + ' (' + t.code + ')'}">
+                                    th:text="${t.name + ' (' + t.code + ')'}"
+                                    th:selected="${trip != null and trip.train != null and trip.train.id == t.id}">
                             </option>
                         </select>
                     </div>
@@ -66,25 +70,31 @@
                 <!-- Время отправления -->
                 <div class="form-group">
                     <label for="departure">Отправление</label>
-                    <input id="departure" type="datetime-local" name="departure" required>
+                    <input id="departure" type="datetime-local" name="departure"
+                           th:value="${trip != null && trip.departureTime != null ? #temporals.format(trip.departureTime, 'yyyy-MM-dd''T''HH:mm') : ''}"
+                           required>
                 </div>
 
                 <!-- Время прибытия -->
                 <div class="form-group">
                     <label for="arrival">Прибытие</label>
-                    <input id="arrival" type="datetime-local" name="arrival" required>
+                    <input id="arrival" type="datetime-local" name="arrival"
+                           th:value="${trip != null && trip.arrivalTime != null ? #temporals.format(trip.arrivalTime, 'yyyy-MM-dd''T''HH:mm') : ''}"
+                           required>
                 </div>
 
                 <!-- Цена -->
                 <div class="form-group">
                     <label for="basePrice">Базовая цена (BYN)</label>
                     <input id="basePrice" type="number" name="basePrice"
-                           step="0.01" min="0" required>
+                           step="0.01" min="0"
+                           th:value="${trip != null ? trip.basePrice : ''}"
+                           required>
                 </div>
 
                 <button class="btn primary w-100" type="submit"
                         th:disabled="${#lists.isEmpty(routes) or #lists.isEmpty(trains)}">
-                    Создать рейс
+                    <span th:text="${trip != null and trip.id != null ? 'Сохранить изменения' : 'Создать рейс'}">Создать рейс</span>
                 </button>
 
                 <div class="actions centered">
