@@ -6,56 +6,6 @@
     <meta charset="UTF-8">
     <title>Выбор места • Railway Booker</title>
     <link rel="stylesheet" th:href="@{/css/app.css}">
-    <style>
-        .hint { margin-top: 10px; opacity: .8; font-size: 14px; }
-        .muted { opacity: .85; }
-        .seat-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(54px, 1fr)); gap:10px; margin-top:12px; }
-        .seat {
-            min-width: 46px;
-            height: 40px;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,.18);
-            background: rgba(255,255,255,.06);
-            color: #fff;
-            cursor: pointer;
-            transition: transform .08s ease, background .12s ease, border-color .12s ease;
-        }
-        .seat:hover { background: rgba(255,255,255,.10); transform: translateY(-1px); }
-        .seat.is-selected {
-            border-color: rgba(120,110,255,.9);
-            background: rgba(120,110,255,.22);
-            outline: 2px solid rgba(120,110,255,.35);
-        }
-        .seat.is-busy {
-            opacity: 0.35;
-            cursor: not-allowed;
-            text-decoration: line-through;
-        }
-        .card.is-disabled { opacity: .45; pointer-events: none; }
-        .card-header { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; }
-        .chip {
-            padding: 6px 10px;
-            border-radius: 999px;
-            background: rgba(255,255,255,.08);
-            border: 1px solid rgba(255,255,255,.12);
-            font-size: 12px;
-            white-space: nowrap;
-        }
-        .card h3 { margin: 0 0 8px 0; }
-        .row { display:flex; gap:16px; flex-wrap:wrap; margin-top:8px; align-items:center; }
-        .row p { margin: 0; }
-        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 10px; }
-        .pill { padding: 6px 10px; border-radius: 10px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); font-size: 12px; }
-        .legend { display:flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
-        .legend-item { display: inline-flex; gap: 6px; align-items: center; font-size: 12px; opacity: .8; }
-        .legend-swatch { width: 16px; height: 16px; border-radius: 6px; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.06); }
-        .legend-swatch.busy { background: rgba(255,255,255,.12); }
-        .legend-swatch.selected { background: rgba(120,110,255,.22); border-color: rgba(120,110,255,.9); }
-        .form-grid { display:grid; gap:12px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
-        .form-grid .form-group { margin: 0; }
-        .section-title { display:flex; justify-content:space-between; align-items:center; gap:12px; }
-        .extras { display:grid; gap:10px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
-    </style>
 </head>
 <body class="app-bg">
 
@@ -70,7 +20,7 @@
     <form th:action="@{/booking/reserve}" method="post">
         <section class="cards-grid">
             <!-- SINGLE TRIP -->
-            <div th:if="${tripId != null}" style="width: 100%; display: grid; gap: 14px;">
+            <div th:if="${tripId != null}" class="stacked-grid">
                 <article class="card">
                     <div class="card-header">
                         <div>
@@ -122,7 +72,7 @@
             </div>
 
             <!-- TRANSFER (2 segments) -->
-            <div th:if="${tripId1 != null}" style="width: 100%; display: grid; gap: 14px;">
+            <div th:if="${tripId1 != null}" class="stacked-grid">
                 <div class="cards-grid">
                     <!-- CARD 1 -->
                     <article class="card">
@@ -237,7 +187,7 @@
                         <input id="loyaltyNumber" name="loyaltyNumber" type="text" placeholder="RB-000001">
                     </div>
                 </div>
-                <div class="form-group" style="margin-top: 10px;">
+                <div class="form-group mt-10">
                     <label class="muted">
                         <input type="checkbox" name="childTicket" value="true"> Детский билет (50% скидка)
                     </label>
@@ -295,7 +245,7 @@
         <input type="hidden" name="seat1" id="seat1"/>
         <input type="hidden" name="seat2" id="seat2"/>
 
-        <div class="actions" style="margin-top: 16px;">
+        <div class="actions mt-16">
             <button class="btn primary" type="submit" id="reserveBtnSingle" th:if="${tripId != null}" disabled>Забронировать</button>
             <button class="btn primary" type="submit" id="reserveBtnTransfer" th:if="${tripId1 != null}" disabled>Забронировать</button>
             <a class="btn secondary" th:href="@{/routes/search}">Назад</a>

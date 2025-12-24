@@ -77,7 +77,7 @@ public class BookingController {
             model.addAttribute("seatMap1", bookingService.seatMap(tripId1));
             model.addAttribute("seatMap2", bookingService.seatMap(tripId2));
         }
-        return "booking/select-seat";
+        return "pages/booking/select-seat";
     }
 
     /**
@@ -116,7 +116,7 @@ public class BookingController {
             throw new IllegalArgumentException("Неверные параметры для бронирования");
         }
         model.addAttribute("passenger", request);
-        return "booking/confirmation";
+        return "pages/booking/confirmation";
     }
 
     /**

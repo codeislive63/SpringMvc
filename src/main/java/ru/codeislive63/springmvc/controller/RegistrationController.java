@@ -17,7 +17,7 @@ public class RegistrationController {
 
     @GetMapping("/register")
     public String showRegisterForm() {
-        return "register";
+        return "pages/auth/register";
     }
 
     @PostMapping("/register")
@@ -28,11 +28,11 @@ public class RegistrationController {
         try {
             userService.getByEmail(email);
             model.addAttribute("error", "Пользователь с таким email уже существует");
-            return "register";
+            return "pages/auth/register";
         } catch (IllegalArgumentException ignored) { }
 
         userService.register(email, password, fullName, RoleType.CUSTOMER);
         model.addAttribute("success", "Регистрация прошла успешно, войдите с вашими данными");
-        return "login";
+        return "pages/auth/login";
     }
 }

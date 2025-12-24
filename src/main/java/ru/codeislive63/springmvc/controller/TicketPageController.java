@@ -19,7 +19,7 @@ public class TicketPageController {
     @GetMapping
     public String myTickets(@AuthenticationPrincipal UserPrincipal principal, Model model) {
         model.addAttribute("tickets", bookingService.myTickets(principal.user().getId()));
-        return "tickets/list";
+        return "pages/tickets/list";
     }
 
     @PostMapping("/{ticketId}/refund")

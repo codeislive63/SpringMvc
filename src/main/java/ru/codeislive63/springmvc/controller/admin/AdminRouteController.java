@@ -25,14 +25,14 @@ public class AdminRouteController {
     @GetMapping
     public String list(Model model) {
         model.addAttribute("routes", routeRepository.findAll());
-        return "admin/routes/list";
+        return "pages/admin/routes/list";
     }
 
     @GetMapping("/new")
     public String createForm(Model model) {
         model.addAttribute("route", new Route());
         model.addAttribute("stations", stationRepository.findAll());
-        return "admin/routes/form";
+        return "pages/admin/routes/form";
     }
 
     @GetMapping("/{id}/edit")
@@ -43,7 +43,7 @@ public class AdminRouteController {
 
         model.addAttribute("route", route);
         model.addAttribute("stations", stationRepository.findAll());
-        return "admin/routes/form";
+        return "pages/admin/routes/form";
     }
 
     @PostMapping("/create")

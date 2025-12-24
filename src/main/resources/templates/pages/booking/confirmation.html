@@ -32,7 +32,7 @@
             </div>
             <div th:if="${t.additionalServices != null}" class="notice">
                 <p><b>Услуги:</b></p>
-                <ul style="margin: 6px 0 0 14px;">
+                <ul class="list-compact">
                     <li th:if="${t.additionalServices.mealOption != null and !t.additionalServices.mealOption.isEmpty()}"
                         th:text="'Питание: ' + ${t.additionalServices.mealOption}"></li>
                     <li th:if="${t.additionalServices.insuranceIncluded}">Страхование</li>
@@ -46,7 +46,7 @@
             </form>
         </article>
 
-        <div class="actions" style="margin-top: 16px;">
+        <div class="actions mt-16">
             <a class="btn secondary" th:href="@{/booking/my}">Мои билеты</a>
             <a class="btn" th:href="@{/routes/search}">Вернуться к поиску</a>
         </div>

@@ -32,20 +32,20 @@ public class RouteSearchController {
 
         if (req.getFromPointId() == null && req.getToPointId() == null
                 && req.getDepartureDate() == null) {
-            return "routes/search";
+            return "pages/routes/search";
         }
 
         if (binding.hasErrors()) {
-            return "routes/search";
+            return "pages/routes/search";
         }
 
         if (Objects.equals(req.getFromPointId(), req.getToPointId())) {
             model.addAttribute("error", "Выберите разные станции отправления и назначения.");
-            return "routes/search";
+            return "pages/routes/search";
         }
 
         model.addAttribute("req", req);
         model.addAttribute("itineraries", routeSearchService.search(req));
-        return "routes/results";
+        return "pages/routes/results";
     }
 }

@@ -27,13 +27,13 @@ public class HomeController {
         }
 
         model.addAttribute("routes", routeRepository.findAll());
-        return "index";
+        return "pages/home/index";
     }
 
     @GetMapping("/trips/search")
     public String searchPage(Model model) {
         model.addAttribute("routes", routeRepository.findAll());
-        return "index";
+        return "pages/home/index";
     }
 
     @GetMapping("/search")
@@ -50,6 +50,6 @@ public class HomeController {
         }
 
         model.addAttribute("trips", tripService.searchTrips(routeId, date));
-        return "trips";
+        return "pages/trips/list";
     }
 }

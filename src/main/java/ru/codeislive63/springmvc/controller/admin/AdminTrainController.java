@@ -21,13 +21,13 @@ public class AdminTrainController {
     @GetMapping
     public String list(Model model) {
         model.addAttribute("trains", trainRepository.findAll());
-        return "admin/trains/list";
+        return "pages/admin/trains/list";
     }
 
     @GetMapping("/new")
     public String createForm(Model model) {
         model.addAttribute("train", new Train());
-        return "admin/trains/form";
+        return "pages/admin/trains/form";
     }
 
     @GetMapping("/{id}/edit")
@@ -37,7 +37,7 @@ public class AdminTrainController {
                 .orElseThrow(() -> new IllegalArgumentException("Поезд не найден"));
 
         model.addAttribute("train", train);
-        return "admin/trains/form";
+        return "pages/admin/trains/form";
     }
 
     @PostMapping("/create")
