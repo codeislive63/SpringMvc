@@ -19,7 +19,7 @@
 
     <section class="profile-layout">
 
-        <nav class="profile-tabs">
+        <nav class="profile-tabs pill-tabs">
             <button type="button" class="is-active" data-target="tabProfile">Профиль</button>
             <button type="button" data-target="tabPassengers">Пассажиры</button>
             <button type="button" data-target="tabBookings">Активные брони</button>
@@ -29,7 +29,7 @@
 
         <!-- ПРОФИЛЬ -->
         <div class="tab-content" id="tabProfile">
-            <article class="card">
+            <article class="card wide-card profile-card">
                 <h2>Учётная запись</h2>
                 <p class="muted">Основные данные и бонусы.</p>
 
@@ -50,122 +50,134 @@
         </div>
 
         <div class="tab-content is-hidden" id="tabPassengers">
-            <article class="card">
-                <div class="passenger-list__header">
-                    <div>
-                        <h2>Пассажиры</h2>
-                        <p class="muted">Шаблоны пассажиров сохраняются в браузере и доступны при оформлении.</p>
+            <div class="passenger-board">
+                <article class="card wide-card passenger-list-card">
+                    <div class="card-header between">
+                        <div>
+                            <h2>Пассажиры</h2>
+                            <p class="muted">Шаблоны сохраняются в браузере и доступны при оформлении билетов.</p>
+                        </div>
+                        <button class="btn primary" type="button" onclick="startCreatePassenger()">Добавить пассажира</button>
                     </div>
-                    <button class="btn primary" type="button" onclick="startCreatePassenger()">Добавить пассажира</button>
-                </div>
 
-                <div class="passengers-layout" style="margin-top: 12px;">
-                    <!-- LIST -->
-                    <div class="passenger-list">
+                    <div class="passenger-list-shell">
                         <div class="passenger-search">
                             <span style="opacity:.7">🔎</span>
                             <input id="passengerSearch" type="text" placeholder="Поиск по имени или документу" oninput="renderPassengerList()">
                         </div>
-                        <div id="passengerList"></div>
-                        <p class="muted" id="passengerEmpty" style="display:none;">Пока нет пассажиров. Нажми «Добавить пассажира».</p>
+                        <div id="passengerList" class="passenger-stack"></div>
+                        <p class="muted" id="passengerEmpty" style="display:none;">Пока нет пассажиров. Нажмите «Добавить пассажира».</p>
                     </div>
+                </article>
 
-                    <!-- EDITOR -->
-                    <div>
-                        <article class="card" style="margin:0;">
+                <article class="card wide-card passenger-editor-card">
+                    <div class="card-header between">
+                        <div>
                             <h3 id="passengerEditorTitle">Новый пассажир</h3>
-                            <p class="muted">Заполни данные и сохрани.</p>
-
-                            <div class="form-grid" style="margin-top: 10px;">
-                                <div class="form-group">
-                                    <label>Фамилия</label>
-                                    <input id="pLastName" type="text" placeholder="Иванов">
-                                </div>
-                                <div class="form-group">
-                                    <label>Имя</label>
-                                    <input id="pFirstName" type="text" placeholder="Иван">
-                                </div>
-                                <div class="form-group">
-                                    <label>Отчество</label>
-                                    <input id="pMiddleName" type="text" placeholder="Иванович">
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Пол</label>
-                                    <div class="row" style="gap:8px;">
-                                        <button class="btn ghost" type="button" id="pGenderM" onclick="setGender('M')">Мужской</button>
-                                        <button class="btn ghost" type="button" id="pGenderF" onclick="setGender('F')">Женский</button>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Дата рождения</label>
-                                    <input id="pBirthDate" type="date">
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Тип документа</label>
-                                    <div class="select-wrapper">
-                                        <select id="pDocType" class="custom-select">
-                                            <option value="PASSPORT">Паспорт</option>
-                                            <option value="FOREIGN_PASSPORT">Загранпаспорт</option>
-                                            <option value="ID">ID-карта</option>
-                                            <option value="BIRTH_CERT">Свидетельство о рождении</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Номер документа</label>
-                                    <input id="pDocNumber" type="text" placeholder="00 00 №123456">
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Льготы</label>
-                                    <div class="select-wrapper">
-                                        <select id="pBenefit" class="custom-select">
-                                            <option value="">Без льготы</option>
-                                            <option value="student">Студент</option>
-                                            <option value="pensioner">Пенсионер</option>
-                                            <option value="military">Военная</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Номер бонусной карты</label>
-                                    <input id="pLoyalty" type="text" placeholder="RB-000001">
-                                </div>
-
-                                <div class="form-group">
-                                    <label class="muted">
-                                        <input type="checkbox" id="pChildTicket">
-                                        Детский билет (50% скидка)
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="actions mt-16">
-                                <button class="btn primary" type="button" onclick="savePassenger()">Сохранить</button>
-                                <button class="btn ghost" type="button" onclick="resetPassengerForm()">Очистить</button>
-                            </div>
-                        </article>
+                            <p class="muted">Заполните данные по образцу РЖД, но в нашей стилистике.</p>
+                        </div>
+                        <span class="pill soft">Сохраняется локально</span>
                     </div>
-                </div>
-            </article>
+
+                    <div class="pill-tabs passenger-form-tabs">
+                        <button type="button" class="is-active" data-passenger-tab="profileMain" onclick="switchProfilePassengerTab('profileMain')">Основная информация</button>
+                        <button type="button" data-passenger-tab="profileDocs" onclick="switchProfilePassengerTab('profileDocs')">Документы и льготы</button>
+                    </div>
+
+                    <div class="passenger-pane" id="profileMain">
+                        <div class="form-grid" style="margin-top: 10px;">
+                            <div class="form-group">
+                                <label>Фамилия</label>
+                                <input id="pLastName" type="text" placeholder="Иванов">
+                            </div>
+                            <div class="form-group">
+                                <label>Имя</label>
+                                <input id="pFirstName" type="text" placeholder="Иван">
+                            </div>
+                            <div class="form-group">
+                                <label>Отчество</label>
+                                <input id="pMiddleName" type="text" placeholder="Иванович">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Пол</label>
+                                <div class="row pill-buttons">
+                                    <button class="btn ghost" type="button" id="pGenderM" onclick="setGender('M')">Мужской</button>
+                                    <button class="btn ghost" type="button" id="pGenderF" onclick="setGender('F')">Женский</button>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Дата рождения</label>
+                                <input id="pBirthDate" type="date">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="passenger-pane is-hidden" id="profileDocs">
+                        <div class="form-grid" style="margin-top: 10px;">
+                            <div class="form-group">
+                                <label>Тип документа</label>
+                                <div class="select-wrapper">
+                                    <select id="pDocType" class="custom-select">
+                                        <option value="PASSPORT">Паспорт</option>
+                                        <option value="FOREIGN_PASSPORT">Загранпаспорт</option>
+                                        <option value="ID">ID-карта</option>
+                                        <option value="BIRTH_CERT">Свидетельство о рождении</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Номер документа</label>
+                                <input id="pDocNumber" type="text" placeholder="00 00 №123456">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Льготы</label>
+                                <div class="select-wrapper">
+                                    <select id="pBenefit" class="custom-select">
+                                        <option value="">Без льготы</option>
+                                        <option value="student">Студент</option>
+                                        <option value="pensioner">Пенсионер</option>
+                                        <option value="military">Военная</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Номер бонусной карты</label>
+                                <input id="pLoyalty" type="text" placeholder="RB-000001">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="muted">
+                                    <input type="checkbox" id="pChildTicket">
+                                    Детский билет (50% скидка)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="actions mt-16">
+                        <button class="btn primary" type="button" onclick="savePassenger()">Сохранить</button>
+                        <button class="btn ghost" type="button" onclick="resetPassengerForm()">Очистить</button>
+                    </div>
+                </article>
+            </div>
         </div>
 
         <!-- АКТИВНЫЕ -->
         <div class="tab-content is-hidden" id="tabBookings">
-            <article class="card">
+            <article class="card wide-card ticket-collection">
                 <h2>Активные брони</h2>
 
                 <div th:if="${#lists.isEmpty(unpaidTickets)}">
                     <p>Нет активных бронирований.</p>
                 </div>
 
-                <div th:each="t : ${unpaidTickets}">
-                    <details class="ticket-collapse">
+                <div th:each="t : ${unpaidTickets}" class="ticket-list">
+                    <details class="ticket-collapse ticket-panel">
                         <summary>
                             <div class="ticket-summary">
                                 <div>
@@ -218,15 +230,15 @@
 
         <!-- ПОКУПКИ -->
         <div class="tab-content is-hidden" id="tabPurchases">
-            <article class="card">
+            <article class="card wide-card ticket-collection">
                 <h2>Покупки</h2>
 
                 <div th:if="${#lists.isEmpty(paidTickets)}">
                     <p>Нет оплаченных билетов.</p>
                 </div>
 
-                <div th:each="t : ${paidTickets}">
-                    <details class="ticket-collapse">
+                <div th:each="t : ${paidTickets}" class="ticket-list">
+                    <details class="ticket-collapse ticket-panel">
                         <summary>
                             <div class="ticket-summary">
                                 <div>
@@ -273,15 +285,15 @@
 
         <!-- ОТМЕНЁННЫЕ -->
         <div class="tab-content is-hidden" id="tabCancelled">
-            <article class="card">
+            <article class="card wide-card ticket-collection">
                 <h2>Отменённые</h2>
 
                 <div th:if="${#lists.isEmpty(cancelledTickets)}">
                     <p>Нет отменённых или возвращённых билетов.</p>
                 </div>
 
-                <div th:each="t : ${cancelledTickets}">
-                    <details class="ticket-collapse">
+                <div th:each="t : ${cancelledTickets}" class="ticket-list">
+                    <details class="ticket-collapse ticket-panel">
                         <summary>
                             <div class="ticket-summary">
                                 <div>
@@ -375,6 +387,15 @@
         return `${t} ${p.docNumber || ''}`.trim();
     }
 
+    function switchProfilePassengerTab(targetId) {
+        document.querySelectorAll('.passenger-editor-card .passenger-pane').forEach(pane => {
+            pane.classList.toggle('is-hidden', pane.id !== targetId);
+        });
+        document.querySelectorAll('.passenger-editor-card .passenger-form-tabs button').forEach(btn => {
+            btn.classList.toggle('is-active', btn.dataset.passengerTab === targetId);
+        });
+    }
+
     function renderPassengerList() {
         const listEl = document.getElementById('passengerList');
         const emptyEl = document.getElementById('passengerEmpty');
@@ -424,6 +445,7 @@
         editingPassengerId = null;
         document.getElementById('passengerEditorTitle').textContent = 'Новый пассажир';
         resetPassengerForm(false);
+        switchProfilePassengerTab('profileMain');
     }
 
     function startEditPassenger(id) {
@@ -520,6 +542,7 @@
     document.addEventListener('DOMContentLoaded', () => {
         renderPassengerList();
         startCreatePassenger();
+        switchProfilePassengerTab('profileMain');
     });
 </script>
 
