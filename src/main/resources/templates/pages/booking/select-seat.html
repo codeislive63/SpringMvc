@@ -23,7 +23,7 @@
             <div class="booking-primary">
                 <!-- SINGLE TRIP -->
                 <div th:if="${tripId != null}" class="stacked-grid">
-                    <article class="card seat-card">
+                    <article class="card seat-card wide-card">
                         <div class="card-header between">
                             <div>
                                 <p class="eyebrow">Сегмент 1</p>
@@ -79,42 +79,52 @@
 
                 <!-- TRANSFER (2 segments) -->
                 <div th:if="${tripId1 != null}" class="stacked-grid">
-                    <div class="segment-switcher">
-                        <!-- вкладки сегментов -->
-                        <button type="button"
-                                class="segment-tab is-active"
-                                data-target="segment1Panel"
-                                onclick="switchSegment('segment1Panel')">
-                            <div class="segment-tab__top">
-                                <span class="eyebrow">Сегмент 1</span>
-                                <span class="pill soft" th:text="${routeLabelA}">Маршрут 1</span>
+                    <article class="card wide-card segment-card">
+                        <div class="segment-card__head">
+                            <div>
+                                <p class="eyebrow">Стыковка</p>
+                                <h3>Сегменты поездки</h3>
+                                <p class="muted">Выберите сегмент, затем отметьте места по порядку.</p>
                             </div>
-                            <div class="segment-tab__bottom">
-                                <span class="muted">Рейс <b th:text="${tripId1}"></b></span>
-                                <span class="pill muted">Свободно <b th:text="${#lists.size(seats1)}"></b></span>
-                            </div>
-                        </button>
-                        <button type="button"
-                                class="segment-tab is-disabled"
-                                data-target="segment2Panel"
-                                id="segment2Tab"
-                                onclick="switchSegment('segment2Panel')"
-                                disabled>
-                            <div class="segment-tab__top">
-                                <span class="eyebrow">Сегмент 2</span>
-                                <span class="pill soft" th:text="${routeLabelB}">Маршрут 2</span>
-                            </div>
-                            <div class="segment-tab__bottom">
-                                <span class="muted">Рейс <b th:text="${tripId2}"></b></span>
-                                <span class="pill muted">Свободно <b th:text="${#lists.size(seats2)}"></b></span>
-                                <span class="pill danger is-inline" id="segment2Lock">Откроется после выбора места</span>
-                            </div>
-                        </button>
-                    </div>
+                            <span class="pill soft">2 сегмента</span>
+                        </div>
+                        <div class="segment-switcher segment-switcher--flat">
+                            <!-- вкладки сегментов -->
+                            <button type="button"
+                                    class="segment-tab is-active"
+                                    data-target="segment1Panel"
+                                    onclick="switchSegment('segment1Panel')">
+                                <div class="segment-tab__top">
+                                    <span class="eyebrow">Сегмент 1</span>
+                                    <span class="pill soft" th:text="${routeLabelA}">Маршрут 1</span>
+                                </div>
+                                <div class="segment-tab__bottom">
+                                    <span class="muted">Рейс <b th:text="${tripId1}"></b></span>
+                                    <span class="pill muted">Свободно <b th:text="${#lists.size(seats1)}"></b></span>
+                                </div>
+                            </button>
+                            <button type="button"
+                                    class="segment-tab is-disabled"
+                                    data-target="segment2Panel"
+                                    id="segment2Tab"
+                                    onclick="switchSegment('segment2Panel')"
+                                    disabled>
+                                <div class="segment-tab__top">
+                                    <span class="eyebrow">Сегмент 2</span>
+                                    <span class="pill soft" th:text="${routeLabelB}">Маршрут 2</span>
+                                </div>
+                                <div class="segment-tab__bottom">
+                                    <span class="muted">Рейс <b th:text="${tripId2}"></b></span>
+                                    <span class="pill muted">Свободно <b th:text="${#lists.size(seats2)}"></b></span>
+                                    <span class="pill danger is-inline" id="segment2Lock">Откроется после выбора места</span>
+                                </div>
+                            </button>
+                        </div>
+                    </article>
 
-                    <div class="segment-panels">
+                    <div class="segment-panels segment-panels--wide">
                         <!-- Панель сегмента 1 -->
-                        <article class="card seat-card" id="segment1Panel" data-panel>
+                        <article class="card seat-card wide-card" id="segment1Panel" data-panel>
                             <div class="card-header between">
                                 <div>
                                     <h3 th:text="${routeLabelA}">Маршрут 1</h3>
@@ -161,7 +171,7 @@
                         </article>
 
                         <!-- Панель сегмента 2 (изначально скрыта) -->
-                        <article class="card seat-card is-hidden" id="segment2Panel" data-panel>
+                        <article class="card seat-card wide-card is-hidden" id="segment2Panel" data-panel>
                             <div class="card-header between">
                                 <div>
                                     <h3 th:text="${routeLabelB}">Маршрут 2</h3>
@@ -211,7 +221,7 @@
 
             <div class="booking-secondary">
                 <!-- Данные пассажира -->
-                <article class="card">
+                <article class="card wide-card passenger-card">
                     <div class="section-title">
                         <div>
                             <h3>Данные пассажира</h3>
@@ -230,41 +240,53 @@
                     </div>
                     <p class="small">Сохранённые пассажиры остаются в браузере и помогут бронировать быстрее.</p>
 
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="passengerName">ФИО</label>
-                            <input id="passengerName" name="passengerName" type="text" placeholder="Иванов Иван" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="passengerDocument">Документ</label>
-                            <input id="passengerDocument" name="passengerDocument" type="text" placeholder="Паспорт 00 00 №123456" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="benefitType">Льготы</label>
-                            <div class="select-wrapper">
-                                <select id="benefitType" name="benefitType" class="custom-select">
-                                    <option value="">Без льготы</option>
-                                    <option value="student">Студент</option>
-                                    <option value="pensioner">Пенсионер</option>
-                                    <option value="military">Военная</option>
-                                </select>
+                    <div class="pill-tabs passenger-form-tabs">
+                        <button type="button" class="is-active" data-passenger-tab="psMain" onclick="switchPassengerTab('psMain')">Основная информация</button>
+                        <button type="button" data-passenger-tab="psDocs" onclick="switchPassengerTab('psDocs')">Документы и льготы</button>
+                    </div>
+
+                    <div class="passenger-pane" id="psMain">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="passengerName">ФИО</label>
+                                <input id="passengerName" name="passengerName" type="text" placeholder="Иванов Иван" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="loyaltyNumber">Номер бонусной карты</label>
+                                <input id="loyaltyNumber" name="loyaltyNumber" type="text" placeholder="RB-000001">
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label for="loyaltyNumber">Номер бонусной карты</label>
-                            <input id="loyaltyNumber" name="loyaltyNumber" type="text" placeholder="RB-000001">
-                        </div>
                     </div>
-                    <div class="form-group mt-10">
-                        <label class="muted">
-                            <input type="checkbox" name="childTicket" id="childTicket" value="true">
-                            Детский билет (50% скидка)
-                        </label>
+
+                    <div class="passenger-pane is-hidden" id="psDocs">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="passengerDocument">Документ</label>
+                                <input id="passengerDocument" name="passengerDocument" type="text" placeholder="Паспорт 00 00 №123456" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="benefitType">Льготы</label>
+                                <div class="select-wrapper">
+                                    <select id="benefitType" name="benefitType" class="custom-select">
+                                        <option value="">Без льготы</option>
+                                        <option value="student">Студент</option>
+                                        <option value="pensioner">Пенсионер</option>
+                                        <option value="military">Военная</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group mt-10">
+                            <label class="muted">
+                                <input type="checkbox" name="childTicket" id="childTicket" value="true">
+                                Детский билет (50% скидка)
+                            </label>
+                        </div>
                     </div>
                 </article>
 
                 <!-- Дополнительные услуги -->
-                <article class="card">
+                <article class="card wide-card">
                     <div class="section-title">
                         <div>
                             <h3>Дополнительные услуги</h3>
@@ -384,6 +406,15 @@
         });
         document.querySelectorAll('.segment-tab').forEach(tab => {
             tab.classList.toggle('is-active', tab.dataset.target === targetId);
+        });
+    }
+
+    function switchPassengerTab(targetId) {
+        document.querySelectorAll('.passenger-pane').forEach(pane => {
+            pane.classList.toggle('is-hidden', pane.id !== targetId);
+        });
+        document.querySelectorAll('.passenger-form-tabs button').forEach(btn => {
+            btn.classList.toggle('is-active', btn.dataset.passengerTab === targetId);
         });
     }
 
@@ -514,6 +545,7 @@
         syncActions();
         const firstTab = document.querySelector('.segment-tab.is-active');
         if (firstTab) switchSegment(firstTab.dataset.target);
+        switchPassengerTab('psMain');
     });
 </script>
 
