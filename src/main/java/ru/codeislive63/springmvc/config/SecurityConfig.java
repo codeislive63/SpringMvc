@@ -28,14 +28,12 @@ public class SecurityConfig {
                                     "/login", "/register",
                                     "/routes/search",
                                     "/routes/**",
-                                    "/trips/**",
                                     "/error",
                                     "/error/**",
                                     "/css/**", "/js/**", "/images/**"
                             ).permitAll()
                             .requestMatchers(
                                     "/booking/**",
-                                    "/dashboard",
                                     "/profile/**"
                             ).authenticated()
                             .requestMatchers("/admin/**").hasRole("ADMIN")
@@ -46,7 +44,7 @@ public class SecurityConfig {
                     .loginProcessingUrl("/login")
                     .usernameParameter("email")
                     .passwordParameter("password")
-                    .defaultSuccessUrl("/dashboard")
+                    .defaultSuccessUrl("/profile")
                     .permitAll()
             )
             .logout(logout -> logout

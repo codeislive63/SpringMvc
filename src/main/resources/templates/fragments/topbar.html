@@ -9,6 +9,9 @@
     </div>
 
     <div class="topbar-right">
+        <a class="btn ghost" th:href="@{/routes/search}">
+            Поиск маршрутов
+        </a>
 
         <span class="user-name"
               sec:authorize="isAuthenticated()"
@@ -19,6 +22,11 @@
         <a class="btn ghost" th:href="@{/admin/analytics}"
            sec:authorize="hasRole('ADMIN')">
             Аналитика
+        </a>
+
+        <a class="btn ghost" th:href="@{/tickets}"
+           sec:authorize="isAuthenticated()">
+            Мои билеты
         </a>
 
         <a class="btn ghost" th:href="@{/profile}"

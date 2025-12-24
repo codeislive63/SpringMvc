@@ -39,7 +39,7 @@ class AuthAndAccessMockMvcTest {
                         .param("email", "customer@example.com")
                         .param("password", "cust123"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/dashboard"))
+                .andExpect(redirectedUrl("/profile"))
                 .andExpect(authenticated().withUsername("customer@example.com"));
     }
 
@@ -74,6 +74,6 @@ class AuthAndAccessMockMvcTest {
     void adminAccessAdminPanel_shouldBeOk() throws Exception {
         mockMvc.perform(get("/admin/panel/stations"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("admin/stations/list"));
+                .andExpect(view().name("pages/admin/stations/list"));
     }
 }

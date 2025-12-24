@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 /**
- * Тесты сценария поиска рейсов (Тест 5 и Тест 6 из главы 3).
+ * Тесты сценария поиска маршрутов (Тест 5 и Тест 6 из главы 3).
  */
 @SpringBootTest
 @ActiveProfiles("test")
@@ -52,34 +52,36 @@ class TripSearchMockMvcTest {
     }
 
     /**
-     * Тест 5: Поиск рейсов по маршруту и дате.
+     * Тест 5: Поиск маршрутов по станциям и дате.
      */
     @Test
-    void searchTrips_found_shouldReturnTripsPageWithResults() throws Exception {
-        mockMvc.perform(get("/search")
-                        .param("routeId", route.getId().toString())
-                        .param("date", tripDate.toString()))
+    void searchRoutes_found_shouldReturnResultsPageWithItineraries() throws Exception {
+        mockMvc.perform(get("/routes/search")
+                        .param("fromPointId", route.getOrigin().getId().toString())
+                        .param("toPointId", route.getDestination().getId().toString())
+                        .param("departureDate", tripDate.toString()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("trips"))
-                .andExpect(model().attributeExists("trips"))
-                .andExpect(model().attribute("trips", Matchers.not(Matchers.empty())))
-                .andExpect(content().string(Matchers.containsString("Доступные рейсы")));
+                .andExpect(view().name("pages/routes/results"))
+                .andExpect(model().attributeExists("itineraries"))
+                .andExpect(model().attribute("itineraries", Matchers.not(Matchers.empty())))
+                .andExpect(content().string(Matchers.containsString("Результаты поиска")));
     }
 
     /**
      * Тест 6: Поиск при отсутствии подходящих рейсов.
      */
     @Test
-    void searchTrips_notFound_shouldReturnTripsPageWithEmptyListAndMessage() throws Exception {
+    void searchRoutes_notFound_shouldReturnResultsPageWithEmptyListAndMessage() throws Exception {
         LocalDate noTripsDate = tripDate.plusDays(30);
 
-        mockMvc.perform(get("/search")
-                        .param("routeId", route.getId().toString())
-                        .param("date", noTripsDate.toString()))
+        mockMvc.perform(get("/routes/search")
+                        .param("fromPointId", route.getOrigin().getId().toString())
+                        .param("toPointId", route.getDestination().getId().toString())
+                        .param("departureDate", noTripsDate.toString()))
                 .andExpect(status().isOk())
-                .andExpect(view().name("trips"))
-                .andExpect(model().attributeExists("trips"))
-                .andExpect(model().attribute("trips", Matchers.empty()))
-                .andExpect(content().string(Matchers.containsString("рейсов не найдено")));
+                .andExpect(view().name("pages/routes/results"))
+                .andExpect(model().attributeExists("itineraries"))
+                .andExpect(model().attribute("itineraries", Matchers.empty()))
+                .andExpect(content().string(Matchers.containsString("Ничего не найдено")));
     }
 }
