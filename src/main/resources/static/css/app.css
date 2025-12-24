@@ -1535,3 +1535,25 @@ input[type="time"]::-webkit-calendar-picker-indicator {
     position: sticky;
     top: 84px;
 }
+
+/* ===== JavaFX WebView fallback ===== */
+.is-javafx .extras-grid{
+    display:flex;            /* вместо grid */
+    flex-wrap:wrap;
+    gap:0;                   /* на случай если gap ломается */
+    margin:-6px;
+}
+
+.is-javafx .service-card{
+    width: calc(50% - 12px);
+    margin:6px;
+}
+
+@media (max-width: 900px){
+    .is-javafx .service-card{ width:100%; }
+}
+
+/* если где-то используются flex + gap и “плывёт” — переводим gap в margin */
+.is-javafx .row{ gap:0 !important; }
+.is-javafx .row > *{ margin-right:8px; }
+.is-javafx .row > *:last-child{ margin-right:0; }

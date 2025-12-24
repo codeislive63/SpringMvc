@@ -1,6 +1,7 @@
 package ru.codeislive63;
 
 import javafx.application.Application;
+import javafx.concurrent.Worker;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -15,6 +16,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -29,6 +31,9 @@ public class ClientApp extends Application {
 
         WebView webView = new WebView();
         WebEngine engine = getWebEngine(webView);
+
+        webView.setZoom(0.9);
+        webView.setContextMenuEnabled(false);
 
         WebHistory history = engine.getHistory();
 
@@ -98,6 +103,14 @@ public class ClientApp extends Application {
             return res.isPresent() && res.get() == ButtonType.OK;
         });
 
+        engine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
+            if (Objects.requireNonNull(newState) == Worker.State.SUCCEEDED) {
+                try {
+                    engine.executeScript("document.documentElement.classList.add('is-javafx');");
+                } catch (Exception ignored) { }
+            }
+        });
+
         return engine;
     }
 
@@ -133,6 +146,7 @@ public class ClientApp extends Application {
     }
 
     public static void main(String[] args) {
+        System.setProperty("prism.order", "sw");
         launch(args);
     }
 }

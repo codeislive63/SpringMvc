@@ -6,6 +6,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import ru.codeislive63.springmvc.domain.entity.Payment;
 import ru.codeislive63.springmvc.domain.entity.Ticket;
 import ru.codeislive63.springmvc.domain.entity.Trip;
@@ -32,10 +33,17 @@ public class BookingController {
     }
 
     @PostMapping("/pay/{ticketId}")
-    public ResponseEntity<Payment> pay(@PathVariable Long ticketId) {
-        return ResponseEntity.ok(bookingService.payTicket(ticketId));
+    public String pay(@PathVariable Long ticketId,
+                      @AuthenticationPrincipal UserPrincipal principal,
+                      RedirectAttributes ra) {
+        try {
+            bookingService.payTicket(ticketId); // лучше: payTicket(ticketId, principal.user().getId())
+            ra.addFlashAttribute("success", "Оплата прошла успешно ✅");
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/profile";
     }
-
     @PostMapping("/cancel/{ticketId}")
     public ResponseEntity<Ticket> cancel(@PathVariable Long ticketId,
                                          @AuthenticationPrincipal UserPrincipal principal) {
@@ -55,7 +63,7 @@ public class BookingController {
                         @RequestParam(required = false) Long tripId1,
                         @RequestParam(required = false) Long tripId2,
                         Model model) {
-        // If single trip selected, prepare available seats and route info
+
         if (tripId != null) {
             Trip trip = tripService.getTrip(tripId);
             model.addAttribute("tripId", tripId);
@@ -64,7 +72,7 @@ public class BookingController {
             model.addAttribute("seats", bookingService.availableSeats(tripId));
             model.addAttribute("seatMap", bookingService.seatMap(tripId));
         }
-        // If two trips selected (transfer), prepare seats for both legs and route info
+
         if (tripId1 != null && tripId2 != null) {
             Trip tripA = tripService.getTrip(tripId1);
             Trip tripB = tripService.getTrip(tripId2);
@@ -82,11 +90,6 @@ public class BookingController {
         return "pages/booking/select-seat";
     }
 
-    /**
-     * Handles reservation requests when the user has chosen specific seats.
-     * If a single trip is selected, expects parameters {@code tripId} and {@code seat}.
-     * If a transfer route is selected, expects {@code tripId1}, {@code tripId2}, {@code seat1} and {@code seat2}.
-     */
     @PostMapping("/reserve")
     public String reserve(@ModelAttribute BookingRequest request,
                           @AuthenticationPrincipal UserPrincipal principal,
@@ -121,12 +124,6 @@ public class BookingController {
         return "pages/booking/confirmation";
     }
 
-    /**
-     * Формирует краткое название маршрута (откуда — куда) для отображения.
-     *
-     * @param trip объект поездки
-     * @return строка вида «Минск — Орша»
-     */
     private String routeLabel(Trip trip) {
         if (trip == null || trip.getRoute() == null) {
             return "Маршрут";

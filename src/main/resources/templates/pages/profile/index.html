@@ -2,16 +2,17 @@
 <html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Личный кабинет • Railway Booker</title>
+    <title>Личный кабинет</title>
     <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
 
 <body class="app-bg">
 <header th:replace="~{fragments/topbar :: topbar}"></header>
 
-<main class="page">
+<div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+<div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
 
-    <!-- ТОЛЬКО заголовок, без “здравствуйте/email” -->
+<main class="page">
     <section class="welcome">
         <h1>Личный кабинет</h1>
         <p class="muted">Управляйте профилем, пассажирами и билетами.</p>
@@ -51,36 +52,54 @@
 
         <div class="tab-content is-hidden" id="tabPassengers">
             <div class="passenger-board">
+
                 <article class="card wide-card passenger-list-card">
                     <div class="card-header between">
                         <div>
                             <h2>Пассажиры</h2>
-                            <p class="muted">Шаблоны сохраняются в браузере и доступны при оформлении билетов.</p>
+                            <p class="muted">Шаблоны сохраняются и доступны при оформлении билетов</p>
                         </div>
+                        <button class="btn primary" type="button" onclick="startCreatePassenger()">Добавить пассажира</button>
                     </div>
 
                     <div class="passenger-list-shell">
                         <div class="passenger-search">
                             <span style="opacity:.7">🔎</span>
-                            <input id="passengerSearch" type="text" placeholder="Поиск по имени или документу" oninput="renderPassengerList()">
+                            <input id="passengerSearch"
+                                   type="text"
+                                   placeholder="Поиск по имени или документу"
+                                   oninput="renderPassengerList()">
                         </div>
+
                         <div id="passengerList" class="passenger-stack"></div>
-                        <p class="muted" id="passengerEmpty" style="display:none;">Пока нет пассажиров. Нажмите «Добавить пассажира».</p>
+
+                        <p class="muted" id="passengerEmpty" style="display:none;">
+                            Пока нет пассажиров. Нажмите «Добавить пассажира».
+                        </p>
                     </div>
                 </article>
 
                 <article class="card wide-card passenger-editor-card">
+
                     <div class="card-header between">
                         <div>
-                            <h3 id="passengerEditorTitle">Новый пассажир</h3>
-                            <p class="muted">Заполните данные по образцу РЖД, но в нашей стилистике.</p>
+                            <h2 id="passengerEditorTitle">Новый пассажир</h2>
+                            <p class="muted">Заполните данные и сохраните шаблон.</p>
                         </div>
-                        <span class="pill soft">Сохраняется локально</span>
                     </div>
 
                     <div class="pill-tabs passenger-form-tabs">
-                        <button type="button" class="is-active" data-passenger-tab="profileMain" onclick="switchProfilePassengerTab('profileMain')">Основная информация</button>
-                        <button type="button" data-passenger-tab="profileDocs" onclick="switchProfilePassengerTab('profileDocs')">Документы и льготы</button>
+                        <button type="button"
+                                class="is-active"
+                                data-passenger-tab="profileMain"
+                                onclick="switchProfilePassengerTab('profileMain')">
+                            Основная информация
+                        </button>
+                        <button type="button"
+                                data-passenger-tab="profileDocs"
+                                onclick="switchProfilePassengerTab('profileDocs')">
+                            Документы и льготы
+                        </button>
                     </div>
 
                     <div class="passenger-pane" id="profileMain">
@@ -139,7 +158,7 @@
                                         <option value="">Без льготы</option>
                                         <option value="student">Студент</option>
                                         <option value="pensioner">Пенсионер</option>
-                                        <option value="military">Военная</option>
+                                        <option value="military">Ветеран</option>
                                     </select>
                                 </div>
                             </div>
@@ -180,18 +199,21 @@
                         <summary>
                             <div class="ticket-summary">
                                 <div class="ticket-main">
-                                    <div class="ticket-route" th:text="${t.trip.route.origin.name + ' — ' + t.trip.route.destination.name}">
+                                    <div class="ticket-route"
+                                         th:text="${t.trip.route.origin.name + ' — ' + t.trip.route.destination.name}">
                                         Маршрут
                                     </div>
 
                                     <div class="ticket-meta">
                                         <div class="meta-item">
                                             <div class="label">Дата</div>
-                                            <div class="value" th:text="${#temporals.format(t.trip.departureTime,'dd.MM.yyyy')}">24.12.2025</div>
+                                            <div class="value"
+                                                 th:text="${#temporals.format(t.trip.departureTime,'dd.MM.yyyy')}">24.12.2025</div>
                                         </div>
                                         <div class="meta-item">
                                             <div class="label">Время</div>
-                                            <div class="value" th:text="${#temporals.format(t.trip.departureTime,'HH:mm')}">17:15</div>
+                                            <div class="value"
+                                                 th:text="${#temporals.format(t.trip.departureTime,'HH:mm')}">17:15</div>
                                         </div>
                                         <div class="meta-item">
                                             <div class="label">Место</div>
@@ -199,7 +221,8 @@
                                         </div>
                                         <div class="meta-item">
                                             <div class="label">Стоимость</div>
-                                            <div class="value" th:text="${#numbers.formatDecimal(t.price,1,'COMMA',2,'POINT')} + ' BYN'">12.00 BYN</div>
+                                            <div class="value"
+                                                 th:text="${#numbers.formatDecimal(t.price,1,'COMMA',2,'POINT')} + ' BYN'">12.00 BYN</div>
                                         </div>
                                     </div>
                                 </div>
@@ -241,18 +264,21 @@
                         <summary>
                             <div class="ticket-summary">
                                 <div class="ticket-main">
-                                    <div class="ticket-route" th:text="${t.trip.route.origin.name + ' — ' + t.trip.route.destination.name}">
+                                    <div class="ticket-route"
+                                         th:text="${t.trip.route.origin.name + ' — ' + t.trip.route.destination.name}">
                                         Маршрут
                                     </div>
 
                                     <div class="ticket-meta">
                                         <div class="meta-item">
                                             <div class="label">Дата</div>
-                                            <div class="value" th:text="${#temporals.format(t.trip.departureTime,'dd.MM.yyyy')}">24.12.2025</div>
+                                            <div class="value"
+                                                 th:text="${#temporals.format(t.trip.departureTime,'dd.MM.yyyy')}">24.12.2025</div>
                                         </div>
                                         <div class="meta-item">
                                             <div class="label">Время</div>
-                                            <div class="value" th:text="${#temporals.format(t.trip.departureTime,'HH:mm')}">17:15</div>
+                                            <div class="value"
+                                                 th:text="${#temporals.format(t.trip.departureTime,'HH:mm')}">17:15</div>
                                         </div>
                                         <div class="meta-item">
                                             <div class="label">Место</div>
@@ -260,7 +286,8 @@
                                         </div>
                                         <div class="meta-item">
                                             <div class="label">Стоимость</div>
-                                            <div class="value" th:text="${#numbers.formatDecimal(t.price,1,'COMMA',2,'POINT')} + ' BYN'">12.00 BYN</div>
+                                            <div class="value"
+                                                 th:text="${#numbers.formatDecimal(t.price,1,'COMMA',2,'POINT')} + ' BYN'">12.00 BYN</div>
                                         </div>
                                     </div>
                                 </div>
@@ -296,18 +323,21 @@
                         <summary>
                             <div class="ticket-summary">
                                 <div class="ticket-main">
-                                    <div class="ticket-route" th:text="${t.trip.route.origin.name + ' — ' + t.trip.route.destination.name}">
+                                    <div class="ticket-route"
+                                         th:text="${t.trip.route.origin.name + ' — ' + t.trip.route.destination.name}">
                                         Маршрут
                                     </div>
 
                                     <div class="ticket-meta">
                                         <div class="meta-item">
                                             <div class="label">Дата</div>
-                                            <div class="value" th:text="${#temporals.format(t.trip.departureTime,'dd.MM.yyyy')}">24.12.2025</div>
+                                            <div class="value"
+                                                 th:text="${#temporals.format(t.trip.departureTime,'dd.MM.yyyy')}">24.12.2025</div>
                                         </div>
                                         <div class="meta-item">
                                             <div class="label">Время</div>
-                                            <div class="value" th:text="${#temporals.format(t.trip.departureTime,'HH:mm')}">17:15</div>
+                                            <div class="value"
+                                                 th:text="${#temporals.format(t.trip.departureTime,'HH:mm')}">17:15</div>
                                         </div>
                                         <div class="meta-item">
                                             <div class="label">Место</div>
@@ -315,7 +345,8 @@
                                         </div>
                                         <div class="meta-item">
                                             <div class="label">Стоимость</div>
-                                            <div class="value" th:text="${#numbers.formatDecimal(t.price,1,'COMMA',2,'POINT')} + ' BYN'">12.00 BYN</div>
+                                            <div class="value"
+                                                 th:text="${#numbers.formatDecimal(t.price,1,'COMMA',2,'POINT')} + ' BYN'">12.00 BYN</div>
                                         </div>
                                     </div>
                                 </div>
@@ -336,13 +367,14 @@
 </main>
 
 <script>
-    // Вкладки
+    // Вкладки профиля
     document.querySelectorAll('.profile-tabs button').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.tab-content').forEach(div => div.classList.add('is-hidden'));
             document.querySelectorAll('.profile-tabs button').forEach(b => b.classList.remove('is-active'));
             const targetId = btn.dataset.target;
-            document.getElementById(targetId).classList.remove('is-hidden');
+            const target = document.getElementById(targetId);
+            if (target) target.classList.remove('is-hidden');
             btn.classList.add('is-active');
         });
     });
@@ -350,6 +382,11 @@
     const PASSENGER_STORAGE_KEY = 'rb-passenger-templates';
     let editingPassengerId = null;
     let currentGender = '';
+
+    function setEditorTitle(text) {
+        const el = document.getElementById('passengerEditorTitle');
+        if (el) el.textContent = text;
+    }
 
     function loadPassengers() {
         try {
@@ -413,36 +450,44 @@
         listEl.innerHTML = '';
 
         if (filtered.length === 0) {
-            if (emptyEl) emptyEl.style.display = passengers.length ? 'block' : 'block';
+            if (emptyEl) emptyEl.style.display = 'block';
             return;
         }
         if (emptyEl) emptyEl.style.display = 'none';
 
         filtered.forEach(p => {
-            const btn = document.createElement('div');
-            btn.className = 'passenger-item';
-            btn.onclick = () => startEditPassenger(p.id);
+            const item = document.createElement('div');
+            item.className = 'passenger-item';
+            item.onclick = () => startEditPassenger(p.id);
 
-            btn.innerHTML = `
-        <div class="passenger-avatar">${initialsOf(p)}</div>
-        <div class="passenger-main">
-          <div class="passenger-name">${fullNameOf(p) || 'Пассажир'}</div>
-          <div class="passenger-meta">
-            ${p.birthDate ? `д.р. ${p.birthDate}` : ''}${p.birthDate ? ' • ' : ''}${docLabel(p)}
-          </div>
-        </div>
-        <div class="row" style="gap:8px;">
-          <button class="icon-btn" type="button" title="Редактировать" onclick="event.stopPropagation(); startEditPassenger('${p.id}')">✎</button>
-          <button class="icon-btn danger" type="button" title="Удалить" onclick="event.stopPropagation(); deletePassenger('${p.id}')">🗑</button>
-        </div>
-      `;
-            listEl.appendChild(btn);
+            item.innerHTML = `
+                <div class="passenger-avatar">${initialsOf(p)}</div>
+                <div class="passenger-main">
+                    <div class="passenger-name">${fullNameOf(p) || 'Пассажир'}</div>
+                    <div class="passenger-meta">
+                        ${p.birthDate ? `д.р. ${p.birthDate}` : ''}${p.birthDate ? ' • ' : ''}${docLabel(p)}
+                    </div>
+                </div>
+                <div class="row" style="gap:8px;">
+                    <button class="icon-btn"
+                            type="button"
+                            aria-label="Редактировать"
+                            title="Редактировать"
+                            onclick="event.stopPropagation(); startEditPassenger('${p.id}')">✎</button>
+                    <button class="icon-btn danger"
+                            type="button"
+                            aria-label="Удалить"
+                            title="Удалить"
+                            onclick="event.stopPropagation(); deletePassenger('${p.id}')">🗑</button>
+                </div>
+            `;
+            listEl.appendChild(item);
         });
     }
 
     function startCreatePassenger() {
         editingPassengerId = null;
-        document.getElementById('passengerEditorTitle').textContent = 'Новый пассажир';
+        setEditorTitle('Новый пассажир');
         resetPassengerForm(false);
         switchProfilePassengerTab('profileMain');
     }
@@ -453,7 +498,7 @@
         if (!p) return;
 
         editingPassengerId = id;
-        document.getElementById('passengerEditorTitle').textContent = 'Редактирование пассажира';
+        setEditorTitle('Редактирование пассажира');
 
         document.getElementById('pLastName').value = p.lastName || '';
         document.getElementById('pFirstName').value = p.firstName || '';
@@ -480,7 +525,7 @@
         f.classList.toggle('ghost', g !== 'F');
     }
 
-    function resetPassengerForm(clearList = true) {
+    function resetPassengerForm(refreshList = true) {
         document.getElementById('pLastName').value = '';
         document.getElementById('pFirstName').value = '';
         document.getElementById('pMiddleName').value = '';
@@ -491,7 +536,7 @@
         document.getElementById('pLoyalty').value = '';
         document.getElementById('pChildTicket').checked = false;
         setGender('');
-        if (clearList) renderPassengerList();
+        if (refreshList) renderPassengerList();
     }
 
     function savePassenger() {
