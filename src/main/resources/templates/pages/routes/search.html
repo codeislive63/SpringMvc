@@ -73,10 +73,10 @@
                         <div class="select-wrapper">
                             <select id="carClass" class="custom-select" name="carClass">
                                 <option value="">Любой</option>
-                                <option th:each="c : ${carClasses}"
+                                <option th:each="c : ${trainClasses}"
                                         th:value="${c}"
                                         th:text="${c.label}"
-                                        th:selected="${req.carClass != null and req.carClass == c}"></option>
+                                        th:selected="${req.trainClass != null and req.trainClass == c}"></option>
                             </select>
                         </div>
                     </div>

@@ -7,7 +7,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.codeislive63.springmvc.domain.TrainClass;
-import ru.codeislive63.springmvc.domain.TrainClass;
 import ru.codeislive63.springmvc.domain.TrainType;
 import ru.codeislive63.springmvc.repository.StationRepository;
 import ru.codeislive63.springmvc.service.RouteSearchService;
@@ -31,7 +30,7 @@ public class RouteSearchController {
                          Model model) {
         model.addAttribute("stations", stationRepository.findAll());
         model.addAttribute("trainTypes", TrainType.values());
-        model.addAttribute("carClasses", TrainClass.values());
+        model.addAttribute("trainClasses", TrainClass.values());
 
         if (req.getFromPointId() == null && req.getToPointId() == null
                 && req.getDepartureDate() == null) {

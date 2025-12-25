@@ -32,8 +32,8 @@
                       th:text="'Дата: ' + ${#temporals.format(req.departureDate, 'dd.MM.yyyy')}"></span>
                 <span class="chip" th:if="${req != null and req.trainType != null}"
                       th:text="'Тип: ' + ${req.trainType.label}"></span>
-                <span class="chip" th:if="${req != null and req.carClass != null}"
-                      th:text="'Класс: ' + ${req.carClass.label}"></span>
+                <span class="chip" th:if="${req != null and req.trainClass != null}"
+                      th:text="'Класс: ' + ${req.trainClass.label}"></span>
                 <span class="chip" th:if="${req != null and req.departureFrom != null}"
                       th:text="'Отправление с: ' + ${#temporals.format(req.departureFrom, 'HH:mm')}"></span>
                 <span class="chip" th:if="${req != null and req.arrivalTo != null}"
@@ -94,7 +94,7 @@
                         <span th:text="'Цена: ' + ${leg.price}"></span>
                         <span th:text="'Свободно мест: ' + ${leg.seatsAvailable}"></span>
                         <span th:if="${leg.trainType != null}" th:text="${leg.trainType.label}"></span>
-                        <span th:if="${leg.carClass != null}" th:text="${leg.carClass.label}"></span>
+                        <span th:if="${leg.trainClass != null}" th:text="${leg.trainClass.label}"></span>
                         <span th:if="${leg.wifiAvailable}" class="pill">Wi‑Fi</span>
                         <span th:if="${leg.diningAvailable}" class="pill">Питание</span>
                         <span th:if="${leg.powerOutlets}" class="pill">Розетки</span>

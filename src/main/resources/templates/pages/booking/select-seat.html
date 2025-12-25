@@ -83,7 +83,7 @@
                                 </div>
                                 <div class="info-grid" th:if="${trip != null}">
                                     <span class="pill" th:text="${trip.train.type.label}"></span>
-                                    <span class="pill" th:text="${trip.train.carClass.label}"></span>
+                                    <span class="pill" th:text="${trip.train.trainClass.label}"></span>
                                     <span class="pill" th:if="${trip.train.wifiAvailable}">Wi-Fi</span>
                                     <span class="pill" th:if="${trip.train.diningAvailable}">Питание</span>
                                     <span class="pill" th:if="${trip.train.powerOutlets}">Розетки</span>
@@ -177,7 +177,7 @@
                                     </div>
                                     <div class="info-grid" th:if="${tripA != null}">
                                         <span class="pill" th:text="${tripA.train.type.label}"></span>
-                                        <span class="pill" th:text="${tripA.train.carClass.label}"></span>
+                                        <span class="pill" th:text="${tripA.train.trainClass.label}"></span>
                                         <span class="pill" th:if="${tripA.train.wifiAvailable}">Wi-Fi</span>
                                         <span class="pill" th:if="${tripA.train.diningAvailable}">Питание</span>
                                         <span class="pill" th:if="${tripA.train.powerOutlets}">Розетки</span>
@@ -223,7 +223,7 @@
                                     </div>
                                     <div class="info-grid" th:if="${tripB != null}">
                                         <span class="pill" th:text="${tripB.train.type.label}"></span>
-                                        <span class="pill" th:text="${tripB.train.carClass.label}"></span>
+                                        <span class="pill" th:text="${tripB.train.trainClass.label}"></span>
                                         <span class="pill" th:if="${tripB.train.wifiAvailable}">Wi-Fi</span>
                                         <span class="pill" th:if="${tripB.train.diningAvailable}">Питание</span>
                                         <span class="pill" th:if="${tripB.train.powerOutlets}">Розетки</span>

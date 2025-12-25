@@ -24,7 +24,6 @@ public class RouteSearchRequest {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate departureDate;
 
-    // Поля для автокомплита (чтобы вернуть введённый текст на форму)
     private String fromPointName;
     private String toPointName;
 
