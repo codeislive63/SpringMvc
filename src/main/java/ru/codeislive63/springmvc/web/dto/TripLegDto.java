@@ -2,7 +2,7 @@ package ru.codeislive63.springmvc.web.dto;
 
 import lombok.Builder;
 import lombok.Value;
-import ru.codeislive63.springmvc.domain.CarClass;
+import ru.codeislive63.springmvc.domain.TrainClass;
 import ru.codeislive63.springmvc.domain.TrainType;
 
 import java.math.BigDecimal;
@@ -22,7 +22,7 @@ public class TripLegDto {
     BigDecimal price;
     String trainName;
     TrainType trainType;
-    CarClass carClass;
+    TrainClass trainClass;
     boolean wifiAvailable;
     boolean diningAvailable;
     boolean powerOutlets;

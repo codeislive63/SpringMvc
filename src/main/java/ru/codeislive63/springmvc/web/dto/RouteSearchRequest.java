@@ -3,7 +3,8 @@ package ru.codeislive63.springmvc.web.dto;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
-import ru.codeislive63.springmvc.domain.CarClass;
+import ru.codeislive63.springmvc.domain.TrainClass;
+import ru.codeislive63.springmvc.domain.TrainClass;
 import ru.codeislive63.springmvc.domain.TrainType;
 
 import java.math.BigDecimal;
@@ -28,7 +29,7 @@ public class RouteSearchRequest {
     private String toPointName;
 
     private TrainType trainType;
-    private CarClass carClass;
+    private TrainClass trainClass;
 
     @DateTimeFormat(pattern = "HH:mm")
     private LocalTime departureFrom;

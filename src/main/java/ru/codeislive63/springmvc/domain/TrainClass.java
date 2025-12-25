@@ -3,14 +3,14 @@ package ru.codeislive63.springmvc.domain;
 /**
  * Класс обслуживания вагона.
  */
-public enum CarClass {
+public enum TrainClass {
     ECONOMY("Эконом"),
     COMFORT("Комфорт"),
     BUSINESS("Бизнес");
 
     private final String label;
 
-    CarClass(String label) {
+    TrainClass(String label) {
         this.label = label;
     }
 

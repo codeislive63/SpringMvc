@@ -3,8 +3,9 @@ package ru.codeislive63.springmvc.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import ru.codeislive63.springmvc.domain.CarClass;
+import ru.codeislive63.springmvc.domain.TrainClass;
 import ru.codeislive63.springmvc.domain.RoleType;
+import ru.codeislive63.springmvc.domain.TrainClass;
 import ru.codeislive63.springmvc.domain.TrainType;
 import ru.codeislive63.springmvc.domain.entity.Route;
 import ru.codeislive63.springmvc.domain.entity.Station;
@@ -39,9 +40,9 @@ public class DataInitializer implements CommandLineRunner {
         Station smolensk = adminService.createStation("SML", "Смоленск");
 
         Train t1 = adminService.createTrain("TRAIN-1", "Скорый 001", 30,
-                TrainType.HIGH_SPEED, CarClass.COMFORT, true, true, true);
+                TrainType.HIGH_SPEED, TrainClass.COMFORT, true, true, true);
         Train t2 = adminService.createTrain("TRAIN-2", "Региональный 045", 30,
-                TrainType.REGIONAL, CarClass.ECONOMY, true, false, true);
+                TrainType.REGIONAL, TrainClass.ECONOMY, true, false, true);
 
         Route route1 = adminService.createRoute(minsk.getId(), gomel.getId(), 320, "Минск — Гомель",
                 java.util.List.of("Осиповичи", "Жлобин"));

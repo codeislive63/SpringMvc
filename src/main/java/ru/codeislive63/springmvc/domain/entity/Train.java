@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.codeislive63.springmvc.domain.CarClass;
+import ru.codeislive63.springmvc.domain.TrainClass;
 import ru.codeislive63.springmvc.domain.TrainType;
 
 @Getter
@@ -30,7 +30,7 @@ public class Train {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private CarClass carClass = CarClass.ECONOMY;
+    private TrainClass trainClass = TrainClass.ECONOMY;
 
     @Column(nullable = false)
     private boolean wifiAvailable = false;

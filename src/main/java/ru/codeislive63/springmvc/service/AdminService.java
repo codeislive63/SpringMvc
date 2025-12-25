@@ -3,7 +3,8 @@ package ru.codeislive63.springmvc.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.codeislive63.springmvc.domain.CarClass;
+import ru.codeislive63.springmvc.domain.TrainClass;
+import ru.codeislive63.springmvc.domain.TrainClass;
 import ru.codeislive63.springmvc.domain.TrainType;
 import ru.codeislive63.springmvc.domain.entity.Route;
 import ru.codeislive63.springmvc.domain.entity.Station;
@@ -36,14 +37,14 @@ public class AdminService {
     }
 
     public Train createTrain(String code, String name, int capacity) {
-        return createTrain(code, name, capacity, TrainType.EXPRESS, CarClass.ECONOMY, true, true, true);
+        return createTrain(code, name, capacity, TrainType.EXPRESS, TrainClass.ECONOMY, true, true, true);
     }
 
     public Train createTrain(String code,
                              String name,
                              int capacity,
                              TrainType type,
-                             CarClass carClass,
+                             TrainClass trainClass,
                              boolean wifi,
                              boolean dining,
                              boolean outlets) {
@@ -52,7 +53,7 @@ public class AdminService {
             train.setCode(code);
             train.setName(name);
             train.setType(type);
-            train.setCarClass(carClass);
+            train.setTrainClass(trainClass);
             train.setWifiAvailable(wifi);
             train.setDiningAvailable(dining);
             train.setPowerOutlets(outlets);
